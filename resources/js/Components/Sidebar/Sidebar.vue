@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { sidebarState } from '@/Composables'
 import SidebarHeader from '@/Components/Sidebar/SidebarHeader.vue'
+import SidebarProfile from '@/Components/Sidebar/SidebarProfile.vue'
 import SidebarContent from '@/Components/Sidebar/SidebarContent.vue'
 import SidebarFooter from '@/Components/Sidebar/SidebarFooter.vue'
 
@@ -39,7 +40,7 @@ onMounted(() => {
             transition-duration: 150ms;
         "
         :class="[
-            'fixed inset-y-0 z-20 py-4 flex flex-col space-y-6 bg-white shadow-lg dark:bg-dark-eval-1',
+            'fixed inset-y-0 z-20 py-4 flex flex-col space-y-6 bg-white shadow-lg dark:bg-gray-800 border-r dark:border-gray-700',
             {
                 'translate-x-0 w-64':
                     sidebarState.isOpen || sidebarState.isHovered,
@@ -51,6 +52,8 @@ onMounted(() => {
         @mouseleave="sidebarState.handleHover(false)"
     >
         <SidebarHeader />
+
+        <SidebarProfile v-if="sidebarState.isOpen" />
 
         <SidebarContent />
 

@@ -26,23 +26,6 @@ import { TemplateIcon } from '@heroicons/vue/outline'
             </template>
         </SidebarLink>
 
-        <SidebarCollapsible
-            title="Components"
-            :active="route().current('components.*')"
-        >
-            <template #icon>
-                <TemplateIcon
-                    class="flex-shrink-0 w-6 h-6"
-                    aria-hidden="true"
-                />
-            </template>
-
-            <SidebarCollapsibleItem
-                :href="route('components.buttons')"
-                title="Buttons"
-                :active="route().current('components.buttons')"
-            />
-        </SidebarCollapsible>
 
         <!-- Examples -->
         <!--

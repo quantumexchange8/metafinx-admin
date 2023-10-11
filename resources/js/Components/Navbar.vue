@@ -3,12 +3,10 @@ import { onMounted, onUnmounted } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import { useFullscreen } from '@vueuse/core'
 import {
-    SunIcon,
-    MoonIcon,
-    SearchIcon,
     MenuIcon,
     XIcon,
-    ArrowsExpandIcon,
+    BellIcon,
+    ChevronDownIcon,
 } from '@heroicons/vue/outline'
 import {
     handleScroll,
@@ -21,7 +19,14 @@ import Button from '@/Components/Button.vue'
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import Dropdown from '@/Components/Dropdown.vue'
 import DropdownLink from '@/Components/DropdownLink.vue'
-import { ArrowsInnerIcon } from '@/Components/Icons/outline'
+import {
+    ArrowsInnerIcon, DashboardIcon,
+    DashboardIconInactive,
+    EarnIcon,
+    InactiveEarnIcon, InactiveWalletIcon,
+    WalletIcon,
+    AffiliateIcon, InactiveAffiliateIcon
+} from '@/Components/Icons/outline'
 
 const { isFullscreen, toggle: toggleFullScreen } = useFullscreen()
 
@@ -38,7 +43,7 @@ onUnmounted(() => {
     <nav
         aria-label="secondary"
         :class="[
-            'sticky top-0 z-10 px-6 py-4 bg-white flex items-center justify-between transition-transform duration-500 dark:bg-dark-eval-1',
+            'md:hidden sticky top-0 z-10 p-4 md:py-8 md:px-4 bg-white flex items-center justify-between transition-transform duration-500 dark:bg-gray-800',
             {
                 '-translate-y-full': scrolling.down,
                 'translate-y-0': scrolling.up,
@@ -50,155 +55,95 @@ onUnmounted(() => {
                 iconOnly
                 variant="secondary"
                 type="button"
-                @click="() => { toggleDarkMode() }"
+                @click="sidebarState.isOpen = !sidebarState.isOpen"
                 v-slot="{ iconSizeClasses }"
                 class="md:hidden"
-                srText="Toggle dark mode"
+                srText="Search"
             >
-                <MoonIcon
-                    v-show="!isDark"
+                <MenuIcon
+                    v-show="!sidebarState.isOpen"
                     aria-hidden="true"
                     :class="iconSizeClasses"
                 />
-                <SunIcon
-                    v-show="isDark"
+                <XIcon
+                    v-show="sidebarState.isOpen"
                     aria-hidden="true"
                     :class="iconSizeClasses"
                 />
             </Button>
         </div>
-        <div class="flex items-center gap-2">
-            <Button
-                iconOnly
-                variant="secondary"
-                type="button"
-                @click="() => { toggleDarkMode() }"
-                v-slot="{ iconSizeClasses }"
-                class="hidden md:inline-flex"
-                srText="Toggle dark mode"
-            >
-                <MoonIcon
-                    v-show="!isDark"
-                    aria-hidden="true"
-                    :class="iconSizeClasses"
-                />
-                <SunIcon
-                    v-show="isDark"
-                    aria-hidden="true"
-                    :class="iconSizeClasses"
-                />
-            </Button>
-
-            <Button
-                iconOnly
-                variant="secondary"
-                type="button"
-                @click="toggleFullScreen"
-                v-slot="{ iconSizeClasses }"
-                class="hidden md:inline-flex"
-                srText="Toggle dark mode"
-            >
-                <ArrowsExpandIcon
-                    v-show="!isFullscreen"
-                    aria-hidden="true"
-                    :class="iconSizeClasses"
-                />
-                <ArrowsInnerIcon
-                    v-show="isFullscreen"
-                    aria-hidden="true"
-                    :class="iconSizeClasses"
-                />
-            </Button>
-
-            <!-- Dropdwon -->
-            <Dropdown align="right" width="48">
-                <template #trigger>
-                    <span class="inline-flex rounded-md">
-                        <button
-                            type="button"
-                            class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out bg-white border border-transparent rounded-md hover:text-gray-700 focus:outline-none focus:ring focus:ring-purple-500 focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-dark-eval-1 dark:bg-dark-eval-1 dark:text-gray-400 dark:hover:text-gray-200"
-                        >
-                            {{ $page.props.auth.user.name }}
-
-                            <svg
-                                class="ml-2 -mr-0.5 h-4 w-4"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                    clip-rule="evenodd"
-                                />
-                            </svg>
-                        </button>
-                    </span>
-                </template>
-
-                <template #content>
-                    <DropdownLink
-                        :href="route('profile.edit')"
-                    >
-                        Profile
-                    </DropdownLink>
-
-                    <DropdownLink
-                        :href="route('logout')"
-                        method="post"
-                        as="button"
-                    >
-                        Log Out
-                    </DropdownLink>
-                </template>
-            </Dropdown>
-        </div>
+        <!--        <div class="flex items-center gap-2">-->
+        <!--            <div class="flex flex-row">-->
+        <!--                <div>-->
+        <!--                    <Dropdown align="right">-->
+        <!--                        <template #trigger>-->
+        <!--                            <Button-->
+        <!--                                iconOnly-->
+        <!--                                variant="transparent"-->
+        <!--                                type="button"-->
+        <!--                                class="border-0 bg-transparent md:inline-flex p-0"-->
+        <!--                                srText="Toggle dark mode"-->
+        <!--                            >-->
+        <!--                                <span class="dark:text-white">EN</span>-->
+        <!--                                <ChevronDownIcon-->
+        <!--                                    aria-hidden="true"-->
+        <!--                                    class="w-4 h-4 ml-2 dark:text-white"-->
+        <!--                                />-->
+        <!--                            </Button>-->
+        <!--                        </template>-->
+        <!--                        <template #content>-->
+        <!--                            <DropdownLink>-->
+        <!--                                <div class="inline-flex items-center gap-2">-->
+        <!--                                    English-->
+        <!--                                </div>-->
+        <!--                            </DropdownLink>-->
+        <!--                            <DropdownLink>-->
+        <!--                                <div class="inline-flex items-center gap-2">-->
+        <!--                                    中文 (繁)-->
+        <!--                                </div>-->
+        <!--                            </DropdownLink>-->
+        <!--                        </template>-->
+        <!--                    </Dropdown>-->
+        <!--                </div>-->
+        <!--                <div>-->
+        <!--                    <Button-->
+        <!--                        iconOnly-->
+        <!--                        variant="secondary"-->
+        <!--                        type="button"-->
+        <!--                        class="border-0 bg-transparent md:inline-flex p-0"-->
+        <!--                        srText="Toggle dark mode"-->
+        <!--                    >-->
+        <!--                        <BellIcon-->
+        <!--                            aria-hidden="true"-->
+        <!--                            class="w-6 h-6 dark:text-white"-->
+        <!--                        />-->
+        <!--                    </Button>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
     </nav>
 
     <!-- Mobile bottom bar -->
     <div
         :class="[
-            'fixed inset-x-0 bottom-0 flex items-center justify-between px-4 py-4 sm:px-6 transition-transform duration-500 bg-white md:hidden dark:bg-dark-eval-1',
+            'fixed inset-x-0 z-50 bottom-0 flex items-center justify-between px-4 py-4 sm:px-6 transition-transform duration-500 bg-white md:hidden dark:bg-gray-900',
             {
                 'translate-y-full': scrolling.down,
                 'translate-y-0': scrolling.up,
             },
         ]"
     >
-        <Button
-            iconOnly
-            variant="secondary"
-            type="button"
-            v-slot="{ iconSizeClasses }"
-            srText="Search"
-        >
-            <SearchIcon aria-hidden="true" :class="iconSizeClasses" />
-        </Button>
-
-        <Link :href="route('dashboard')">
-            <ApplicationLogo class="w-10 h-10" />
-            <span class="sr-only">K UI</span>
-        </Link>
-
-        <Button
-            iconOnly
-            variant="secondary"
-            type="button"
-            @click="sidebarState.isOpen = !sidebarState.isOpen"
-            v-slot="{ iconSizeClasses }"
-            class="md:hidden"
-            srText="Search"
-        >
-            <MenuIcon
-                v-show="!sidebarState.isOpen"
-                aria-hidden="true"
-                :class="iconSizeClasses"
-            />
-            <XIcon
-                v-show="sidebarState.isOpen"
-                aria-hidden="true"
-                :class="iconSizeClasses"
-            />
-        </Button>
+        <div>
+            <Link :href="route('dashboard')">
+                <div class="fixed bottom-4 dark:bg-gray-900 border-2 border-gray-800 rounded-full w-16 h-16 -translate-y-6">
+                    <img src="/assets/icon.png" class="w-10 h-10 mx-auto mt-2" alt="logo" />
+                </div>
+                <div class="flex justify-center items-center mt-7 w-16">
+                    <p :class="route().current('dashboard') ? 'text-pink-500' : 'text-white' " class="text-xs">
+                        Dashboard
+                    </p>
+                </div>
+            </Link>
+        </div>
     </div>
 </template>

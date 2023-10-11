@@ -7,7 +7,7 @@ const props = defineProps({
         type: String,
         default: 'primary',
         validator(value) {
-            return ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'black'].includes(value)
+            return ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'gray', 'transparent'].includes(value)
         },
     },
     type: {
@@ -57,34 +57,36 @@ const { type, variant, size, squared, pill, href, iconOnly, srText, external } =
 const { disabled } = toRefs(props)
 
 const baseClasses = [
-    'inline-flex items-center transition-colors font-medium select-none disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-eval-2',
+    'inline-flex items-center transition-colors font-medium select-none disabled:bg-gray-100 disabled:text-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-600 disabled:cursor-not-allowed focus:outline-none',
 ]
 
 const variantClasses = (variant) => ({
-    'bg-purple-500 text-white hover:bg-purple-600 focus:ring-purple-500': variant == 'primary',
-    'bg-white text-gray-500 hover:bg-gray-100 focus:ring-purple-500 dark:text-gray-400 dark:bg-dark-eval-1 dark:hover:bg-dark-eval-2 dark:hover:text-gray-200':
+    'bg-pink-500 text-white hover:bg-pink-600': variant == 'primary',
+    'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-[#1B2530]':
         variant == 'secondary',
-    'bg-green-500 text-white hover:bg-green-600 focus:ring-green-500': variant == 'success',
-    'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500': variant == 'danger',
-    'bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500': variant == 'warning',
-    'bg-cyan-500 text-white hover:bg-cyan-600 focus:ring-cyan-500': variant == 'info',
-    'bg-black text-gray-300 hover:text-white hover:bg-gray-800 focus:ring-black dark:hover:bg-dark-eval-3':
-        variant == 'black',
+    'bg-success-600 hover:bg-success-700 text-white': variant == 'success',
+    'bg-error-600 text-white hover:bg-error-700': variant == 'danger',
+    'bg-warning-400 text-white hover:bg-warning-500': variant == 'warning',
+    'bg-gray-600 border border-gray-500 text-white': variant == 'info',
+    'bg-gray-400 hover:bg-gray-500 text-white dark:bg-gray-500 dark:hover:bg-gray-600':
+        variant == 'gray',
+    'text-gray-400 bg-transparent dark:hover:text-white':
+        variant == 'transparent',
 })
 
 const classes = computed(() => [
     ...baseClasses,
     iconOnly
         ? {
-                'p-1.5': size == 'sm',
-                'p-2': size == 'base',
-                'p-3': size == 'lg',
-            }
+            'p-1.5': size == 'sm',
+            'p-2': size == 'base',
+            'p-3': size == 'lg',
+        }
         : {
-                'px-2.5 py-1.5 text-sm': size == 'sm',
-                'px-4 py-2 text-base': size == 'base',
-                'px-5 py-2 text-xl': size == 'lg',
-            },
+            'px-2.5 py-1.5 text-sm': size == 'sm',
+            'px-4 py-2 text-base': size == 'base',
+            'px-5 py-2 text-xl': size == 'lg',
+        },
     variantClasses(variant),
     {
         'rounded-md': !squared && !pill,

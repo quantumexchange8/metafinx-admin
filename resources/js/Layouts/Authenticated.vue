@@ -14,7 +14,7 @@ defineProps({
     <Head :title="title"></Head>
 
     <div
-        class="min-h-screen text-gray-900 bg-gray-100 dark:bg-dark-eval-0 dark:text-gray-100"
+        class="min-h-screen text-gray-900 bg-gray-100 dark:bg-gray-800 dark:text-white"
     >
         <!-- Sidebar -->
         <Sidebar />
@@ -32,19 +32,33 @@ defineProps({
             <!-- Navbar -->
             <Navbar />
 
-            <!-- Page Heading -->
-            <header v-if="$slots.header">
-                <div class="p-4 sm:p-6">
-                    <slot name="header" />
-                </div>
-            </header>
+            <main class="flex-1 px-4 sm:px-6 md:pt-0" :class="{ 'md:mr-80': $slots.asideRight, 'lg:mr-96': $slots.asideRight}">
+                <!-- Page Heading -->
+                <header v-if="$slots.header">
+                    <div class="pb-4 sm:py-6 px-0">
+                        <slot name="header" />
+                    </div>
+                </header>
 
-            <!-- Page Content -->
-            <main class="flex-1 px-4 sm:px-6">
+                <!-- Page Content -->
+<!--                <Alert-->
+<!--                    :show="showAlert"-->
+<!--                    :on-dismiss="() => showAlert = false"-->
+<!--                    :title="alertTitle"-->
+<!--                    :intent="intent"-->
+<!--                >-->
+<!--                    {{ alertMessage }}-->
+<!--                </Alert>-->
+<!--                <ToastList />-->
                 <slot />
+
             </main>
 
-            <PageFooter />
+            <!-- <PageFooter class="hidden md:block"/> -->
         </div>
+
+        <aside v-if="$slots.asideRight" class="hidden md:block">
+            <slot name="asideRight" />
+        </aside>
     </div>
 </template>
