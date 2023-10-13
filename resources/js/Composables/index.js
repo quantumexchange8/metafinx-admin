@@ -57,7 +57,7 @@ export const handleScroll = () => {
 
 export function transactionFormat() {
 
-    function formatDateTime(date) {
+    function formatDateTime(date, includeTime = true) {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const formattedDate = new Date(date);
 
@@ -68,7 +68,11 @@ export function transactionFormat() {
         const minutes = formattedDate.getMinutes().toString().padStart(2, '0');
         const seconds = formattedDate.getSeconds().toString().padStart(2, '0');
 
-        return `${day} ${month} ${year} ${hours}:${minutes}:${seconds}`;
+        if (includeTime) {
+            return `${day} ${month} ${year} ${hours}:${minutes}:${seconds}`;
+        } else {
+            return `${day} ${month} ${year}`;
+        }
     }
 
 

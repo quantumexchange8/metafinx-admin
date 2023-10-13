@@ -125,7 +125,10 @@ export const EmptyCircleIcon = defineComponent({
 export const UserIcon = defineComponent({
     setup() {
         return () => (
-            <svg class="text-gray-400"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round">  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />  <circle cx="12" cy="7" r="4" /></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.0012 10.7368C14.9661 10.7368 17.3696 8.33329 17.3696 5.36841C17.3696 2.40352 14.9661 0 12.0012 0C9.03633 0 6.63281 2.40352 6.63281 5.36841C6.63281 8.33329 9.03633 10.7368 12.0012 10.7368Z" fill="#D2D6DB"/>
+                <path d="M11.9991 12C6.76692 12 2.52539 16.2416 2.52539 21.4737C2.52539 22.8689 3.65648 24 5.05172 24H18.9465C20.3417 24 21.4728 22.8689 21.4728 21.4737C21.4727 16.2416 17.2312 12 11.9991 12Z" fill="#FF2D55"/>
+            </svg>
         )
     },
 })

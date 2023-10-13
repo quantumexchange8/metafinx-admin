@@ -1,17 +1,16 @@
 <script setup>
 import PerfectScrollbar from '@/Components/PerfectScrollbar.vue'
 import SidebarLink from '@/Components/Sidebar/SidebarLink.vue'
-import { DashboardIcon } from '@/Components/Icons/outline'
+import { DashboardIcon, UserIcon, LogoutIcon } from '@/Components/Icons/outline'
 import SidebarCollapsible from '@/Components/Sidebar/SidebarCollapsible.vue'
 import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.vue'
-import { TemplateIcon } from '@heroicons/vue/outline'
 </script>
 
 <template>
     <PerfectScrollbar
         tagname="nav"
         aria-label="main"
-        class="relative flex flex-col flex-1 max-h-full gap-4 px-3"
+        class="relative flex flex-col flex-1 max-h-full gap-2 px-3"
     >
         <SidebarLink
             title="Dashboard"
@@ -20,6 +19,34 @@ import { TemplateIcon } from '@heroicons/vue/outline'
         >
             <template #icon>
                 <DashboardIcon
+                    class="flex-shrink-0 w-6 h-6"
+                    aria-hidden="true"
+                />
+            </template>
+        </SidebarLink>
+
+        <SidebarLink
+            title="Member Listing"
+            :href="route('member.member_listing')"
+            :active="route().current('member.*')"
+        >
+            <template #icon>
+                <UserIcon
+                    class="flex-shrink-0 w-6 h-6"
+                    aria-hidden="true"
+                />
+            </template>
+        </SidebarLink>
+
+        <SidebarLink
+            title="Log Out"
+            :href="route('logout')"
+            method="post"
+            as="button"
+            class="mt-6"
+        >
+            <template #icon>
+                <LogoutIcon
                     class="flex-shrink-0 w-6 h-6"
                     aria-hidden="true"
                 />
