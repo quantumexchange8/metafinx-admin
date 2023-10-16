@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\IpoSchemeController;
 use App\Http\Controllers\MemberController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,18 @@ Route::middleware('auth')->group(function () {
     Route::prefix('member')->group(function () {
         Route::get('/listing', [MemberController::class, 'listing'])->name('member.member_listing');
         Route::get('/getMemberDetails/{id}', [MemberController::class, 'getMemberDetails'])->name('member.getMemberDetails');
+    });
+
+    /**
+     * ==============================
+     *       IPO Scheme Setting
+     * ==============================
+     */
+    Route::prefix('ipo_scheme')->group(function () {
+        Route::get('/setting', [IpoSchemeController::class, 'setting'])->name('ipo_scheme.setting');
+        Route::get('/getSubscriptionDetails', [IpoSchemeController::class, 'getSubscriptionDetails'])->name('ipo_scheme_setting.getSubscriptionDetails');
+        Route::get('/getSelectedPlans', [IpoSchemeController::class, 'getSelectedPlans'])->name('ipo_scheme_setting.getSelectedPlans');
+        Route::post('/updateStatus', [IpoSchemeController::class, 'updateStatus'])->name('ipo_scheme_setting.updateStatus');
     });
 });
 
