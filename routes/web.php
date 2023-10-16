@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('member')->group(function () {
         Route::get('/listing', [MemberController::class, 'listing'])->name('member.member_listing');
         Route::get('/getMemberDetails/{id}', [MemberController::class, 'getMemberDetails'])->name('member.getMemberDetails');
+        
+        // Route::delete('/delete_member', [MemberController::class, 'delete_member'])->name('member.delete_member');
     });
 
     /**

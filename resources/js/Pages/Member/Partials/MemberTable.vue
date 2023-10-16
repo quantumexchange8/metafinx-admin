@@ -5,6 +5,7 @@ import {TailwindPagination} from "laravel-vue-pagination";
 import {ref, watch} from "vue";
 import debounce from "lodash/debounce.js";
 import {transactionFormat} from "@/Composables/index.js";
+import Action from "@/Pages/Member/Partials/Action.vue";
 
 const props = defineProps({
     search: String,
@@ -105,6 +106,9 @@ const paginationActiveClass = [
                 <th scope="col" class="px-3 py-2.5 text-center">
                     Status
                 </th>
+                <th scope="col" class="px-3 py-2.5 text-center">
+                    Action  
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -132,6 +136,14 @@ const paginationActiveClass = [
                 <td class="px-3 py-2.5 text-center">
                     <span v-if="member.kyc_approval === 'approved'" class="flex w-2 h-2 bg-green-500 dark:bg-success-500 mx-auto rounded-full"></span>
                     <span v-else-if="member.kyc_approval === 'pending'" class="flex w-2 h-2 bg-red-500 dark:bg-warning-500 mx-auto rounded-full"></span>
+                </td>
+                <td class="px-3 py-2.5 text-center">
+                    <Action
+                        :member="member"
+                        :countries="props.countries"
+                        :accountTypes="props.accountTypes"
+                        :getMemberSel="props.getMemberSel"
+                    />
                 </td>
             </tr>
             </tbody>

@@ -7,7 +7,7 @@ const props = defineProps({
         type: String,
         default: 'primary',
         validator(value) {
-            return ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'gray', 'transparent'].includes(value)
+            return ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'gray', 'transparent', 'action'].includes(value)
         },
     },
     type: {
@@ -72,6 +72,8 @@ const variantClasses = (variant) => ({
         variant == 'gray',
     'text-gray-400 bg-transparent dark:hover:text-white':
         variant == 'transparent',
+    'bg-gray-400 hover:bg-gray-500 text-white dark:bg-gray-600 dark:hover:bg-gray-500':
+        variant == 'action',
 })
 
 const classes = computed(() => [
@@ -88,10 +90,10 @@ const classes = computed(() => [
             'px-5 py-2 text-xl': size == 'lg',
         },
     variantClasses(variant),
-    {
-        'rounded-md': !squared && !pill,
-        'rounded-full': pill,
-    },
+    // {
+    //     'rounded-md': !squared && !pill,
+    //     'rounded-full': pill,
+    // },
     {
         'pointer-events-none opacity-50': href && disabled.value,
     },
