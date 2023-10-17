@@ -98,6 +98,12 @@ function refreshTable() {
             />
             <TransactionHistory
                 v-if="activeComponent === 'history'"
+                :refresh="refresh"
+                :isLoading="isLoading"
+                :search="search"
+                :date="date"
+                @update:loading="isLoading = $event"
+                @update:refresh="refresh = $event"
             />
         </div>
     </AuthenticatedLayout>

@@ -109,4 +109,40 @@ class TransactionController extends Controller
 
         return redirect()->back()->with('title', 'Rejected successfully')->with('success', 'The transaction request has been rejected successfully.');
     }
+
+    public function getTransactionHistory(Request $request, $type)
+    {
+        $query = Payment::query()->with(['user', 'wallet'])
+            ->where('type', $type)
+            ->whereNotIn('status', ['Processing', 'Pending']);
+
+        if ($request->filled('search')) {
+            $search = '%' . $request->input('search') . '%';
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('wallet', function ($wallet_query) use ($search) {
+                    $wallet_query->where('name', 'like', $search);
+                })
+                    ->orWhere('transaction_id', 'like', $search)
+                    ->orWhere('amount', 'like', $search);
+            });
+        }
+
+        if ($request->filled('date')) {
+            $date = $request->input('date');
+            $dateRange = explode(' - ', $date);
+            $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+            $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+
+            $query->whereBetween('created_at', [$start_date, $end_date]);
+        }
+
+        $results = $query->latest()->paginate(10);
+
+        $results->each(function ($user_deposit) {
+            $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
+        });
+
+
+        return response()->json([$type => $results]);
+    }
 }
