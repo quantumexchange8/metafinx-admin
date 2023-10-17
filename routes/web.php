@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IpoSchemeController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\TransactionController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -39,7 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('member')->group(function () {
         Route::get('/listing', [MemberController::class, 'listing'])->name('member.member_listing');
         Route::get('/getMemberDetails/{id}', [MemberController::class, 'getMemberDetails'])->name('member.getMemberDetails');
-        
+
         // Route::delete('/delete_member', [MemberController::class, 'delete_member'])->name('member.delete_member');
     });
 
@@ -53,6 +54,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/getSubscriptionDetails', [IpoSchemeController::class, 'getSubscriptionDetails'])->name('ipo_scheme_setting.getSubscriptionDetails');
         Route::get('/getSelectedPlans', [IpoSchemeController::class, 'getSelectedPlans'])->name('ipo_scheme_setting.getSelectedPlans');
         Route::post('/updateStatus', [IpoSchemeController::class, 'updateStatus'])->name('ipo_scheme_setting.updateStatus');
+    });
+
+    /**
+     * ==============================
+     *          Transaction
+     * ==============================
+     */
+    Route::prefix('transaction')->group(function () {
+        Route::get('/listing', [TransactionController::class, 'index'])->name('transaction.listing');
+        Route::get('/getPendingTransaction/{type}', [TransactionController::class, 'getPendingTransaction'])->name('transaction.getPendingTransaction');
+        Route::post('/approveTransaction', [TransactionController::class, 'approveTransaction'])->name('transaction.approveTransaction');
+        Route::post('/rejectTransaction', [TransactionController::class, 'rejectTransaction'])->name('transaction.rejectTransaction');
     });
 });
 

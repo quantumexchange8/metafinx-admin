@@ -2,12 +2,38 @@
 import { Head } from '@inertiajs/vue3'
 import Sidebar from '@/Components/Sidebar/Sidebar.vue'
 import Navbar from '@/Components/Navbar.vue'
-import PageFooter from '@/Components/PageFooter.vue'
 import { sidebarState } from '@/Composables'
+import Alert from "@/Components/Alert.vue";
+import {onUnmounted, ref} from "vue";
+import {Inertia} from "@inertiajs/inertia";
+import {usePage} from "@inertiajs/vue3";
+import ToastList from "@/Components/ToastList.vue";
 
+const page = usePage();
 defineProps({
     title: String
 })
+
+const showAlert = ref(false);
+const intent = ref(null);
+const alertTitle = ref('');
+const alertMessage = ref(null);
+
+let removeFinishEventListener = Inertia.on("finish", () => {
+    if (page.props.success) {
+        showAlert.value = true
+        intent.value = 'success'
+        alertTitle.value = page.props.title
+        alertMessage.value = page.props.success
+    } else if (page.props.warning) {
+        showAlert.value = true
+        intent.value = 'warning'
+        alertTitle.value = page.props.title
+        alertMessage.value = page.props.warning
+    }
+});
+
+onUnmounted(() => removeFinishEventListener());
 </script>
 
 <template>
@@ -40,16 +66,16 @@ defineProps({
                     </div>
                 </header>
 
-                <!-- Page Content -->
-<!--                <Alert-->
-<!--                    :show="showAlert"-->
-<!--                    :on-dismiss="() => showAlert = false"-->
-<!--                    :title="alertTitle"-->
-<!--                    :intent="intent"-->
-<!--                >-->
-<!--                    {{ alertMessage }}-->
-<!--                </Alert>-->
-<!--                <ToastList />-->
+                 Page Content
+                <Alert
+                    :show="showAlert"
+                    :on-dismiss="() => showAlert = false"
+                    :title="alertTitle"
+                    :intent="intent"
+                >
+                    {{ alertMessage }}
+                </Alert>
+                <ToastList />
                 <slot />
 
             </main>

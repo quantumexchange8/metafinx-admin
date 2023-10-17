@@ -1,7 +1,7 @@
 <script setup>
 import PerfectScrollbar from '@/Components/PerfectScrollbar.vue'
 import SidebarLink from '@/Components/Sidebar/SidebarLink.vue'
-import {DashboardIcon, UserIcon, IPOIcon, LogoutIcon} from '@/Components/Icons/outline'
+import {DashboardIcon, UserIcon, IPOIcon, TransactionIcon, LogoutIcon} from '@/Components/Icons/outline'
 import SidebarCollapsible from '@/Components/Sidebar/SidebarCollapsible.vue'
 import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.vue'
 </script>
@@ -45,6 +45,19 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
         >
             <template #icon>
                 <IPOIcon
+                    class="flex-shrink-0 w-6 h-6"
+                    aria-hidden="true"
+                />
+            </template>
+        </SidebarLink>
+
+        <SidebarLink
+            title="Transaction"
+            :href="route('transaction.listing')"
+            :active="route().current('transaction.*')"
+        >
+            <template #icon>
+                <TransactionIcon
                     class="flex-shrink-0 w-6 h-6"
                     aria-hidden="true"
                 />

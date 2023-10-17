@@ -57,22 +57,22 @@ const { type, variant, size, squared, pill, href, iconOnly, srText, external } =
 const { disabled } = toRefs(props)
 
 const baseClasses = [
-    'inline-flex items-center transition-colors font-medium select-none disabled:bg-gray-100 disabled:text-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-600 disabled:cursor-not-allowed focus:outline-none',
+    'inline-flex items-center transition-colors font-medium select-none disabled:cursor-not-allowed focus:outline-none',
 ]
 
 const variantClasses = (variant) => ({
-    'bg-pink-500 text-white hover:bg-pink-600': variant === 'primary',
-    'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-[#1B2530]':
+    'bg-pink-500 text-white hover:bg-pink-600 disabled:bg-gray-100 disabled:text-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-600': variant === 'primary',
+    'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-[#1B2530] disabled:bg-gray-100 disabled:text-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-600':
         variant === 'secondary',
-    'bg-success-600 hover:bg-success-700 text-white': variant === 'success',
-    'bg-error-600 text-white hover:bg-error-700': variant === 'danger',
-    'bg-warning-400 text-white hover:bg-warning-500': variant === 'warning',
-    'bg-gray-600 border border-gray-500 text-white': variant === 'info',
-    'bg-gray-400 hover:bg-gray-500 text-white dark:bg-gray-500 dark:hover:bg-gray-600':
+    'bg-success-600 hover:bg-success-700 text-white dark:disabled:bg-success-900 dark:disabled:text-success-700': variant === 'success',
+    'bg-error-600 text-white hover:bg-error-700 dark:disabled:bg-error-900 dark:disabled:text-error-700': variant === 'danger',
+    'bg-warning-400 text-white hover:bg-warning-500 disabled:bg-gray-100 disabled:text-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-600': variant === 'warning',
+    'bg-gray-600 border border-gray-500 text-white disabled:bg-gray-100 disabled:text-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-600': variant === 'info',
+    'bg-gray-400 hover:bg-gray-500 text-white dark:bg-gray-500 dark:hover:bg-gray-600 disabled:bg-gray-100 disabled:text-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-600':
         variant === 'gray',
-    'text-gray-400 bg-transparent dark:hover:text-white':
+    'text-gray-400 bg-transparent dark:hover:text-white disabled:bg-gray-100 disabled:text-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-600':
         variant === 'transparent',
-    'bg-gray-400 hover:bg-gray-500 text-white dark:bg-gray-600 dark:hover:bg-gray-800':
+    'bg-gray-400 hover:bg-gray-500 text-white dark:bg-gray-600 dark:hover:bg-gray-800 disabled:bg-gray-100 disabled:text-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-600':
         variant === 'action',
 })
 
