@@ -6,6 +6,7 @@ import {CheckIcon, XIcon} from "@heroicons/vue/outline";
 import Button from "@/Components/Button.vue";
 import Modal from "@/Components/Modal.vue";
 import {transactionFormat} from "@/Composables/index.js";
+import {useForm} from "@inertiajs/vue3";
 
 const props = defineProps({
     transaction: Object
@@ -29,6 +30,30 @@ const openTransactionModal = (ibId, componentType) => {
 const closeModal = () => {
     transactionModal.value = false
     modalComponent.value = null;
+}
+
+const form = useForm({
+    id: props.transaction.id,
+    type: 'single',
+});
+
+const submitForm = () => {
+    let submitRoute;
+    if (modalComponent.value === 'Approve Transaction') {
+        submitRoute = route('transaction.approveTransaction');
+    } else if (modalComponent.value === 'Reject Transaction') {
+        submitRoute = route('transaction.rejectTransaction');
+    }
+
+    if (submitRoute) {
+        form.post(submitRoute, {
+            onSuccess: () => {
+                closeModal();
+            },
+        });
+    } else {
+        console.error('Invalid modal component:', modalComponent);
+    }
 }
 
 </script>
@@ -80,14 +105,14 @@ const closeModal = () => {
                 <alertTriangle />
                 <h2 class="text-xl font-semibold dark:text-white pt-5">Approve Transaction</h2>
                 <div class="text-sm font-normal dark:text-gray-400">
-                    Do you want to approve a total amount of $XX,XXX.XX?
+                    Do you want to approve a total amount of ${{ formatAmount(transaction.amount )}}?
                 </div>
             </div>
             <div class="pt-5 px-2 grid grid-cols-2 gap-4">
                 <Button type="button" variant="secondary" class="px-6 justify-center" @click="closeModal">
                     Cancel
                 </Button>
-                <Button class="px-6 justify-center">Confirm</Button>
+                <Button class="px-6 justify-center" @click.prevent="submitForm">Confirm</Button>
             </div>
         </div>
 
@@ -97,14 +122,14 @@ const closeModal = () => {
                 <alertTriangle />
                 <h2 class="text-xl font-semibold dark:text-white pt-5">Reject Transaction</h2>
                 <div class="text-sm font-normal dark:text-gray-400">
-                    Do you want to reject a total amount of $XX,XXX.XX?
+                    Do you want to reject a total amount of ${{ formatAmount(transaction.amount )}}?
                 </div>
             </div>
             <div class="pt-5 px-2 grid grid-cols-2 gap-4">
                 <Button type="button" variant="secondary" class="px-6 justify-center" @click="closeModal">
                     Cancel
                 </Button>
-                <Button class="px-6 justify-center">Confirm</Button>
+                <Button class="px-6 justify-center" @click.prevent="submitForm">Confirm</Button>
             </div>
         </div>
 

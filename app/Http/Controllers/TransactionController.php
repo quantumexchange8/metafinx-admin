@@ -71,7 +71,7 @@ class TransactionController extends Controller
             ]);
         }
 
-        return redirect()->back();
+        return redirect()->back()->with('title', 'Approved successfully')->with('success', 'The transaction request has been approved successfully.');
     }
 
     public function rejectTransaction(Request $request)
@@ -100,8 +100,13 @@ class TransactionController extends Controller
             $payment->update([
                 'status' => 'Rejected'
             ]);
+
+            $wallet = Wallet::find($payment->wallet_id);
+
+            $wallet->balance += $payment->amount;
+            $wallet->save();
         }
 
-        return redirect()->back();
+        return redirect()->back()->with('title', 'Rejected successfully')->with('success', 'The transaction request has been rejected successfully.');
     }
 }

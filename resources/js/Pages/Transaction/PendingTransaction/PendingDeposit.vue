@@ -17,10 +17,10 @@ import Alert from "@/Components/Alert.vue";
 import {Inertia} from "@inertiajs/inertia";
 
 const props = defineProps({
-    search: String,
-    date: String,
     refresh: Boolean,
     isLoading: Boolean,
+    search: String,
+    date: String,
 })
 const formatter = ref({
     date: 'YYYY-MM-DD',

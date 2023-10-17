@@ -66,7 +66,7 @@ onUnmounted(() => removeFinishEventListener());
                     </div>
                 </header>
 
-                 Page Content
+                <!-- Page Content -->
                 <Alert
                     :show="showAlert"
                     :on-dismiss="() => showAlert = false"

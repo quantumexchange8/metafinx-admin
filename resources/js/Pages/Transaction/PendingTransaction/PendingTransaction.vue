@@ -4,6 +4,14 @@ import {ref} from "vue";
 import PendingDeposit from "@/Pages/Transaction/PendingTransaction/PendingDeposit.vue";
 import PendingWithdrawal from "@/Pages/Transaction/PendingTransaction/PendingWithdrawal.vue";
 
+const props = defineProps({
+    refresh: Boolean,
+    isLoading: Boolean,
+    search: String,
+    date: String,
+})
+
+const emit = defineEmits(['update:loading', 'update:refresh']);
 const type = ref('Deposit');
 const updateTransactionType = (transaction_type) => {
     type.value = transaction_type
@@ -50,10 +58,24 @@ const updateTransactionType = (transaction_type) => {
         </TabList>
         <TabPanels>
             <TabPanel>
-                <PendingDeposit />
+                <PendingDeposit
+                    :refresh="refresh"
+                    :isLoading="isLoading"
+                    :search="search"
+                    :date="date"
+                    @update:loading="$emit('update:loading', $event)"
+                    @update:refresh="$emit('update:refresh', $event)"
+                />
             </TabPanel>
             <TabPanel>
-                <PendingWithdrawal />
+                <PendingWithdrawal
+                    :refresh="refresh"
+                    :isLoading="isLoading"
+                    :search="search"
+                    :date="date"
+                    @update:loading="$emit('update:loading', $event)"
+                    @update:refresh="$emit('update:refresh', $event)"
+                />
             </TabPanel>
         </TabPanels>
     </TabGroup>
