@@ -164,7 +164,7 @@ const submitForm = () => {
                 <span class="col-span-2 text-black dark:text-white py-2">$ {{ transaction.amount }}</span>
             </div>
             <div class="grid grid-cols-3 items-center">
-                <span class="text-sm font-semibold dark:text-gray-400">Investment Status</span>
+                <span class="text-sm font-semibold dark:text-gray-400">Transaction Status</span>
                 <span class="col-span-2 text-black dark:text-white py-2">{{ formatType(transaction.status) }}</span>
             </div>
         </div>

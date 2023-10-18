@@ -9,9 +9,10 @@ const props = defineProps({
     isLoading: Boolean,
     search: String,
     date: String,
+    exportStatus: Boolean,
 })
 
-const emit = defineEmits(['update:loading', 'update:refresh']);
+const emit = defineEmits(['update:loading', 'update:refresh', 'update:export']);
 const type = ref('Deposit');
 const updateTransactionType = (transaction_type) => {
     type.value = transaction_type
@@ -63,8 +64,10 @@ const updateTransactionType = (transaction_type) => {
                     :isLoading="isLoading"
                     :search="search"
                     :date="date"
+                    :exportStatus="exportStatus"
                     @update:loading="$emit('update:loading', $event)"
                     @update:refresh="$emit('update:refresh', $event)"
+                    @update:export="$emit('update:export', $event)"
                 />
             </TabPanel>
             <TabPanel>
@@ -73,8 +76,10 @@ const updateTransactionType = (transaction_type) => {
                     :isLoading="isLoading"
                     :search="search"
                     :date="date"
+                    :exportStatus="exportStatus"
                     @update:loading="$emit('update:loading', $event)"
                     @update:refresh="$emit('update:refresh', $event)"
+                    @update:export="$emit('update:export', $event)"
                 />
             </TabPanel>
         </TabPanels>

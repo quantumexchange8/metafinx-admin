@@ -4,17 +4,19 @@ import {ref} from "vue";
 import DepositHistoryTable from "@/Pages/Transaction/TransactionHistory/DepositHistoryTable.vue";
 import WithdrawalHistoryTable from "@/Pages/Transaction/TransactionHistory/WithdrawalHistoryTable.vue";
 import PendingWithdrawal from "@/Pages/Transaction/PendingTransaction/PendingWithdrawal.vue";
+import PendingDeposit from "@/Pages/Transaction/PendingTransaction/PendingDeposit.vue";
 
 const props = defineProps({
     refresh: Boolean,
     isLoading: Boolean,
     search: String,
     date: String,
+    exportStatus: Boolean,
 })
 
 const type = ref('Deposit');
 
-const emit = defineEmits(['update:loading', 'update:refresh']);
+const emit = defineEmits(['update:loading', 'update:refresh', 'update:export']);
 
 const updateTransactionType = (transaction_type) => {
     type.value = transaction_type
@@ -70,8 +72,10 @@ const updateTransactionType = (transaction_type) => {
                     :isLoading="isLoading"
                     :search="search"
                     :date="date"
+                    :exportStatus="exportStatus"
                     @update:loading="$emit('update:loading', $event)"
                     @update:refresh="$emit('update:refresh', $event)"
+                    @update:export="$emit('update:export', $event)"
                 />
             </TabPanel>
             <TabPanel>
@@ -80,8 +84,10 @@ const updateTransactionType = (transaction_type) => {
                     :isLoading="isLoading"
                     :search="search"
                     :date="date"
+                    :exportStatus="exportStatus"
                     @update:loading="$emit('update:loading', $event)"
                     @update:refresh="$emit('update:refresh', $event)"
+                    @update:export="$emit('update:export', $event)"
                 />
             </TabPanel>
         </TabPanels>

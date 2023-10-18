@@ -21,6 +21,7 @@ const props = defineProps({
     isLoading: Boolean,
     search: String,
     date: String,
+    exportStatus: Boolean,
 })
 const formatter = ref({
     date: 'YYYY-MM-DD',
@@ -30,7 +31,7 @@ const deposits = ref({data: []});
 const currentPage = ref(1);
 const refreshDeposit = ref(props.refresh);
 const depositLoading = ref(props.isLoading);
-const emit = defineEmits(['update:loading', 'update:refresh']);
+const emit = defineEmits(['update:loading', 'update:refresh', 'update:export']);
 const { formatDateTime, formatAmount } = transactionFormat();
 const totalAmount = ref(0);
 const isChecked = ref([]);
@@ -140,6 +141,24 @@ watch(() => props.refresh, (newVal) => {
         // Call the getResults function when refresh is true
         getResults();
         emit('update:refresh', false);
+    }
+});
+
+watch(() => props.exportStatus, (newVal) => {
+    refreshDeposit.value = newVal;
+    if (newVal) {
+        let url = `/transaction/getPendingTransaction/Deposit?exportStatus=yes`;
+
+        if (props.date) {
+            url += `&date=${props.date}`;
+        }
+
+        if (props.search) {
+            url += `&search=${props.search}`;
+        }
+
+        window.location.href = url;
+        emit('update:export', false);
     }
 });
 

@@ -4,15 +4,18 @@ import {ref} from "vue";
 import PendingTransaction from "@/Pages/Transaction/PendingTransaction/PendingTransaction.vue";
 import TransactionHistory from "@/Pages/Transaction/TransactionHistory/TransactionHistory.vue";
 import {SearchIcon, RefreshIcon} from "@heroicons/vue/outline";
+import {CloudDownloadIcon} from "@/Components/Icons/outline.jsx";
 import InputIconWrapper from "@/Components/InputIconWrapper.vue";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
 import Input from "@/Components/Input.vue";
+import Button from "@/Components/Button.vue";
 
 const activeComponent = ref("pending"); // 'pending' is initially active
 const refresh = ref(false);
 const isLoading = ref(false);
 const search = ref('');
 const date = ref('');
+const exportStatus = ref(false);
 const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
@@ -25,19 +28,44 @@ function refreshTable() {
     isLoading.value = !isLoading.value;
     refresh.value = true;
 }
+
+const exportTransaction = () => {
+    exportStatus.value = true;
+}
 </script>
 
 <template>
     <AuthenticatedLayout title="Transaction">
         <template #header>
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <h2 class="text-2xl font-semibold leading-tight">
-                    Transaction
-                </h2>
+                <div>
+                    <h2 class="text-2xl font-semibold leading-tight">
+                        Transaction
+                    </h2>
+                    <p class="text-base font-normal dark:text-gray-400">
+                        Track and manage all transactions carried out by your members.
+                    </p>
+                </div>
+
+                <div>
+                    <Button
+                        type="button"
+                        class="justify-center w-full gap-2 border border-gray-600 text-white text-sm dark:hover:bg-gray-600"
+                        variant="transparent"
+                        v-slot="{ iconSizeClasses }"
+                        @click="exportTransaction"
+                    >
+                        <div class="inline-flex items-center">
+                            <CloudDownloadIcon
+                                aria-hidden="true"
+                                class="mr-2 w-5 h-5"
+                            />
+                            <span>Export as Excel</span>
+                        </div>
+                    </Button>
+                </div>
+
             </div>
-            <p class="text-base font-normal dark:text-gray-400">
-                Track and manage all transactions carried out by your members.
-            </p>
         </template>
 
         <div class="pt-3 md:flex md:justify-between">
@@ -93,8 +121,10 @@ function refreshTable() {
                 :isLoading="isLoading"
                 :search="search"
                 :date="date"
+                :exportStatus="exportStatus"
                 @update:loading="isLoading = $event"
                 @update:refresh="refresh = $event"
+                @update:export="exportStatus = $event"
             />
             <TransactionHistory
                 v-if="activeComponent === 'history'"
@@ -102,8 +132,10 @@ function refreshTable() {
                 :isLoading="isLoading"
                 :search="search"
                 :date="date"
+                :exportStatus="exportStatus"
                 @update:loading="isLoading = $event"
                 @update:refresh="refresh = $event"
+                @update:export="exportStatus = $event"
             />
         </div>
     </AuthenticatedLayout>
