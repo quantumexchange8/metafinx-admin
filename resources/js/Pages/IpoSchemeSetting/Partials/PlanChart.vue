@@ -106,7 +106,7 @@ onMounted(() => {
         </div>
 
         <div class="mt-5 space-y-5">
-            <div class="md:w-1/3">
+            <div class="md:w-1/2">
                 <vue-tailwind-datepicker
                     placeholder="Select dates"
                     :formatter="formatter"

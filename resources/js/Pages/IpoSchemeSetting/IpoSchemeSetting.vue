@@ -4,6 +4,9 @@ import PlanChart from "@/Pages/IpoSchemeSetting/Partials/PlanChart.vue";
 import SubscriptionTable from "@/Pages/IpoSchemeSetting/Partials/SubscriptionTable.vue";
 import {computed, ref} from 'vue'
 import { Switch } from '@headlessui/vue'
+import AddInvestmentPlan from "@/Pages/IpoSchemeSetting/Partials/AddInvestmentPlan.vue";
+import Button from "@/Components/Button.vue";
+import EditInvestmentPlan from "@/Pages/IpoSchemeSetting/Partials/EditInvestmentPlan.vue";
 
 const props = defineProps({
     investmentPlans: Object
@@ -100,13 +103,14 @@ const updateStatus = async (planId, newStatus) => {
                 <h3 class="text-xl font-semibold leading-tight">
                     Ongoing Investment Plan
                 </h3>
+                <AddInvestmentPlan />
                 <div v-for="investmentPlan in props.investmentPlans" class="p-5 dark:bg-gray-700 rounded-[20px] flex flex-col gap-2">
                     <div class="flex justify-between">
                         <div class="inline-flex items-center justify-center gap-3">
                             <img class="w-12 h-12 rounded-lg bg-white" src="/assets/icon.png" alt="Medium avatar">
                             <div class="grid">
                                 <div class="font-semibold">
-                                    {{ investmentPlan.name }}
+                                    {{ investmentPlan.name['en'] }}
                                 </div>
                                 <div class="font-normal dark:text-gray-400">
                                     {{ investmentPlan.roi_per_annum }}% p.a.
@@ -126,6 +130,11 @@ const updateStatus = async (planId, newStatus) => {
                                 class="pointer-events-none inline-block h-[20px] w-[20px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out"
                             />
                         </Switch>
+                    </div>
+                    <div class="pt-5">
+                        <EditInvestmentPlan
+                            :investmentPlan="investmentPlan"
+                        />
                     </div>
                 </div>
             </div>

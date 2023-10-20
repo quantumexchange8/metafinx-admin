@@ -2,7 +2,7 @@
 import Input from "@/Components/Input.vue";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
 import InputIconWrapper from "@/Components/InputIconWrapper.vue";
-import {SearchIcon, RefreshIcon} from "@heroicons/vue/outline";
+import {SearchIcon, RefreshIcon, ArrowLeftIcon, ArrowRightIcon} from "@heroicons/vue/outline";
 import {ref, watch} from "vue";
 import {CloudDownloadIcon} from "@/Components/Icons/outline.jsx";
 import Button from "@/Components/Button.vue";
@@ -190,7 +190,14 @@ const closeModal = () => {
                 :data="subscriptions"
                 :limit=2
                 @pagination-change-page="handlePageChange"
-            />
+            >
+                <template #prev-nav>
+                    <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> Previous</span>
+                </template>
+                <template #next-nav>
+                    <span class="flex gap-2">Next <ArrowRightIcon class="w-5 h-5" /></span>
+                </template>
+            </TailwindPagination>
         </div>
     </div>
 

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\InvestmentPlanRequest;
 use App\Models\InvestmentPlan;
+use App\Models\InvestmentPlanDescription;
 use App\Models\InvestmentSubscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -13,8 +15,10 @@ class IpoSchemeController extends Controller
 {
     public function setting()
     {
+        $investmentPlans = InvestmentPlan::with('descriptions:id,investment_plan_id,description')->get();
+
         return Inertia::render('IpoSchemeSetting/IpoSchemeSetting', [
-            'investmentPlans' => InvestmentPlan::all(),
+            'investmentPlans' => $investmentPlans
         ]);
     }
 
@@ -87,5 +91,53 @@ class IpoSchemeController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    public function addInvestmentPlan(InvestmentPlanRequest $request)
+    {
+        $investmentPlan = InvestmentPlan::create([
+            'name' => $request->plan_name,
+            'investment_min_amount' => $request->investment_min_amount,
+            'roi_per_annum' => $request->roi_per_annum,
+            'investment_period' => $request->investment_period,
+        ]);
+
+        $descriptionItems = $request->descriptions;
+
+        foreach ($descriptionItems as $descriptionItem) {
+            InvestmentPlanDescription::create([
+                'investment_plan_id' => $investmentPlan->id,
+                'description' => json_encode($descriptionItem)
+            ]);
+        }
+
+        return redirect()->back()->with('title', 'Investment plan added')->with('success', 'This new investment plan has been added successfully.');
+    }
+
+    public function editInvestmentPlan(InvestmentPlanRequest $request)
+    {
+        $investmentPlan = InvestmentPlan::find($request->id);
+
+        $investmentPlan->update([
+            'name' => $request->plan_name,
+            'investment_min_amount' => $request->investment_min_amount,
+            'roi_per_annum' => $request->roi_per_annum,
+            'investment_period' => $request->investment_period,
+        ]);
+
+        $descriptionItems = $request->descriptions;
+
+        foreach ($investmentPlan->descriptions as $item) {
+            $item->delete();
+        }
+
+        foreach ($descriptionItems as $descriptionItem) {
+            InvestmentPlanDescription::create([
+                'investment_plan_id' => $investmentPlan->id,
+                'description' => $descriptionItem
+            ]);
+        }
+
+        return redirect()->back()->with('title', 'Investment plan updated')->with('success', 'This investment plan has been updated successfully.');
     }
 }
