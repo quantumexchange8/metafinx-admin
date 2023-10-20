@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
@@ -56,7 +57,7 @@ class MemberController extends Controller
     
     public function addMember(Request $request)
     {
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(),[
             'name' => 'required|regex:/^[a-zA-Z0-9\p{Han}. ]+$/u|max:255',
             'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:8|unique:' . User::class,
             'email' => 'required|string|email|max:255|unique:' . User::class,
@@ -65,29 +66,28 @@ class MemberController extends Controller
         
         ]);
 
+        $attributes = [
+            'name' => 'Name',
+            'phone' => 'Phone Number',
+            'email' => 'Email',
+            'password' => 'Password',
+            'ranking' => 'Ranking',
+        ];
+
+        $validator->setAttributeNames($attributes);
+        $validatedData = $validator->validate();
+
         User::create([
             
-            'name' => $validated['name'],
-            'phone' => $validated['phone'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'setting_rank_id' => $validated['ranking'],
+            'name' => $validatedData['name'],
+            'phone' => $validatedData['phone'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+            'setting_rank_id' => $validatedData['ranking'],
             'referral_code' => $request->refCode,
             'status' => 1,
             'country' => "Malaysia"
         ]);
-
-        // User::create([
-            
-        //     'name' => $request->name,
-        //     'phone' => $request->phone,
-        //     'email' => $request->email,
-        //     'password' => Hash::make($request->password),
-        //     'setting_rank_id' => $request->rankID,
-        //     'referral_code' => $request->refCode,
-        //     'status' => 1,
-        //     'country' => "Malaysia"
-        // ]);
         
         return redirect()->back()->with('title', 'New member added!')->with('success', 'The new member has been added successfully.');
     }
@@ -114,35 +114,60 @@ class MemberController extends Controller
     
     public function editMember(Request $request)
     {  
-        // $validatedData = $request->validate([
-        //     'name' => 'required|regex:/^[a-zA-Z0-9\p{Han}. ]+$/u|max:255',
-        //     'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:8|unique:' . User::class,
-        //     'email' => 'required|string|email|max:255|unique:' . User::class,
-        //     'password' => ['required', Password::defaults()],
-        //     'ranking' => 'required',
-        // ]);
-
-        // $user = new User();
-
-        // $user->fill([
-        //     'name' => $validatedData['name'],
-        //     'phone' => $validatedData['phone'],
-        //     'email' => $validatedData['email'],
-        //     'password' => Hash::make($validatedData['password']),
-        //     'setting_rank_id' => $validatedData['rankID'],
-        //     'status' => 1,
-        //     'country' => "Malaysia",
-        // ]);
-
-        // $user->save();
-
         $user = User::find($request->user_id);
+        if ($request->password){
+            $passwordCheck = ['required', Password::defaults()];
+        }
+        else {
+            $passwordCheck = '';
+        }
+
+        if ($user->phone = $request->phone){
+            $phoneCheck = '';
+        }
+        else {
+            $phoneCheck = 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:8|unique:' . User::class;
+        }
+
+        if ($user->email = $request->email){
+            $emailCheck = '';
+        }
+        else {
+            $emailCheck = 'required|string|email|max:255|unique:' . User::class;
+        }
+
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|regex:/^[a-zA-Z0-9\p{Han}. ]+$/u|max:255',
+            'phone' => $phoneCheck,
+            'email' => $emailCheck,
+            'password' => $passwordCheck,
+            'ranking' => 'required',
         
-        $user->name = $request->name;
-        $user->phone = $request->phone;
-        $user->email = $request->email;
-        // $user->password = Hash::make($request->password);
-        $user->setting_rank_id = $request->rankID;
+        ]);
+
+
+        $attributes = [
+            'name' => 'Name',
+            'phone' => 'Phone Number',
+            'email' => 'Email',
+            'password' => 'Password',
+            'ranking' => 'Ranking',
+        ];
+
+        $validator->setAttributeNames($attributes);
+        $validatedData = $validator->validate();
+
+        $user->fill([
+            'name' => $validatedData['name'],
+            'phone' => $validatedData['phone'],
+            'email' => $validatedData['email'],
+            'setting_rank_id' => $validatedData['ranking'],
+            'status' => 1,
+            'country' => "Malaysia",
+        ]);
+        if ($user->password !== $request->password && $request->password){
+            $user->password = Hash::make($validatedData['password']);
+        }
 
         $user->save();
 

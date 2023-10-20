@@ -19,7 +19,7 @@ const form = useForm({
     name: props.member_details.name,
     phone: props.member_details.phone,
     email: props.member_details.email,
-    password: "testtest",
+    password: "",
     ranking: props.member_details.setting_rank_id,
 })
 
@@ -135,10 +135,10 @@ const closeModal = () => {
                         @click="togglePasswordVisibility"
                     >
                         <template v-if="showPassword">
-                            <EyeIcon aria-hidden="true" class="w-5 h-5" />
+                            <EyeIcon aria-hidden="true" class="w-5 h-5 dark:text-gray-400" />
                         </template>
                         <template v-else>
-                            <EyeOffIcon aria-hidden="true" class="w-5 h-5" />
+                            <EyeOffIcon aria-hidden="true" class="w-5 h-5 dark:text-gray-400" />
                         </template>
                     </div>
                 </InputIconWrapper>
