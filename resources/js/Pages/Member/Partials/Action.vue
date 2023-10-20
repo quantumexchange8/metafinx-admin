@@ -1,89 +1,103 @@
 <script setup>
 import Button from "@/Components/Button.vue";
-import {MemberDetailIcon, AffiliateTreeIcon, DeleteIcon} from "@/Components/Icons/outline.jsx";
+import {MemberDetailIcon, AffiliateTreeIcon, DeleteIcon, AddIcon} from "@/Components/Icons/outline.jsx";
 import {ref} from "vue";
 import Modal from "@/Components/Modal.vue";
-// import DeleteMember from "@/Pages/Member/Partials/DeleteMember.vue";
+import DeleteMember from "@/Pages/Member/Partials/DeleteMember.vue";
+import AddMember from "@/Pages/Member/Partials/AddMember.vue";
 import Tooltip from "@/Components/Tooltip.vue";
 
 
 const props = defineProps({
-    member: Object,
-    countries: Object,
-    accountTypes: Object,
-    getMemberSel: Array,
+    members: Object,
+    type: String,
 })
 
-// const memberDetailModal = ref(false);
+const memberDetailModal = ref(false);
 // const getMemberId = ref(null);
-// const modalComponent = ref(null);
+const modalComponent = ref(null);
 
-// const openMemberDetail = (memberId, componentType) => {
-//     memberDetailModal.value = true;
-//     if (componentType === 'deleteMember') {
-//         modalComponent.value = 'DeleteMemberComponent';
-//     }
-// }
+const openMemberModal = (memberId, componentType) => {
+    memberDetailModal.value = true;
+    if (componentType === 'deleteMember') {
+        modalComponent.value = 'Delete Member';
+    }
+    else if (componentType === 'add_member') {
+        modalComponent.value = 'Add Member';
+    }
+}
 
-// const closeModal = () => {
-//     memberDetailModal.value = false
-//     modalComponent.value = null;
-// }
-
-// const openInNewTab = (url) => {
-//     window.open(url, '_blank');
-// }
-
+const closeModal = () => {
+    memberDetailModal.value = false
+    modalComponent.value = null;
+}
 
 </script>
 
 <template>
     <div class="flex justify-center">
-        <Tooltip content="View Details" placement="top">
-            <!-- @click="openInNewTab(route('member.impersonate', member.id))" -->
+        <Tooltip content="View Details" placement="bottom" v-if="type === 'member'">
             <Button
                 type="button"
-                class="justify-center px-4 pt-2 mx-1 rounded-full w-8 h-8 focus:outline-none"
+                class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
                 variant="action"
+                :href="'/member/member_details/' + members.id"
+                pill
             >
                 <MemberDetailIcon aria-hidden="true" class="w-5 h-5 absolute" />
                 <span class="sr-only">View Details</span>
             </Button>
         </Tooltip>
-        <Tooltip content="Affiliate Tree" placement="top">
-            <!-- @click="openInNewTab(route('member.impersonate', member.id))" -->
+        <Tooltip content="Affiliate Tree" placement="bottom" v-if="type === 'member'">
             <Button
-                class="justify-center p-2 mx-1 rounded-full w-8 h-8 focus:outline-none"
+                type="button"
+                class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
                 variant="action"
+                :href="'/member/member_affiliates/' + members.id"
+                pill
             >
                 <AffiliateTreeIcon aria-hidden="true" class="w-5 h-5 absolute" />
                 <span class="sr-only">Affiliate Tree</span>
             </Button>
         </Tooltip>
-        <Tooltip content="Delete Member" placement="top">
-            <!-- @click="openMemberDetail(member.id, 'deleteMember')" -->
+        <Tooltip content="Delete Member" placement="bottom" v-if="type === 'member'">
             <Button
-                class="justify-center px-4 pt-2 mx-1 rounded-full w-8 h-8 focus:outline-none"
+                type="button"
+                class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
                 variant="danger"
-
+                @click="openMemberModal(members.id, 'deleteMember')"
+                pill
             >
                 <DeleteIcon aria-hidden="true" class="w-5 h-5 absolute" />
                 <span class="sr-only">Delete</span>
             </Button>
         </Tooltip>
+        <Button
+            type="button"
+            class="justify-center px-3 py-2 gap-2 grow focus:outline-none"
+            variant="primary"
+            @click="openMemberModal('','add_member')"
+            v-if="type === 'add_member'"
+        >
+            <AddIcon aria-hidden="true" class="w-5 h-5" />
+            <span class="text-sm">Add Member</span>
+        </Button>
     </div>
 
     
-    <!-- <Modal :show="memberDetailModal" @close="closeModal">
-        <div class="p-6">
+    <Modal :show="memberDetailModal" :title="modalComponent" @close="closeModal" max-width="xl">
 
-            <template v-if="modalComponent === 'DeleteMemberComponent'">
+            <template v-if="modalComponent === 'Delete Member'">
                 <DeleteMember
-                    :member="member"
+                    :members="members"
                     @update:memberDetailModal="memberDetailModal = $event"
                 />
             </template>
-
-        </div>
-    </Modal> -->
+            <template v-if="modalComponent === 'Add Member'">
+                <AddMember
+                    
+                    @update:memberDetailModal="memberDetailModal = $event"
+                />
+            </template>
+    </Modal>
 </template>

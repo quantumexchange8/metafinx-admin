@@ -119,7 +119,7 @@ const paginationActiveClass = [
             </tr>
             <tr
                 v-for="member in members.data"
-                class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
+                class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600"
             >
                 <td class="pl-5 py-2.5 text-right inline-flex items-center gap-2">
                     {{ member.name }}
@@ -139,10 +139,8 @@ const paginationActiveClass = [
                 </td>
                 <td class="px-3 py-2.5 text-center">
                     <Action
-                        :member="member"
-                        :countries="props.countries"
-                        :accountTypes="props.accountTypes"
-                        :getMemberSel="props.getMemberSel"
+                        :members="member"
+                        type="member"
                     />
                 </td>
             </tr>

@@ -9,6 +9,7 @@ import {CloudDownloadIcon} from "@/Components/Icons/outline.jsx";
 import Button from "@/Components/Button.vue";
 import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
 import MemberTable from "@/Pages/Member/Partials/MemberTable.vue";
+import Action from "@/Pages/Member/Partials/Action.vue";
 
 const props = defineProps({
     settingRanks: Object
@@ -37,14 +38,20 @@ const updateTransactionType = (transaction_type) => {
 <template>
     <AuthenticatedLayout title="Member Listing">
         <template #header>
-            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <h2 class="text-2xl font-semibold leading-tight">
-                    Member Listing
-                </h2>
+            <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div>
+                    <h2 class="text-2xl font-semibold leading-tight">
+                        Member Listing
+                    </h2>
+                    <p class="text-base font-normal dark:text-gray-400">
+                        Track and manage all your members accounts here
+                    </p>
+                </div>
+                <Action
+                    type="add_member"
+                    
+                />
             </div>
-            <p class="text-base font-normal dark:text-gray-400">
-                Track and manage all your members accounts here
-            </p>
         </template>
 
         <div class="p-5 my-5 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700">
