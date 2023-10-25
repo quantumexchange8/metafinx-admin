@@ -39,9 +39,9 @@ const label = computed(() => {
         :model-value="props.modelValue"
         @update:modelValue="value => emit('update:modelValue', value)"
     >
-        <div class="relative mt-1">
+        <div class="relative">
             <ListboxButton
-                class="relative w-full cursor-default rounded-lg bg-white dark:bg-gray-600 py-2.5 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-pink-500 focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-opacity-100 focus-visible:ring-offset-2 focus-visible:ring-offset-pink-500 sm:text-sm"
+                class="relative w-full cursor-default rounded-lg bg-white dark:bg-gray-600 py-2.5 pl-3 pr-10 text-left focus:outline-none focus-visible:border-pink-500 focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-opacity-100 focus-visible:ring-offset-2 focus-visible:ring-offset-pink-500"
                 :class="[
                     { 'border border-pink-500': error }
                 ]"

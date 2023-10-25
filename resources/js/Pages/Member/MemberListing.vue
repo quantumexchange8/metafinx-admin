@@ -10,14 +10,18 @@ import Button from "@/Components/Button.vue";
 import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
 import MemberTable from "@/Pages/Member/Partials/MemberTable.vue";
 import Action from "@/Pages/Member/Partials/Action.vue";
+import BaseListbox from "@/Components/BaseListbox.vue";
 
 const props = defineProps({
-    settingRanks: Object
+    settingRanks: Object,
+    pendingKycCount: Number,
+    unverifiedKycCount: Number,
 })
 
 const search = ref('');
 const date = ref('');
-const type = ref('Deposit');
+const type = ref('');
+const rank = ref('');
 const isLoading = ref(false);
 const refresh = ref(false);
 const formatter = ref({
@@ -30,8 +34,22 @@ function refreshTable() {
     refresh.value = true;
 }
 
-const updateTransactionType = (transaction_type) => {
-    type.value = transaction_type
+const kycStatuses = [
+    { value: '', name: 'All' },
+    { value: 'pending', name: 'Pending' },
+    { value: 'verified', name: 'Verified' },
+    { value: 'unverified', name: 'Unverified' },
+]
+
+const rankList = [
+    {value:'1', label:"Member"},
+    {value:'2', label:"LVL 1"},
+    {value:'3', label:"LVL 2"},
+    {value:'4', label:"LVL 3"},
+];
+
+const updateKycStatus = (kyc_status) => {
+    type.value = kyc_status
 };
 </script>
 
@@ -49,7 +67,7 @@ const updateTransactionType = (transaction_type) => {
                 </div>
                 <Action
                     type="add_member"
-                    
+
                 />
             </div>
         </template>
@@ -74,15 +92,27 @@ const updateTransactionType = (transaction_type) => {
                         <Input withIcon id="search" type="text" class="block w-full" placeholder="Search" v-model="search" />
                     </InputIconWrapper>
                 </div>
-                <div class="md:w-2/3">
-                    <vue-tailwind-datepicker
-                        placeholder="Select dates"
-                        :formatter="formatter"
-                        separator=" - "
-                        v-model="date"
-                        input-classes="py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-                    />
+                <div class="flex gap-3">
+                    <div>
+                        <vue-tailwind-datepicker
+                            placeholder="Select dates"
+                            :formatter="formatter"
+                            separator=" - "
+                            v-model="date"
+                            input-classes="py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+                        />
+                    </div>
+                    <div>
+                        <BaseListbox
+                            id="rankID"
+                            class="w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600"
+                            v-model="rank"
+                            :options="rankList"
+                            placeholder="Filter rank"
+                        />
+                    </div>
                 </div>
+
 <!--                <div class="flex justify-end">-->
 <!--                    <Button-->
 <!--                        type="button"-->
@@ -102,37 +132,36 @@ const updateTransactionType = (transaction_type) => {
 
             <div class="w-full pt-5">
                 <TabGroup>
-                    <TabList class="max-w-xs flex py-1">
+                    <TabList class="max-w-md flex py-1">
                         <Tab
-                            v-for="settingRank in settingRanks"
-                            :key="settingRank.id"
+                            v-for="kycStatus in kycStatuses"
                             as="template"
                             v-slot="{ selected }"
                         >
                             <button
-                                @click="updateTransactionType(settingRank.name)"
+                                @click="updateKycStatus(kycStatus.value)"
                                 :class="[
                                     'w-full py-2.5 text-sm font-semibold dark:text-gray-400',
                                     'ring-white ring-offset-0 focus:outline-none focus:ring-0',
                                     selected ? 'dark:text-white border-b-2' : 'border-b border-gray-400',
                                 ]"
                             >
-                                {{ settingRank.name }}
+                                {{ kycStatus.name }} <span v-if="kycStatus.value === 'pending'">({{ pendingKycCount }})</span><span v-if="kycStatus.value === 'unverified'">({{ unverifiedKycCount }})</span>
                             </button>
                         </Tab>
                     </TabList>
 
                     <TabPanels>
                         <TabPanel
-                            v-for="settingRank in settingRanks"
-                            :key="settingRank.id"
+                            v-for="kycStatus in kycStatuses"
                         >
                             <MemberTable
                                 :refresh="refresh"
                                 :isLoading="isLoading"
                                 :search="search"
                                 :date="date"
-                                :settingRankId=settingRank.id
+                                :rank="rank"
+                                :kycStatus=kycStatus.value
                                 @update:loading="isLoading = $event"
                                 @update:refresh="refresh = $event"
                             />

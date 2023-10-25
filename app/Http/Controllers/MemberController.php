@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\KycApprovalRequest;
 use App\Models\SettingRank;
 use App\Models\User;
 use App\Models\InvestmentSubscription;
+use App\Notifications\KycApprovalNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -17,21 +20,32 @@ class MemberController extends Controller
 {
     public function listing()
     {
-        $settingRanks = SettingRank::select('id', 'name')->get();
         return Inertia::render('Member/MemberListing', [
-            'settingRanks' => $settingRanks
+            'pendingKycCount' => User::where('kyc_approval', '=', 'pending')->count(),
+            'unverifiedKycCount' => User::where('kyc_approval', '=', 'unverified')->count(),
         ]);
     }
 
-    public function getMemberDetails(Request $request, $settingRankId)
+    public function getMemberDetails(Request $request)
     {
         $members = User::query()
-            ->where('setting_rank_id', $settingRankId)
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->input('search');
                 $query->where(function ($innerQuery) use ($search) {
                     $innerQuery->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->filled('type'), function ($query) use ($request) {
+                $type = $request->input('type');
+                $query->where(function ($innerQuery) use ($type) {
+                    $innerQuery->where('kyc_approval', $type);
+                });
+            })
+            ->when($request->filled('rank'), function ($query) use ($request) {
+                $rank_id = $request->input('rank');
+                $query->where(function ($innerQuery) use ($rank_id) {
+                    $innerQuery->where('setting_rank_id', $rank_id);
                 });
             })
             ->when($request->filled('date'), function ($query) use ($request) {
@@ -41,20 +55,24 @@ class MemberController extends Controller
                 $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
                 $query->whereBetween('created_at', [$start_date, $end_date]);
             })
-            ->with(['media'])
+            ->select('id', 'name', 'email', 'setting_rank_id', 'kyc_approval', 'created_at')
+            ->with('rank:id,name')
             ->withSum('wallets', 'balance')
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
 
-        $members->getCollection()->transform(function ($member) {
-            $member->total_children = count($member->getChildrenIds());
-            return $member;
+        $members->each(function ($user) {
+            $user->profile_photo_url = $user->getFirstMediaUrl('profile_photo');
+            $user->front_identity = $user->getFirstMediaUrl('front_identity');
+            $user->back_identity = $user->getFirstMediaUrl('back_identity');
+            $user->kyc_upload_date = $user->getMedia('back_identity')->first()->created_at ?? null;
+            $user->active_investment_amount = $this->getActiveSubscriptionAmount($user);
         });
 
         return response()->json($members);
     }
-    
+
     public function addMember(Request $request)
     {
         $validator = Validator::make($request->all(),[
@@ -63,7 +81,7 @@ class MemberController extends Controller
             'email' => 'required|string|email|max:255|unique:' . User::class,
             'password' => ['required', Password::defaults()],
             'ranking' => 'required',
-        
+
         ]);
 
         $attributes = [
@@ -78,7 +96,7 @@ class MemberController extends Controller
         $validatedData = $validator->validate();
 
         User::create([
-            
+
             'name' => $validatedData['name'],
             'phone' => $validatedData['phone'],
             'email' => $validatedData['email'],
@@ -88,32 +106,54 @@ class MemberController extends Controller
             'status' => 1,
             'country' => "Malaysia"
         ]);
-        
+
         return redirect()->back()->with('title', 'New member added!')->with('success', 'The new member has been added successfully.');
     }
 
     public function deleteMember(Request $request)
-    {  
+    {
         $user = User::find($request->user_id);
-        
+
         $user->delete();
 
         return redirect()->back();
     }
 
-    public function verifyMember(Request $request)
-    {  
-        $user = User::find($request->user_id);
-        
-        $user->kyc_approval = "approved";
+    public function verifyMember(KycApprovalRequest $request)
+    {
+        $user = User::find($request->id);
+        $approvalType = $request->type;
 
-        $user->save();
+        $title = '';
+        $message = '';
 
-        return redirect()->back()->with('title', 'Member verified!')->with('success', 'The member has been verified successfully.');
+        if ($approvalType == 'approve') {
+            $user->update([
+                'kyc_approval' => 'verified',
+            ]);
+
+            $title = 'Member verified!';
+            $message = 'The member has been verified successfully.';
+
+        } elseif ($approvalType == 'reject') {
+            $user->update([
+                'kyc_approval' => 'unverified',
+                'kyc_approval_description' => $request->remark,
+            ]);
+
+            $title = 'Member unverified!';
+            $message = 'An email has been sent to the member to request updated KYC information.';
+
+        }
+
+        Notification::route('mail', $user->email)
+            ->notify(new KycApprovalNotification($user));
+
+        return redirect()->back()->with('title', $title)->with('success', $message);
     }
-    
+
     public function editMember(Request $request)
-    {  
+    {
         $user = User::find($request->user_id);
         if ($request->password){
             $passwordCheck = ['required', Password::defaults()];
@@ -142,7 +182,7 @@ class MemberController extends Controller
             'email' => $emailCheck,
             'password' => $passwordCheck,
             'ranking' => 'required',
-        
+
         ]);
 
 
@@ -175,7 +215,7 @@ class MemberController extends Controller
     }
 
     public function viewMemberDetails($id)
-    {   
+    {
         $user = User::with('media')->find($id);
         $upline = User::with('media')
         ->where('id', $user->upline_id)
@@ -186,7 +226,7 @@ class MemberController extends Controller
         ->with('investment_plan:id,name,investment_period')
         ->where('user_id', $id)
         ->get();
-        
+
         return Inertia::render('Member/MemberDetails/MemberDetail', [
             'member_details' => $user,
             'upline_member' => $upline,
@@ -195,7 +235,7 @@ class MemberController extends Controller
     }
 
     public function unsubscribePlan(Request $request)
-    {  
+    {
         $investment_plan = InvestmentSubscription::find($request->investment_id);
 
         $investment_plan->delete();
@@ -214,10 +254,10 @@ class MemberController extends Controller
 
     public function getTreeData(Request $request, $id)
     {
-        
+
         $searchUser = null;
         $searchTerm = $request->input('search');
-        
+
         if ($searchTerm) {
             $searchUser = User::where('name', 'like', '%' . $searchTerm . '%')
                 ->orWhere('email', 'like', '%' . $searchTerm . '%')
@@ -299,6 +339,14 @@ class MemberController extends Controller
 
         return InvestmentSubscription::query()
             ->whereIn('user_id', $ids)
+            ->whereDate('expired_date', '>', now())
+            ->sum('amount');
+    }
+
+    protected function getActiveSubscriptionAmount($user)
+    {
+        return InvestmentSubscription::query()
+            ->where('user_id', $user->id)
             ->whereDate('expired_date', '>', now())
             ->sum('amount');
     }

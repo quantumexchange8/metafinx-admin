@@ -28,7 +28,10 @@ class User extends Authenticatable implements HasMedia
         'country',
         'address_1',
         'address_2',
+        'identity_number',
         'verification_type',
+        'kyc_approval',
+        'kyc_approval_description',
         'referral_code',
         'upline_id',
         'hierarchyList',
@@ -80,6 +83,16 @@ class User extends Authenticatable implements HasMedia
     public function children(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(User::class, 'upline_id', 'id');
+    }
+
+    public function rank(): \Illuminate\Database\Eloquent\Relations\belongsTo
+    {
+        return $this->belongsTo(SettingRank::class, 'setting_rank_id', 'id');
+    }
+
+    public function subscriptions(): \Illuminate\Database\Eloquent\Relations\hasMany
+    {
+        return $this->hasMany(InvestmentSubscription::class, 'user_id', 'id');
     }
 
 }

@@ -39,14 +39,14 @@ Route::middleware('auth')->group(function () {
      */
     Route::prefix('member')->group(function () {
         Route::get('/listing', [MemberController::class, 'listing'])->name('member.member_listing');
-        Route::get('/getMemberDetails/{id}', [MemberController::class, 'getMemberDetails'])->name('member.getMemberDetails');
-        
+        Route::get('/getMemberDetails', [MemberController::class, 'getMemberDetails'])->name('member.getMemberDetails');
+
         Route::post('/addMember', [MemberController::class, 'addMember'])->name('member.addMember');
         Route::get('/member_details/{id}', [MemberController::class, 'viewMemberDetails'])->name('member.viewMemberDetails');
         Route::get('/member_affiliates/{id}', [MemberController::class, 'affiliate_tree'])->name('member.affiliate_tree');
         Route::get('/getTreeData/{id}', [MemberController::class, 'getTreeData'])->name('member.getTreeData');
         Route::delete('/deleteMember', [MemberController::class, 'deleteMember'])->name('member.deleteMember');
-        Route::patch('/verifyMember', [MemberController::class, 'verifyMember'])->name('member.verify_member');
+        Route::post('/verifyMember', [MemberController::class, 'verifyMember'])->name('member.verify_member');
         Route::patch('/editMember', [MemberController::class, 'editMember'])->name('member.edit_member');
         Route::delete('/unsubscribePlan', [MemberController::class, 'unsubscribePlan'])->name('member.unsubscribe_plan');
     });
