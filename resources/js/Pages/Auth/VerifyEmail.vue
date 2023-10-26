@@ -33,7 +33,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
             during registration.
         </div>
 
-         @submit.prevent="submit">
+        <form @submit.prevent="submit">
             <div class="flex items-center justify-between mt-4">
                 <Button
                     :class="{ 'opacity-25': form.processing }"
