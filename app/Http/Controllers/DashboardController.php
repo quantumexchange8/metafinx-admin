@@ -104,6 +104,7 @@ class DashboardController extends Controller
     public function getPendingKyc()
     {
         $pendingMembers  = User::query()
+            ->where('role', '=', 'user')
             ->where('kyc_approval', 'pending')
             ->select('id', 'name', 'email', 'kyc_approval', 'identity_number', 'created_at')
             ->orderByDesc('created_at')

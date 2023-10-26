@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddMemberRequest;
 use App\Http\Requests\EditMemberRequest;
 use App\Http\Requests\KycApprovalRequest;
+use App\Models\SettingCountry;
 use App\Models\SettingRank;
 use App\Models\User;
 use App\Models\InvestmentSubscription;
+use App\Models\Wallet;
 use App\Notifications\KycApprovalNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -22,9 +25,30 @@ class MemberController extends Controller
 {
     public function listing()
     {
+        $settingRanks = SettingRank::all();
+
+        $formattedRanks = $settingRanks->map(function ($country) {
+            return [
+                'value' => $country->id,
+                'label' => $country->name,
+            ];
+        });
+
+        $settingCountries = SettingCountry::all();
+
+        $formattedCountries = $settingCountries->map(function ($country) {
+            return [
+                'value' => $country->name_en,
+                'label' => $country->name_en,
+                'phone_code' => $country->phone_code,
+            ];
+        });
+
         return Inertia::render('Member/MemberListing', [
             'pendingKycCount' => User::where('kyc_approval', '=', 'pending')->count(),
             'unverifiedKycCount' => User::where('kyc_approval', '=', 'unverified')->count(),
+            'settingRanks' => $formattedRanks,
+            'countries' => $formattedCountries,
         ]);
     }
 
@@ -76,39 +100,38 @@ class MemberController extends Controller
         return response()->json($members);
     }
 
-    public function addMember(Request $request)
+    public function addMember(AddMemberRequest $request)
     {
-        $validator = Validator::make($request->all(),[
-            'name' => 'required|regex:/^[a-zA-Z0-9\p{Han}. ]+$/u|max:255',
-            'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:8|unique:' . User::class,
-            'email' => 'required|string|email|max:255|unique:' . User::class,
-            'password' => ['required', Password::defaults()],
-            'ranking' => 'required',
+        $upline_id = $request->upline_id['value'];
+        $upline = User::find($upline_id);
 
+        if(empty($upline->hierarchyList)) {
+            $hierarchyList = "-" . $upline_id . "-";
+        } else {
+            $hierarchyList = $upline->hierarchyList . $upline_id . "-";
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'country' => $request->country,
+            'phone' => $request->phone,
+            'verification_type' => $request->verification_type,
+            'upline_id' => $upline_id,
+            'hierarchyList' => $hierarchyList,
+            'setting_rank_id' => $request->ranking,
+            'password' => Hash::make($request->password),
+            'identity_number' => $request->identity_number,
+            'role' => 'user',
+            'kyc_approval' => 'unverified',
         ]);
 
-        $attributes = [
-            'name' => 'Name',
-            'phone' => 'Phone Number',
-            'email' => 'Email',
-            'password' => 'Password',
-            'ranking' => 'Ranking',
-        ];
-
-        $validator->setAttributeNames($attributes);
-        $validatedData = $validator->validate();
-
-        User::create([
-
-            'name' => $validatedData['name'],
-            'phone' => $validatedData['phone'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'setting_rank_id' => $validatedData['ranking'],
-            'referral_code' => $request->refCode,
-            'status' => 1,
-            'country' => "Malaysia"
+        Wallet::create([
+            'user_id' => $user->id,
+            'name' => 'Internal Wallet'
         ]);
+
+        $user->setReferralId();
 
         return redirect()->back()->with('title', 'New member added!')->with('success', 'The new member has been added successfully.');
     }
@@ -126,7 +149,7 @@ class MemberController extends Controller
     {
         $user = User::find($request->id);
         $approvalType = $request->type;
-        
+
         $title = '';
         $message = '';
 

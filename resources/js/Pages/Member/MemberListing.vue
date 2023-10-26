@@ -13,7 +13,8 @@ import Action from "@/Pages/Member/Partials/Action.vue";
 import BaseListbox from "@/Components/BaseListbox.vue";
 
 const props = defineProps({
-    settingRanks: Object,
+    settingRanks: Array,
+    countries: Array,
     pendingKycCount: Number,
     unverifiedKycCount: Number,
 })
@@ -67,7 +68,8 @@ const updateKycStatus = (kyc_status) => {
                 </div>
                 <Action
                     type="add_member"
-
+                    :settingRanks="settingRanks"
+                    :countries="countries"
                 />
             </div>
         </template>
@@ -126,8 +128,9 @@ const updateKycStatus = (kyc_status) => {
             </div>
 
             <div class="flex gap-4 mt-5">
-                <span class="flex items-center text-xs font-normal text-gray-900 dark:text-white"><span class="flex w-2 h-2 bg-red-500 dark:bg-warning-500 rounded-full mr-2 flex-shrink-0"></span>Unverified</span>
-                <span class="flex items-center text-xs font-normal text-gray-900 dark:text-white"><span class="flex w-2 h-2 bg-red-500 dark:bg-success-500 rounded-full mr-2 flex-shrink-0"></span>Verified</span>
+                <span class="flex items-center text-xs font-normal text-gray-900 dark:text-white"><span class="flex w-2 h-2 bg-blue-500 dark:bg-blue-500 rounded-full mr-2 flex-shrink-0"></span>Pending</span>
+                <span class="flex items-center text-xs font-normal text-gray-900 dark:text-white"><span class="flex w-2 h-2 bg-warning-500 dark:bg-warning-500 rounded-full mr-2 flex-shrink-0"></span>Unverified</span>
+                <span class="flex items-center text-xs font-normal text-gray-900 dark:text-white"><span class="flex w-2 h-2 bg-success-500 dark:bg-success-500 rounded-full mr-2 flex-shrink-0"></span>Verified</span>
             </div>
 
             <div class="w-full pt-5">

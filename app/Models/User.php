@@ -36,6 +36,7 @@ class User extends Authenticatable implements HasMedia
         'upline_id',
         'hierarchyList',
         'status',
+        'role',
         'setting_rank_id',
         'total_affiliate',
         'self_deposit',
@@ -68,6 +69,22 @@ class User extends Authenticatable implements HasMedia
             ->where('status', 1)
             ->pluck('id'
             )->toArray();
+    }
+
+    public function setReferralId(): void
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz';
+        $idLength = strlen((string)$this->id);
+
+        $temp_code = substr(str_shuffle($characters), 0, 8 - $idLength);
+        $alphabetId = '';
+
+        foreach (str_split((string)$this->id) as $digit) {
+            $alphabetId .= $characters[$digit];
+        }
+
+        $this->referral_code = $temp_code . $alphabetId;
+        $this->save();
     }
 
     public function wallets(): \Illuminate\Database\Eloquent\Relations\HasMany

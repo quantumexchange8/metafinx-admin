@@ -165,7 +165,8 @@ const paginationActiveClass = [
                     <Rank3Icon class="h-5" v-if="member.rank.id === 4" />
                 </td>
                 <td v-if="kycStatus !== 'pending'" class="px-3 py-2.5 text-center">
-                    <span v-if="member.kyc_approval === 'verified'" class="flex w-2 h-2 bg-green-500 dark:bg-success-500 mx-auto rounded-full"></span>
+                    <span v-if="member.kyc_approval === 'pending'" class="flex w-2 h-2 bg-green-500 dark:bg-blue-500 mx-auto rounded-full"></span>
+                    <span v-else-if="member.kyc_approval === 'verified'" class="flex w-2 h-2 bg-green-500 dark:bg-success-500 mx-auto rounded-full"></span>
                     <span v-else-if="member.kyc_approval === 'unverified'" class="flex w-2 h-2 bg-red-500 dark:bg-warning-500 mx-auto rounded-full"></span>
                 </td>
                 <td class="px-3 py-2.5 text-center">

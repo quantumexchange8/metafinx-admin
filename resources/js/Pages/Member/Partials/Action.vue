@@ -11,6 +11,8 @@ import Tooltip from "@/Components/Tooltip.vue";
 const props = defineProps({
     members: Object,
     type: String,
+    settingRanks: Array,
+    countries: Array,
 })
 
 const memberDetailModal = ref(false);
@@ -84,7 +86,7 @@ const closeModal = () => {
         </Button>
     </div>
 
-    
+
     <Modal :show="memberDetailModal" :title="modalComponent" @close="closeModal" max-width="xl">
 
             <template v-if="modalComponent === 'Delete Member'">
@@ -95,7 +97,8 @@ const closeModal = () => {
             </template>
             <template v-if="modalComponent === 'Add Member'">
                 <AddMember
-                    
+                    :settingRanks="settingRanks"
+                    :countries="countries"
                     @update:memberDetailModal="memberDetailModal = $event"
                 />
             </template>
