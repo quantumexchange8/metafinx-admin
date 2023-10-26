@@ -16,6 +16,7 @@ class InvestmentSubscription extends Model
         'wallet_id',
         'amount',
         'status',
+        'remark',
         'next_roi_date',
         'expired_date',
     ];

@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/member_details/{id}', [MemberController::class, 'viewMemberDetails'])->name('member.viewMemberDetails');
         Route::get('/member_affiliates/{id}', [MemberController::class, 'affiliate_tree'])->name('member.affiliate_tree');
         Route::get('/getTreeData/{id}', [MemberController::class, 'getTreeData'])->name('member.getTreeData');
+        Route::get('/getAllUsers', [MemberController::class, 'getAllUsers'])->name('member.getAllUsers');
         Route::delete('/deleteMember', [MemberController::class, 'deleteMember'])->name('member.deleteMember');
         Route::post('/verifyMember', [MemberController::class, 'verifyMember'])->name('member.verify_member');
         Route::patch('/editMember', [MemberController::class, 'editMember'])->name('member.edit_member');

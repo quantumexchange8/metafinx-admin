@@ -1,7 +1,21 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import {ref} from "vue";
-import {ChevronRight, VerifiedIcon, PhoneIcon, CountryIcon, RankIcon, Rank1Icon, Rank2Icon, Rank3Icon, ReferralIcon, ProofIcon} from "@/Components/Icons/outline.jsx";
+import {
+    ChevronRight,
+    UnverifiedIcon,
+    VerifiedIcon,
+    PhoneIcon,
+    CountryIcon,
+    PassportIcon,
+    IdNoIcon,
+    RankIcon,
+    Rank1Icon,
+    Rank2Icon,
+    Rank3Icon,
+    ReferralIcon,
+    ProofIcon
+} from "@/Components/Icons/outline.jsx";
 import {RefreshIcon} from "@heroicons/vue/outline";
 import Modal from "@/Components/Modal.vue";
 import MemberInvestment from "@/Pages/Member/MemberDetails/Partials/MemberInvestment.vue";
@@ -12,7 +26,8 @@ import EarningInformation from "@/Pages/Member/MemberDetails/Partials/EarningInf
 const props = defineProps({
     member_details: Object,
     upline_member: Object,
-    investments: Object
+    investments: Object,
+    settingRank: Array
 })
 
 const isLoading = ref(false);
@@ -25,8 +40,8 @@ function refreshTable() {
     refresh.value = true;
 }
 
-const getMediaUrlByCollection = (member_details, collectionName) => {
-    const media = member_details.media;
+const getMediaUrlByCollection = (user, collectionName) => {
+    const media = user.media;
     const foundMedia = media.find((m) => m.collection_name === collectionName);
     return foundMedia ? foundMedia.original_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg';
 };
@@ -79,7 +94,8 @@ const backButton = () => {
                             :src="getMediaUrlByCollection(member_details, 'profile_photo')"
                             alt="memberPic"
                         />
-                        <VerifiedIcon aria-hidden="true" class="w-4 h-4 absolute right-0 bottom-0" />
+                        <UnverifiedIcon v-if="member_details.kyc_approval === 'unverified'" aria-hidden="true" class="w-4 h-4 absolute right-0 bottom-0" />
+                        <VerifiedIcon v-if="member_details.kyc_approval === 'verified'" aria-hidden="true" class="w-4 h-4 absolute right-0 bottom-0" />
                     </div>
                     <div class="flex flex-col gap-1">
                         <h3 class="text-xl font-semibold dark:text-white">
@@ -94,19 +110,31 @@ const backButton = () => {
                     <Action
                         type="member"
                         :member_details="member_details"
+                        :upline_member="upline_member"
+                        :settingRank="settingRank"
                     />
                 </div>
             </div>
             <div class="flex flex-col w-full pt-5 gap-5">
                 <div class="flex flex-col md:flex-row gap-5">
-                    <div class="flex items-center gap-3 w-full">
-                        <PhoneIcon aria-hidden="true" class="w-5 h-5" />
-                        <p class="text-base dark:text-white">{{ member_details.phone }}</p>
-                   </div>
                    <div class="flex items-center gap-3 w-full">
                         <CountryIcon aria-hidden="true" class="w-5 h-5" />
                         <p class="text-base dark:text-white">{{ member_details.country }}</p>
                    </div>
+                    <div class="flex items-center gap-3 w-full">
+                        <PhoneIcon aria-hidden="true" class="w-5 h-5" />
+                        <p class="text-base dark:text-white">{{ member_details.phone }}</p>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row gap-5">
+                   <div class="flex items-center gap-3 w-full">
+                        <PassportIcon aria-hidden="true" class="w-5 h-5" />
+                        <p class="text-base dark:text-white uppercase">{{ member_details.verification_type }}</p>
+                   </div>
+                    <div class="flex items-center gap-3 w-full">
+                        <IdNoIcon aria-hidden="true" class="w-5 h-5" />
+                        <p class="text-base dark:text-white">{{ member_details.identity_number }}</p>
+                    </div>
                 </div>
                 <div class="flex flex-col md:flex-row gap-5 font-semibold">
                     <div class="flex flex-row items-center gap-3 w-full">
@@ -125,14 +153,14 @@ const backButton = () => {
                         </div>
                    </div>
                    <div class="flex items-center gap-3 w-full">
-                        <ReferralIcon aria-hidden="true" class="w-5 h-5" /> 
-                        <div class="flex items-center gap-2">
+                        <ReferralIcon aria-hidden="true" class="w-5 h-5" />
+                        <div class="inline-flex items-center justify-center gap-2">
                             <img
-                            class="object-cover w-5 h-5 rounded-full"
-                            :src="getMediaUrlByCollection(upline_member, 'profile_photo')"
-                            alt="refPic"
+                                class="object-cover w-5 h-5 rounded-full"
+                                :src="getMediaUrlByCollection(upline_member, 'profile_photo')"
+                                alt="uplinePic"
                             />
-                            <p class="text-base dark:text-white">{{ upline_member.name }}</p>
+                            <span class="text-base dark:text-white">{{ upline_member.name }}</span>
                         </div>
                    </div>
                 </div>
@@ -146,10 +174,10 @@ const backButton = () => {
                             </div>
                         </Modal>
                         <ProofIcon aria-hidden="true" class="w-5 h-5" />
-                        <a v-if="hasMediaCollection(member_details, 'front_identity')" href="javascript:void(0);" @click.prevent="openFrontIdentityModal" class="hover:text-blue-500 dark:text-white dark:hover:text-blue-400 underline">
+                        <a v-if="hasMediaCollection(member_details, 'front_identity')" href="javascript:void(0);" @click.prevent="openFrontIdentityModal" class="hover:text-pink-500 dark:text-white dark:hover:text-pink-400 underline">
                             {{ getMediaNameByCollection(member_details, 'front_identity') }}
                         </a>
-                        <span v-else class="dark:text-white">Pending Front Proof</span>
+                        <span v-else class="dark:text-white">No File Submitted</span>
                    </div>
                    <div class="flex items-center gap-3 w-full">
                         <Modal :show="backIdentityModal" :title="'Proof of ID (BACK)'" @close="backButton">
@@ -160,10 +188,10 @@ const backButton = () => {
                             </div>
                         </Modal>
                         <ProofIcon aria-hidden="true" class="w-5 h-5" />
-                        <a v-if="hasMediaCollection(member_details, 'back_identity')" href="javascript:void(0);" @click.prevent="openBackIdentityModal" class="hover:text-blue-500 dark:text-white dark:hover:text-blue-400 underline">
+                        <a v-if="hasMediaCollection(member_details, 'back_identity')" href="javascript:void(0);" @click.prevent="openBackIdentityModal" class="hover:text-pink-500 dark:text-white dark:hover:text-pink-400 underline">
                         {{ getMediaNameByCollection(member_details, 'back_identity') }}
                         </a>
-                        <span v-else class="dark:text-white">Pending Back Proof</span>
+                        <span v-else class="dark:text-white">No File Submitted</span>
                    </div>
                 </div>
             </div>
@@ -186,5 +214,5 @@ const backButton = () => {
                 />
             </div>
         </template>
-    </AuthenticatedLayout> 
+    </AuthenticatedLayout>
 </template>

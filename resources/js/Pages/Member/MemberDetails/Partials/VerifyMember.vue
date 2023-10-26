@@ -31,7 +31,7 @@ const closeModal = () => {
         <alertTriangle aria-hidden="true" class="w-12 h-12" />
     </div>
     <div class="mt-5">
-        <h1 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white" style="font-family: Montserrat,sans-serif">
+        <h1 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
             Verify member
         </h1>
         <p class="dark:text-gray-400 text-sm">

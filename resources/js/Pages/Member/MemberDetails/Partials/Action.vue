@@ -11,7 +11,9 @@ import Tooltip from "@/Components/Tooltip.vue";
 
 const props = defineProps({
     member_details: Object,
+    upline_member: Object,
     investments: Object,
+    settingRank: Array,
     type: String,
 })
 
@@ -28,7 +30,7 @@ const openMemberModal = (componentType) => {
         modalComponent.value = 'Verify Member';
     }
     else if (componentType === 'unsubscribe_plan') {
-        modalComponent.value = 'Unsubscribe Member Plan';
+        modalComponent.value = 'Terminate Member Plan';
     }
 }
 
@@ -41,6 +43,7 @@ const closeModal = () => {
 </script>
 
 <template>
+    <div>
         <Tooltip content="Unsubscribe" placement="bottom" v-if="type === 'investment'">
             <Button
                 type="button"
@@ -63,36 +66,21 @@ const closeModal = () => {
             <EditIcon aria-hidden="true" class="w-5 h-5" />
             <span class="text-sm">Edit</span>
         </Button>
-        <Button
-            type="button"
-            class="justify-center px-3 py-2 gap-2 grow focus:outline-none dark:disabled:bg-gray-600 dark:disabled:text-gray-500"
-            variant="success"
-            @click="openMemberModal('verify_member')"
-            v-if="type === 'member'"
-            :disabled="member_details.kyc_approval === 'approved'"
-        >
-            <VerifyMemberIcon aria-hidden="true" class="w-5 h-5" />
-            <span class="text-sm">Verify Member</span>
-        </Button>
+    </div>
 
-    
     <Modal :show="memberDetailModal" :title="modalComponent" @close="closeModal" max-width="xl">
         <div class="">
-            <template v-if="modalComponent === 'Unsubscribe Member Plan'">
+            <template v-if="modalComponent==='Terminate Member Plan'">
                 <UnsubscribePlan
                     :investments="investments"
                     @update:memberDetailModal="memberDetailModal = $event"
                 />
             </template>
-            <template v-if="modalComponent === 'Edit Member'">
+            <template v-if="modalComponent==='Edit Member'">
                 <EditMember
                     :member_details="member_details"
-                    @update:memberDetailModal="memberDetailModal = $event"
-                />
-            </template>
-            <template v-if="modalComponent === 'Verify Member'">
-                <VerifyMember
-                    :member_details="member_details"
+                    :upline_member="upline_member"
+                    :settingRank="settingRank"
                     @update:memberDetailModal="memberDetailModal = $event"
                 />
             </template>

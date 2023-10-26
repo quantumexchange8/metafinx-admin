@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EditMemberRequest;
 use App\Http\Requests\KycApprovalRequest;
 use App\Models\SettingRank;
 use App\Models\User;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class MemberController extends Controller
@@ -29,6 +31,7 @@ class MemberController extends Controller
     public function getMemberDetails(Request $request)
     {
         $members = User::query()
+            ->where('role', '=', 'user')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->input('search');
                 $query->where(function ($innerQuery) use ($search) {
@@ -152,95 +155,98 @@ class MemberController extends Controller
         return redirect()->back()->with('title', $title)->with('success', $message);
     }
 
-    public function editMember(Request $request)
+    public function editMember(EditMemberRequest $request)
     {
         $user = User::find($request->user_id);
-        if ($request->password){
-            $passwordCheck = ['required', Password::defaults()];
-        }
-        else {
-            $passwordCheck = '';
-        }
+        $upline_id = $request->upline_id['value'];
 
-        if ($user->phone = $request->phone){
-            $phoneCheck = '';
-        }
-        else {
-            $phoneCheck = 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:8|unique:' . User::class;
-        }
-
-        if ($user->email = $request->email){
-            $emailCheck = '';
-        }
-        else {
-            $emailCheck = 'required|string|email|max:255|unique:' . User::class;
-        }
-
-        $validator = Validator::make($request->all(),[
-            'name' => 'required|regex:/^[a-zA-Z0-9\p{Han}. ]+$/u|max:255',
-            'phone' => $phoneCheck,
-            'email' => $emailCheck,
-            'password' => $passwordCheck,
-            'ranking' => 'required',
-
+        $user->update([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'identity_number' => $request->identity_number,
+            'setting_rank_id' => $request->rank,
         ]);
 
-
-        $attributes = [
-            'name' => 'Name',
-            'phone' => 'Phone Number',
-            'email' => 'Email',
-            'password' => 'Password',
-            'ranking' => 'Ranking',
-        ];
-
-        $validator->setAttributeNames($attributes);
-        $validatedData = $validator->validate();
-
-        $user->fill([
-            'name' => $validatedData['name'],
-            'phone' => $validatedData['phone'],
-            'email' => $validatedData['email'],
-            'setting_rank_id' => $validatedData['ranking'],
-            'status' => 1,
-            'country' => "Malaysia",
-        ]);
-        if ($user->password !== $request->password && $request->password){
-            $user->password = Hash::make($validatedData['password']);
+        if ($request->password) {
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
         }
 
-        $user->save();
+        if ($user->upline_id != $upline_id) {
+            $this->transferUpline($user, $upline_id);
+        }
 
-        return redirect()->back();
+        return redirect()->back()->with('title', 'Member updated!')->with('success', 'The member has been updated successfully.');
     }
 
     public function viewMemberDetails($id)
     {
         $user = User::with('media')->find($id);
+
         $upline = User::with('media')
         ->where('id', $user->upline_id)
         ->select('name','id')
         ->first();
 
-        $investment = InvestmentSubscription::query()
-        ->with('investment_plan:id,name,investment_period')
-        ->where('user_id', $id)
-        ->get();
+        $investments = InvestmentSubscription::query()
+            ->with('investment_plan:id,name,roi_per_annum,investment_period')
+            ->where('user_id', $user->id)
+            ->get();
+
+        $locale = app()->getLocale(); // Get the current locale
+
+        $investmentSubscriptions = $investments->map(function ($investmentSubscription) use ($locale) {
+            return [
+                'id' => $investmentSubscription->id,
+                'plan_name' => [
+                    'name' => $investmentSubscription->investment_plan->getTranslation('name', $locale),
+                ],
+                'roi_per_annum' => $investmentSubscription->investment_plan->roi_per_annum,
+                'investment_period' => $investmentSubscription->investment_plan->investment_period,
+                'subscription_id' => $investmentSubscription->subscription_id,
+                'amount' => $investmentSubscription->amount,
+                'total_earning' => $investmentSubscription->total_earning,
+                'status' => $investmentSubscription->status,
+                'next_roi_date' => $investmentSubscription->next_roi_date,
+                'expired_date' => $investmentSubscription->expired_date,
+                'created_at' => $investmentSubscription->created_at,
+            ];
+        });
+
+        $settingRanks = SettingRank::all();
+
+        $formattedRanks = $settingRanks->map(function ($country) {
+            return [
+                'value' => $country->id,
+                'label' => $country->name,
+            ];
+        });
 
         return Inertia::render('Member/MemberDetails/MemberDetail', [
             'member_details' => $user,
             'upline_member' => $upline,
-            'investments' => $investment
+            'investments' => $investmentSubscriptions,
+            'settingRank' => $formattedRanks
         ]);
     }
 
     public function unsubscribePlan(Request $request)
     {
-        $investment_plan = InvestmentSubscription::find($request->investment_id);
+        $investment_subscriptions = InvestmentSubscription::find($request->investment_id);
 
-        $investment_plan->delete();
+        $request->validate([
+            'remark' => 'required'
+        ], [
+            'remark' => 'The Remark field is required.'
+        ]);
 
-        return redirect()->back();
+        $investment_subscriptions->update([
+            'status' => 'Terminated',
+            'remark' => $request->remark,
+        ]);
+
+        return redirect()->back()->with('title', 'Subscription terminated!')->with('success', 'The investment plan has been terminated successfully.');
     }
 
     public function affiliate_tree($id)
@@ -298,6 +304,28 @@ class MemberController extends Controller
         return response()->json($rootNode);
     }
 
+    public function getAllUsers(Request $request)
+    {
+        $users = User::query()
+            ->where('role', '=', 'user')
+            ->whereNot('id', $request->id)
+            ->when($request->filled('query'), function ($query) use ($request) {
+                $search = $request->input('query');
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->select('id', 'name', 'email')
+            ->get();
+
+        $users->each(function ($users) {
+            $users->profile_photo = $users->getFirstMediaUrl('profile_photo');
+        });
+
+        return response()->json($users);
+    }
+
     protected function mapUser($user, $level) {
         $children = $user->children;
 
@@ -350,4 +378,64 @@ class MemberController extends Controller
             ->whereDate('expired_date', '>', now())
             ->sum('amount');
     }
+
+    protected function transferUpline($user, $upline_id)
+    {
+        if ($user->id == $upline_id) {
+            throw ValidationException::withMessages(['upline_id' => 'Upline cannot be themselves']);
+        }
+
+        if ($upline_id == $user->upline_id) {
+            throw ValidationException::withMessages(['upline_id' => 'Upline cannot be the same']);
+        }
+
+        $new_parent = User::find($upline_id);
+
+        if ($user->upline_id != $new_parent->id) {
+
+            if (str_contains($new_parent->hierarchyList, $user->id)) {
+                $new_parent->hierarchyList = $user->hierarchyList;
+                $new_parent->upline_id = $user->upline_id;
+                $new_parent->save();
+            }
+
+            if (empty($new_parent->hierarchyList)) {
+                $user_hierarchy = "-" . $new_parent->id . "-";
+            } else {
+                $user_hierarchy = $new_parent->hierarchyList . $new_parent->id . "-";
+            }
+
+            $this->updateHierarchyList($user, $user_hierarchy, '-' . $user->id . '-');
+
+            $user->hierarchyList = $user_hierarchy;
+            $user->upline_id = $new_parent->id;
+            $user->save();
+
+            // Update hierarchyList for users with same upline_id
+            $sameUplineIdUsers = User::where('upline_id', $new_parent->id)->get();
+            if ($sameUplineIdUsers) {
+                foreach ($sameUplineIdUsers as $sameUplineUser) {
+                    $new_user_hierarchy = $new_parent->hierarchyList . $new_parent->id . "-";
+                    $this->updateHierarchyList($sameUplineUser, $new_user_hierarchy, '-' . $sameUplineUser->id . '-');
+                    $sameUplineUser->hierarchyList = $new_user_hierarchy;
+                    $sameUplineUser->upline_id = $new_parent->id;
+                    $sameUplineUser->save();
+                }
+            }
+        }
+    }
+
+    private function updateHierarchyList($user, $list, $id)
+    {
+        $children = $user->children;
+        if (count($children)) {
+            foreach ($children as $child) {
+                //$child->hierarchyList = substr($list, -1) . substr($child->hierarchyList, strpos($child->hierarchyList, $id) + strlen($id));
+                $child->hierarchyList = substr($list, 0, -1) . $id;
+                $child->save();
+                $this->updateHierarchyList($child, $list, $id . $child->id . '-');
+            }
+        }
+    }
+
 }
