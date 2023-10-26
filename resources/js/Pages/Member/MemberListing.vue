@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import { RefreshIcon, SearchIcon } from "@heroicons/vue/outline";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import InputIconWrapper from "@/Components/InputIconWrapper.vue";
 import Input from "@/Components/Input.vue";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
@@ -16,6 +16,7 @@ const props = defineProps({
     settingRanks: Object,
     pendingKycCount: Number,
     unverifiedKycCount: Number,
+    
 })
 
 const search = ref('');
@@ -51,6 +52,22 @@ const rankList = [
 const updateKycStatus = (kyc_status) => {
     type.value = kyc_status
 };
+
+const selectedTab = ref(0);
+function changeTab(index) {
+    selectedTab.value = index;
+}
+
+onMounted(() => {
+    // const urlParams = new URLSearchParams(window.location.search);
+    // const params = urlParams.get('test');
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+    if (params.test === 'pending'){
+        selectedTab.value = 1;
+    }
+});
 </script>
 
 <template>
@@ -131,7 +148,7 @@ const updateKycStatus = (kyc_status) => {
             </div>
 
             <div class="w-full pt-5">
-                <TabGroup>
+                <TabGroup :selectedIndex="selectedTab" @change="changeTab">
                     <TabList class="max-w-md flex py-1">
                         <Tab
                             v-for="kycStatus in kycStatuses"

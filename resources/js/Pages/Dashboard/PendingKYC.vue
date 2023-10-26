@@ -47,7 +47,7 @@ watchEffect(() => {
             <h3>
                 Pending KYC
             </h3>
-            <Link :href="route('member.member_listing')" class="dark:bg-gray-500 dark:hover:bg-gray-600 rounded-full w-6 h-6">
+            <Link :href="route('member.member_listing', {test:'pending'})"  class="dark:bg-gray-500 dark:hover:bg-gray-600 rounded-full w-6 h-6">
                 <ChevronRightIcon aria-hidden="true" class="w-6 h-6" />
             </Link>
         </div>
