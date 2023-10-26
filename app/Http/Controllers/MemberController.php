@@ -126,7 +126,7 @@ class MemberController extends Controller
     {
         $user = User::find($request->id);
         $approvalType = $request->type;
-
+        
         $title = '';
         $message = '';
 
