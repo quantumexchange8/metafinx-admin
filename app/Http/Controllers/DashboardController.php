@@ -24,32 +24,26 @@ class DashboardController extends Controller
         $totalDeposit = $payment->where('type', 'Deposit')->sum('amount');
         $totalWithdrawal = $payment->where('type', 'Withdrawal')->sum('amount');
 
-        $pendingDeposits = Payment::query()
+        $pendingMemberCount  = User::query()
+        ->where('kyc_approval', 'pending')
+        ->count();
+
+        $pendingTransactionCount  = Payment::query()
+        ->where('status', 'Processing')
+        ->count();
+
+        $pendingTransactions  = Payment::query()
             ->where('status', 'Processing')
-            ->where('type', 'Deposit')
             ->with(['user:id,name,email'])
-            ->select('id', 'user_id', 'status', 'amount')
+            ->select('id', 'user_id', 'transaction_id', 'status', 'amount', 'created_at')
+            ->orderByDesc('created_at')
             ->limit(5)
             ->get();
 
         // Get the media URL for 'profile_photo' for each user
-        $pendingDeposits->each(function ($user_deposit) {
-            $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
+        $pendingTransactions->each(function ($user_transaction) {
+            $user_transaction->user->profile_photo_url = $user_transaction->user->getFirstMediaUrl('profile_photo');
         });
-
-        $pendingWithdrawals  = Payment::query()
-            ->where('status', 'Pending')
-            ->where('type', 'Withdrawal')
-            ->with(['user:id,name,email'])
-            ->select('id', 'user_id', 'status', 'amount')
-            ->limit(5)
-            ->get();
-
-        // Get the media URL for 'profile_photo' for each user
-        $pendingWithdrawals->each(function ($user_withdrawal) {
-            $user_withdrawal->user->profile_photo_url = $user_withdrawal->user->getFirstMediaUrl('profile_photo');
-        });
-
 
         return Inertia::render('Dashboard', [
             'newMemberCount' => $newMemberCount,
@@ -57,8 +51,9 @@ class DashboardController extends Controller
             'totalWithdrawal' => $totalWithdrawal,
             'totalInvestment' => InvestmentSubscription::all()->sum('amount'),
             'totalMembers' => User::where('status', 1)->count(),
-            'pendingDeposits' => $pendingDeposits,
-            'pendingWithdrawals' => $pendingWithdrawals,
+            'pendingMemberCount' => $pendingMemberCount,
+            'pendingTransactions' => $pendingTransactions,
+            'pendingTransactionCount' => $pendingTransactionCount,
         ]);
     }
 
@@ -104,5 +99,25 @@ class DashboardController extends Controller
         }
 
         return response()->json(['data' => $data]);
+    }
+
+    public function getPendingKyc()
+    {
+        $pendingMembers  = User::query()
+            ->where('kyc_approval', 'pending')
+            ->select('id', 'name', 'email', 'kyc_approval', 'identity_number', 'created_at')
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->paginate(5);
+
+        // Get the media URL for 'profile_photo' for each user
+        $pendingMembers->each(function ($user) {
+            $user->profile_photo_url = $user->getFirstMediaUrl('profile_photo');
+            $user->front_identity = $user->getFirstMediaUrl('front_identity');
+            $user->back_identity = $user->getFirstMediaUrl('back_identity');
+            $user->kyc_upload_date = $user->getMedia('back_identity')->first()->created_at ?? null;
+        });
+
+        return response()->json(['pendingMembers' => $pendingMembers]);
     }
 }

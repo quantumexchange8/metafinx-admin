@@ -5,8 +5,8 @@ import { GithubIcon } from '@/Components/Icons/brands'
 import {onMounted, ref} from "vue";
 import {transactionFormat} from "@/Composables/index.js";
 import MemberChart from "@/Pages/Dashboard/MemberChart.vue";
-import PendingDeposit from "@/Pages/Dashboard/PendingDeposit.vue";
-import PendingWithdrawal from "@/Pages/Dashboard/PendingWithdrawal.vue";
+import PendingKYC from "@/Pages/Dashboard/PendingKYC.vue";
+import PendingTransaction from "@/Pages/Dashboard/PendingTransaction.vue";
 
 const props = defineProps({
     newMemberCount: Number,
@@ -14,8 +14,12 @@ const props = defineProps({
     totalWithdrawal: Number,
     totalInvestment: Number,
     totalMembers: Number,
+    pendingMembers: Object,
+    pendingMemberCount: Number,
     pendingDeposits: Object,
     pendingWithdrawals: Object,
+    pendingTransactions: Object,
+    pendingTransactionCount: Number
 })
 
 const currentMonth = ref('');
@@ -95,11 +99,12 @@ onMounted(() => {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 my-8">
-            <PendingDeposit
-                :pendingDeposits="props.pendingDeposits"
+            <PendingKYC
+                :pendingMemberCount="props.pendingMemberCount"
             />
-            <PendingWithdrawal
-                :pendingWithdrawals="props.pendingWithdrawals"
+            <PendingTransaction
+                :pendingTransactions="props.pendingTransactions"
+                :pendingTransactionCount="props.pendingTransactionCount"
             />
         </div>
 
