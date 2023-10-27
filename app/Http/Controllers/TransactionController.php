@@ -75,7 +75,7 @@ class TransactionController extends Controller
                 ]);
 
                 if ($payment->type == 'Deposit') {
-                    $wallet = Wallet::where('user_id', $payment->id)->first();
+                    $wallet = Wallet::find($payment->wallet_id);
                     $wallet->balance += $payment->amount;
                     $wallet->save();
                 }
@@ -88,7 +88,7 @@ class TransactionController extends Controller
             ]);
 
             if ($payment->type == 'Deposit') {
-                $wallet = Wallet::where('user_id', $payment->id)->first();
+                $wallet = Wallet::find($payment->wallet_id);
                 $wallet->balance += $payment->amount;
                 $wallet->save();
             }
