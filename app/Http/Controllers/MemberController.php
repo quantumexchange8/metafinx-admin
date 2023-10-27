@@ -246,11 +246,21 @@ class MemberController extends Controller
             ];
         });
 
+        $wallets = Wallet::where('user_id', $user->id)->get();
+        $walletSum = Wallet::where('user_id', $user->id)->sum('balance');
+        $referralCount = User::where('upline_id', $user->id)->count();
+
         return Inertia::render('Member/MemberDetails/MemberDetail', [
             'member_details' => $user,
             'upline_member' => $upline,
             'investments' => $investmentSubscriptions,
-            'settingRank' => $formattedRanks
+            'settingRank' => $formattedRanks,
+            'wallets' => $wallets,
+            'walletSum' => floatval($walletSum),
+            'referralCount' => $referralCount,
+            // 'total_affiliate' => count($user->getChildrenIds()),
+            'self_deposit' => floatval($this->getSelfDeposit($user)),
+            'valid_affiliate_deposit' => floatval($this->getValidAffiliateDeposit($user)),
         ]);
     }
 

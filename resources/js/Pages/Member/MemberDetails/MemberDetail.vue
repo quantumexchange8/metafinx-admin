@@ -14,7 +14,8 @@ import {
     Rank2Icon,
     Rank3Icon,
     ReferralIcon,
-    ProofIcon
+    ProofIcon,
+    Wallet
 } from "@/Components/Icons/outline.jsx";
 import {RefreshIcon} from "@heroicons/vue/outline";
 import Modal from "@/Components/Modal.vue";
@@ -24,10 +25,15 @@ import AccountInformation from "@/Pages/Member/MemberDetails/Partials/AccountInf
 import EarningInformation from "@/Pages/Member/MemberDetails/Partials/EarningInformation.vue";
 
 const props = defineProps({
+    wallets: Object,
     member_details: Object,
     upline_member: Object,
     investments: Object,
-    settingRank: Array
+    settingRank: Array,
+    walletSum: Number,
+    referralCount: Number,
+    self_deposit: Number,
+    valid_affiliate_deposit: Number
 })
 
 const isLoading = ref(false);
@@ -197,8 +203,71 @@ const backButton = () => {
             </div>
         </div>
 
+        <div class="flex flex-col gap-5 mb-8">
+            <h3 class="text-base font-semibold border-b border-gray-700 pb-5">
+                Wallet
+            </h3>
+            <div class=" overflow-x-auto grid grid-flow-col justify-start gap-5">
+                <div v-for="wallet in props.wallets" class="flex flex-col overflow-hidden rounded-[20px] w-80">
+                    <div class="flex justify-between  py-5 px-4 shadow-md bg-gradient-to-bl from-pink-400 to-pink-600">
+                        <div class="space-y-2">
+                            <div class="text-base font-semibold dark:text-white">
+                                {{ wallet.name }}
+                            </div>
+                            <div class="text-xl font-semibold dark:text-white">
+                                $ {{ wallet.balance }}
+                            </div>
+                        </div>
+                        <Wallet class="w-20 h-20"/>
+                    </div>
+                    <div class="flex flex-col gap-3 bg-gray-700 py-3 px-4 justify-center h-20">
+                        <!-- <div class="flex flex-row gap-3 justify-center">
+                                test
+                        </div> -->
+                        <div class="flex justify-center">
+                            <Action
+                                type="wallet"
+                                :member_details="member_details"
+                                :wallet="wallet"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col overflow-hidden rounded-[20px] w-80">
+                    <div class="flex justify-between  py-5 px-4 shadow-md bg-gradient-to-bl from-pink-400 to-pink-600">
+                        <div class="space-y-2">
+                            <div class="text-base font-semibold dark:text-white">
+                                TEST
+                            </div>
+                            <div class="text-xl font-semibold dark:text-white">
+                                $ 1000000.00
+                            </div>
+                        </div>
+                        <Wallet class="w-20 h-20"/>
+                    </div>
+                    <div class="flex flex-col gap-3 bg-gray-700 py-3 px-4 justify-center h-20">
+                        <div class="flex flex-row gap-3 justify-center">
+                                test
+                        </div>
+                        <div class="flex justify-center">
+                            <Action
+                                type="wallet"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
         <div class="flex flex-col md:flex-row items-start gap-8 text-base text-gray-800 dark:text-white">
-            <AccountInformation/>
+            <AccountInformation
+                :walletSum="walletSum"
+                :member_details="member_details"
+                :referralCount="referralCount"
+                :self_deposit="self_deposit"
+                :valid_affiliate_deposit="valid_affiliate_deposit"
+            />
             <EarningInformation/>
         </div>
 
