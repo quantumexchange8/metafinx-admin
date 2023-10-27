@@ -7,19 +7,13 @@ use App\Models\Payment;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $currentMonth = Carbon::now()->month;
-
-        $newMemberCount = User::query()
-            ->where('status', 1)
-            ->whereMonth('created_at', $currentMonth)
-            ->count();
-
         $payment = Payment::where('status', 'Success')->get();
         $totalDeposit = $payment->where('type', 'Deposit')->sum('amount');
         $totalWithdrawal = $payment->where('type', 'Withdrawal')->sum('amount');
@@ -46,7 +40,6 @@ class DashboardController extends Controller
         });
 
         return Inertia::render('Dashboard', [
-            'newMemberCount' => $newMemberCount,
             'totalDeposit' => $totalDeposit,
             'totalWithdrawal' => $totalWithdrawal,
             'totalInvestment' => InvestmentSubscription::all()->sum('amount'),
@@ -57,9 +50,57 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function getTotalMembersByDays(Request $request)
+    {
+        $selectedPlans = User::with('rank')
+            ->when($request->filled('month'), function ($query) use ($request) {
+                $month = $request->input('month');
+                $query->whereMonth('created_at', $month);
+            })
+            ->select(
+                DB::raw('DAY(created_at) as day'),
+                'setting_rank_id',
+                DB::raw('count(*) as users_count')
+            )
+            ->groupBy('day', 'setting_rank_id')
+            ->get();
+
+        // Get unique setting_rank_ids to create datasets
+        $uniqueSettingRankIds = $selectedPlans->pluck('setting_rank_id')->unique();
+
+        $year = Carbon::now()->year;
+        $month = $request->month;
+        // Initialize the chart data structure
+        $chartData = [
+            'labels' => range(1, cal_days_in_month(CAL_GREGORIAN, $month, $year)), // Generate an array of days
+            'datasets' => [],
+        ];
+
+        $backgroundColors = [1 => '#FFB2AB', 2 => '#FF2D55', 3 => '#FEC84B', 4 => '#F79009'];
+
+        // Loop through each unique setting_rank_id and create a dataset
+        foreach ($uniqueSettingRankIds as $settingRankId) {
+            $dataForRank = $selectedPlans->where('setting_rank_id', $settingRankId);
+
+            $dataset = [
+                'label' => $dataForRank->first()->rank->name,
+                'data' => array_map(function ($day) use ($dataForRank) {
+                    return $dataForRank->firstWhere('day', $day)->users_count ?? 0;
+                }, $chartData['labels']),
+                'backgroundColor' => $backgroundColors[$settingRankId],
+                'borderRadius' => PHP_INT_MAX,
+                'barPercentage' => 0.4
+            ];
+
+            $chartData['datasets'][] = $dataset;
+        }
+
+        return response()->json($chartData);
+    }
+
     public function getTotalMembers(Request $request)
     {
-        $year = $request->input('year') ?? 2023;
+        $year = $request->input('year') ?? Carbon::now()->year;
 
         $data = [];
 

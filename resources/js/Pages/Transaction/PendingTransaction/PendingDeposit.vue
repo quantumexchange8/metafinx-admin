@@ -5,7 +5,7 @@ import {ArrowLeftIcon, ArrowRightIcon} from "@heroicons/vue/outline";
 import {alertTriangle} from "@/Components/Icons/outline.jsx";
 import {InternalWalletIcon} from "@/Components/Icons/outline.jsx";
 import debounce from "lodash/debounce.js";
-import {computed, onUnmounted, ref, watch} from "vue";
+import {computed, onUnmounted, ref, watch, watchEffect} from "vue";
 import {transactionFormat} from "@/Composables/index.js";
 import Checkbox from "@/Components/Checkbox.vue";
 import Action from "@/Pages/Transaction/PendingTransaction/Action.vue";
@@ -159,6 +159,12 @@ watch(() => props.exportStatus, (newVal) => {
 
         window.location.href = url;
         emit('update:export', false);
+    }
+});
+
+watchEffect(() => {
+    if (usePage().props.title !== null) {
+        getResults();
     }
 });
 

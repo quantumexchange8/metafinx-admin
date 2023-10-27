@@ -1,104 +1,100 @@
 <script setup>
 import Chart from 'chart.js/auto'
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import Loading from "@/Components/Loading.vue";
+import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
+import MemberMonthChart from "@/Pages/Dashboard/TotalMember/MemberMonthChart.vue";
+import MemberDayChart from "@/Pages/Dashboard/TotalMember/MemberDayChart.vue";
+import BaseListbox from "@/Components/BaseListbox.vue";
 
-const chartData = ref({
-    labels: [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ],
-    datasets: [],
+const categories = ref({
+    Daily: [],
+    Monthly: [],
+})
+
+const months = Array.from({ length: 12 }, (_, index) => {
+    const monthNumber = (index + 1) % 12; // Adjust the month number to be in the range 1-12
+    const monthLabel = new Date(0, monthNumber - 1).toLocaleString('default', { month: 'long' });
+    return { value: monthNumber, label: monthLabel };
 });
-const isLoading = ref(false)
 
-onMounted(async () => {
-    const ctx = document.getElementById('totalMembers');
+const years = [
+    {value: 2023, label: '2023'},
+];
 
-    try {
-        isLoading.value = true;
+const selectedMonth = ref(new Date().getMonth() + 1); // Initialize with the current month (1-12)
+const selectedYear = ref(new Date().getFullYear());
 
-        const response = await axios.get('/getTotalMembers', { params: { year: 2023 } });
-        const data = response.data.data;
-        const backgroundColors = ['#FFB2AB', '#FF2D55', '#FEC84B', '#F79009'];
-        const dataLabels = ['Member', 'LVL 1', 'LVL 2', 'LVL 3'];
+const filterType = ref('Daily');
 
-        // Initialize datasets based on the number of setting ranks
-        for (let settingRankId = 1; settingRankId <= 4; settingRankId++) {
-            const dataset = {
-                label: dataLabels[settingRankId - 1],
-                data: data.map(item => item[`totalRankId${settingRankId}`]),
-                borderWidth: 1,
-                borderRadius: Number.MAX_VALUE,
-                borderSkipped: false,
-                backgroundColor: backgroundColors[settingRankId - 1],
-            };
-
-            chartData.value.datasets.push(dataset);
-        }
-        isLoading.value = false
-
-        // Create the chart after updating chartData
-        new Chart(ctx, {
-            type: 'bar',
-            data: chartData.value,
-            options: {
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        ticks: {
-                            color: '#9DA4AE',
-                            font: {
-                                family: 'Inter, sans-serif',
-                                size: 14,
-                                weight: 400,
-                            },
-                            stepSize: 1
-                        },
-                        grace: '10%',
-                        beginAtZero: true
-                    },
-                    x: {
-                        ticks: {
-                            color: '#9DA4AE',
-                            font: {
-                                family: 'Inter, sans-serif',
-                                size: 14,
-                                weight: 400,
-                            },
-                        },
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            font: {
-                                family: 'Inter, sans-serif',
-                                size: 14,
-                                weight: 400,
-                            },
-                            color: '#fff',
-                            usePointStyle: true,
-                            boxHeight: 8
-                        },
-                        align: 'start',
-                    },
-                }
-            }
-        });
-    } catch (error) {
-        isLoading.value = false
-        console.error('Error fetching chart data:', error);
-    }
-});
+const selectFilterType = (type) => {
+    filterType.value = type
+}
 
 </script>
 
 <template>
-    <div>
-        <div v-if="isLoading" class="flex justify-center mt-8">
-            <Loading />
-        </div>
-        <canvas id="totalMembers" height="350"></canvas>
+    <div class="w-full">
+        <TabGroup>
+            <div class="flex w-full gap-5">
+                <TabList class="flex space-x-1 rounded-xl bg-gray-900/20 dark:bg-transparent w-full max-w-md">
+                    <Tab
+                        v-for="category in Object.keys(categories)"
+                        as="template"
+                        :key="category"
+                        v-slot="{ selected }"
+                    >
+                        <button
+                            :class="[
+                            'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-gray-800 dark:text-gray-400',
+                            'border dark:border-gray-600',
+                            'ring-white ring-opacity-60 ring-offset-2 ring-offset-gray-400 focus:outline-none focus:ring-0',
+                            selected
+                            ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-white'
+                            : 'text-gray-800 dark:text-gray-400 hover:bg-white/[0.12] hover:text-white dark:hover:bg-gray-300/20',
+                            ]"
+                            @click="selectFilterType(category)"
+                        >
+                            {{ category }}
+                        </button>
+                    </Tab>
+                </TabList>
+                <div class="w-36">
+                    <BaseListbox
+                        v-if="filterType==='Daily'"
+                        v-model="selectedMonth"
+                        :options="months"
+                    />
+                    <BaseListbox
+                        v-if="filterType==='Monthly'"
+                        v-model="selectedYear"
+                        :options="years"
+                    />
+                </div>
+            </div>
+
+            <TabPanels class="mt-2">
+                <TabPanel
+                    :class="[
+                        'rounded-xl dark:bg-transparent p-3',
+                        ]"
+                >
+                    <MemberDayChart
+                        :selectedMonth="selectedMonth"
+                    />
+                </TabPanel>
+                <TabPanel
+                    :class="[
+                        'rounded-xl dark:bg-transparent p-3',
+                        ]"
+                >
+                    <MemberMonthChart
+                        :selectedYear="selectedYear"
+                    />
+                </TabPanel>
+            </TabPanels>
+        </TabGroup>
     </div>
+
+
 </template>
