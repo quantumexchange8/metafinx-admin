@@ -73,6 +73,12 @@ class TransactionController extends Controller
                 $payment->update([
                     'status' => 'Success'
                 ]);
+
+                if ($payment->type == 'Deposit') {
+                    $wallet = Wallet::where('user_id', $payment->id)->first();
+                    $wallet->balance += $payment->amount;
+                    $wallet->save();
+                }
             }
         } else {
             $payment = Payment::find($request->id);
@@ -80,6 +86,12 @@ class TransactionController extends Controller
             $payment->update([
                 'status' => 'Success'
             ]);
+
+            if ($payment->type == 'Deposit') {
+                $wallet = Wallet::where('user_id', $payment->id)->first();
+                $wallet->balance += $payment->amount;
+                $wallet->save();
+            }
         }
 
         return redirect()->back()->with('title', 'Approved successfully')->with('success', 'The transaction request has been approved successfully.');
@@ -99,10 +111,12 @@ class TransactionController extends Controller
                         'status' => 'Rejected'
                     ]);
 
-                    $wallet = Wallet::find($payment->wallet_id);
+                    if ($payment->type == 'Withdrawal') {
+                        $wallet = Wallet::find($payment->wallet_id);
 
-                    $wallet->balance += $payment->amount;
-                    $wallet->save();
+                        $wallet->balance += $payment->amount;
+                        $wallet->save();
+                    }
                 }
             }
         } else {
@@ -112,10 +126,12 @@ class TransactionController extends Controller
                 'status' => 'Rejected'
             ]);
 
-            $wallet = Wallet::find($payment->wallet_id);
+            if ($payment->type == 'Withdrawal') {
+                $wallet = Wallet::find($payment->wallet_id);
 
-            $wallet->balance += $payment->amount;
-            $wallet->save();
+                $wallet->balance += $payment->amount;
+                $wallet->save();
+            }
         }
 
         return redirect()->back()->with('title', 'Rejected successfully')->with('success', 'The transaction request has been rejected successfully.');
