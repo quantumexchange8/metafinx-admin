@@ -233,7 +233,7 @@ const backButton = () => {
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col overflow-hidden rounded-[20px] w-80">
+                <!-- <div class="flex flex-col overflow-hidden rounded-[20px] w-80">
                     <div class="flex justify-between  py-5 px-4 shadow-md bg-gradient-to-bl from-pink-400 to-pink-600">
                         <div class="space-y-2">
                             <div class="text-base font-semibold dark:text-white">
@@ -255,7 +255,7 @@ const backButton = () => {
                             />
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
             
         </div>
