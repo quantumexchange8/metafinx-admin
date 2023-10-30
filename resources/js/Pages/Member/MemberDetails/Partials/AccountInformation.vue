@@ -40,7 +40,7 @@ const { formatDateTime, formatAmount } = transactionFormat();
         </div>
         <div class="flex items-center gap-8">
             <p class="text-sm font-semibold text-gray-400 w-full">Wallet Balance</p>
-            <p class="text-sm dark:text-white w-full">$ {{ walletSum }}</p>
+            <p class="text-sm dark:text-white w-full">$ {{ formatAmount(walletSum) }}</p>
         </div>
         <div class="flex items-center gap-8">
             <p class="text-sm font-semibold text-gray-400 w-full">Account Earning</p>

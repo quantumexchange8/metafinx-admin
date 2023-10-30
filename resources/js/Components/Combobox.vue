@@ -76,10 +76,11 @@ let filteredOptions = computed(() =>
                 ]"
             >
                 <ComboboxInput
-                    class="w-full rounded-lg py-2 pr-10 leading-5 dark:bg-gray-600 text-gray-900 dark:text-white focus:border-pink-500 focus-visible:ring-2 focus-visible:ring-pink-500 border-2 border-transparent"
+                    class="w-full rounded-lg py-2 pr-10 leading-5 dark:bg-gray-600 text-gray-900 dark:text-white focus:border-pink-500 focus-visible:ring-2 focus-visible:ring-pink-500 border-2 border-transparent dark:placeholder-gray-400"
                     :displayValue="(option) => option.label"
                     @change="query = $event.target.value"
                     autocomplete="off"
+                    placeholder="Please Search"
                 />
                 <ComboboxButton
                     class="absolute inset-y-0 right-0 flex items-center pr-2"

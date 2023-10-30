@@ -8,30 +8,51 @@ import InputIconWrapper from "@/Components/InputIconWrapper.vue";
 import {useForm} from "@inertiajs/vue3";
 import {ref} from "vue";
 import {Wallet} from "@/Components/Icons/outline.jsx";
+import {transactionFormat} from "@/Composables/index.js";
+import Combobox from "@/Components/Combobox.vue";
 
 const props = defineProps({
     member_details: Object,
     wallet: Object
 })
 const emit = defineEmits(['update:memberDetailModal']);
+const { formatAmount } = transactionFormat();
+const users = ref();
+
+function loadUsers(query, setOptions) {
+    fetch('/member/getAllUsers?query=' + query + '&id=' + props.member_details.id)
+        .then(response => response.json())
+        .then(results => {
+            setOptions(
+                results.map(user => {
+                    return {
+                        value: user.id,
+                        label: user.name,
+                        img: user.profile_photo
+                    }
+                })
+            )
+        });
+}
 
 const form = useForm({
     user_id: props.member_details.id,
+    wallet_id: props.wallet.id,
+    amount: '',
+    description: '',
+    to_user_id: {},
 })
 
-const optionTest = [
-    {value:'1', label:"Test"},
-    {value:'2', label:"Test1"},
-];
+const submit = () => {
+    form.to_user_id = users.value;
 
-// const verifyMember = () => {
-//     form.patch(route('member.verify_member'), {
-//         preserveScroll: true,
-//         onSuccess: () => {
-//             closeModal()
-//         },
-//     })
-// }
+    form.post(route('member.internal_transfer'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeModal()
+        },
+    })
+}
 
 const closeModal = () => {
     emit('update:memberDetailModal', false);
@@ -46,7 +67,7 @@ const closeModal = () => {
                     {{ wallet.name }}
                 </div>
                 <div class="text-xl font-semibold dark:text-white">
-                    $ {{ wallet.balance }}
+                    $ {{ formatAmount(wallet.balance) }}
                 </div>
             </div>
                 <Wallet class="w-24 h-24"/>
@@ -56,13 +77,13 @@ const closeModal = () => {
                 <Label class="text-sm dark:text-white" for="amount" value="Amount" />
                 <div class="md:col-span-2">
                     <Input
-                    id="amount"
-                    type="text"
-                    placeholder="$ 0.00"
-                    class="flex flex-row items-center gap-3 w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600 px-3 py-0"
-                    :class="form.errors.amount ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
-                    v-model="form.amount"
-                    autofocus
+                        id="amount"
+                        type="text"
+                        placeholder="$ 0.00"
+                        class="flex flex-row items-center gap-3 w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600 px-3 py-0"
+                        :class="form.errors.amount ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                        v-model="form.amount"
+                        autofocus
                     />
                     <InputError :message="form.errors.amount" class="mt-1 col-span-4" />
                 </div>
@@ -70,12 +91,10 @@ const closeModal = () => {
             <div class="flex flex-col gap-1 md:grid md:grid-cols-3">
                 <span class="text-sm dark:text-white">Transfer to member</span>
                 <div class="md:col-span-2">
-                    <BaseListbox
-                        class="w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600"
-                        v-model="form.member"
-                        :options="optionTest"
-                        :error="form.errors.rank"
-                        placeholder="Please Select"
+                    <Combobox
+                        :load-options="loadUsers"
+                        v-model="users"
+                        :error="form.errors.to_user_id"
                     />
                 </div>
             </div>
@@ -85,7 +104,7 @@ const closeModal = () => {
                     <Input
                     id="description"
                     type="text"
-                    placeholder="Optional"
+                    placeholder="Description"
                     class="flex flex-row items-center gap-3 w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600 px-3 py-0"
                     :class="form.errors.description ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
                     v-model="form.description"
@@ -107,7 +126,7 @@ const closeModal = () => {
                 variant="primary"
                 class="px-4 py-2 justify-center"
                 :disabled="form.processing"
-                @click.prevent=""
+                @click.prevent="submit"
             >
                 <span class="text-sm font-semibold">Confirm</span>
             </Button>

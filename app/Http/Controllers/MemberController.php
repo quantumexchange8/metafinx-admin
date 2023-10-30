@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AddMemberRequest;
 use App\Http\Requests\EditMemberRequest;
 use App\Http\Requests\KycApprovalRequest;
+use App\Http\Requests\WalletAdjustmentRequest;
+use App\Models\BalanceAdjustment;
 use App\Models\SettingCountry;
 use App\Models\SettingRank;
 use App\Models\User;
@@ -13,6 +15,7 @@ use App\Models\Wallet;
 use App\Notifications\KycApprovalNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Redirect;
@@ -280,6 +283,89 @@ class MemberController extends Controller
         ]);
 
         return redirect()->back()->with('title', 'Subscription terminated!')->with('success', 'The investment plan has been terminated successfully.');
+    }
+
+    public function wallet_adjustment(WalletAdjustmentRequest $request)
+    {
+        $amount = $request->amount;
+
+        $wallet = Wallet::find($request->wallet_id);
+        $new_balance = $wallet->balance + $amount;
+
+        if ($new_balance < 0 || $amount == 0) {
+            throw ValidationException::withMessages(['amount' => 'Insufficient balance']);
+        }
+
+        $wallet_balance = BalanceAdjustment::create([
+            'user_id' => $request->user_id,
+            'wallet_id' => $request->wallet_id,
+            'type' => 'WalletAdjustment',
+            'old_balance' => $wallet->balance,
+            'amount' => $amount,
+            'description' => $request->description,
+            'handle_by' => Auth::id(),
+        ]);
+
+        $wallet->update([
+            'balance' => $new_balance
+        ]);
+
+        $wallet_balance->update([
+            'new_balance' => $new_balance
+        ]);
+
+        return redirect()->back()->with('title', 'Wallet Adjusted!')->with('success', 'This wallet has been adjusted successfully.');
+    }
+
+    public function internal_transfer(Request $request)
+    {
+        $amount = $request->amount;
+
+        //transfer from
+        $user_id = $request->user_id;
+        $wallet = Wallet::find($request->wallet_id);
+
+        //transfer to
+        $to_user_id = $request->to_user_id['value'];
+        $to_user = User::find($to_user_id);
+        $to_wallet = Wallet::where('user_id', $to_user_id)->first();
+
+        if ($wallet->balance < $amount || $amount == 0) {
+            throw ValidationException::withMessages(['amount' => 'Insufficient balance']);
+        }
+
+        if ($to_user_id == $user_id) {
+            throw ValidationException::withMessages(['to_user_id' => 'Cannot transfer to his own account']);
+        }
+
+        $from_user_after_balance = $wallet->balance - $amount;
+        $to_user_after_balance = $to_wallet->balance + $amount;
+
+        $wallet_balance = BalanceAdjustment::create([
+            'user_id' => $user_id,
+            'wallet_id' => $request->wallet_id,
+            'to_user_id' => $to_user_id,
+            'to_wallet_id' => $to_wallet->id,
+            'type' => 'InternalTransfer',
+            'old_balance' => $wallet->balance,
+            'amount' => $amount,
+            'description' => $request->description,
+            'handle_by' => Auth::id(),
+        ]);
+
+        $wallet->update([
+            'balance' => $from_user_after_balance
+        ]);
+
+        $to_wallet->update([
+            'balance' => $to_user_after_balance
+        ]);
+
+        $wallet_balance->update([
+            'new_balance' => $from_user_after_balance
+        ]);
+
+        return redirect()->back()->with('title', 'Balance Transferred!')->with('success', 'The amount is transferred successfully to ' . $to_user->name . '.');
     }
 
     public function affiliate_tree($id)

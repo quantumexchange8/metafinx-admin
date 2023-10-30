@@ -52,6 +52,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/verifyMember', [MemberController::class, 'verifyMember'])->name('member.verify_member');
         Route::patch('/editMember', [MemberController::class, 'editMember'])->name('member.edit_member');
         Route::delete('/unsubscribePlan', [MemberController::class, 'unsubscribePlan'])->name('member.unsubscribe_plan');
+        Route::post('/wallet_adjustment', [MemberController::class, 'wallet_adjustment'])->name('member.wallet_adjustment');
+        Route::post('/internal_transfer', [MemberController::class, 'internal_transfer'])->name('member.internal_transfer');
     });
 
     /**

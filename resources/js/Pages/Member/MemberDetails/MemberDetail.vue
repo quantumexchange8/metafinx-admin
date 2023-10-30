@@ -23,6 +23,7 @@ import MemberInvestment from "@/Pages/Member/MemberDetails/Partials/MemberInvest
 import Action from "@/Pages/Member/MemberDetails/Partials/Action.vue";
 import AccountInformation from "@/Pages/Member/MemberDetails/Partials/AccountInformation.vue";
 import EarningInformation from "@/Pages/Member/MemberDetails/Partials/EarningInformation.vue";
+import {transactionFormat} from "@/Composables/index.js";
 
 const props = defineProps({
     wallets: Object,
@@ -40,6 +41,7 @@ const isLoading = ref(false);
 const refresh = ref(false);
 const frontIdentityModal = ref(false);
 const backIdentityModal = ref(false);
+const { formatAmount } = transactionFormat();
 
 function refreshTable() {
     isLoading.value = !isLoading.value;
@@ -207,23 +209,20 @@ const backButton = () => {
             <h3 class="text-base font-semibold border-b border-gray-700 pb-5">
                 Wallet
             </h3>
-            <div class=" overflow-x-auto grid grid-flow-col justify-start gap-5">
-                <div v-for="wallet in props.wallets" class="flex flex-col overflow-hidden rounded-[20px] w-80">
-                    <div class="flex justify-between  py-5 px-4 shadow-md bg-gradient-to-bl from-pink-400 to-pink-600">
+            <div class="overflow-x-auto grid grid-flow-col justify-start gap-5">
+                <div v-for="wallet in props.wallets" class="flex flex-col overflow-hidden rounded-[20px] w-96">
+                    <div class="flex justify-between py-5 px-4 bg-gradient-to-bl from-pink-400 to-pink-600">
                         <div class="space-y-2">
                             <div class="text-base font-semibold dark:text-white">
                                 {{ wallet.name }}
                             </div>
                             <div class="text-xl font-semibold dark:text-white">
-                                $ {{ wallet.balance }}
+                                $ {{ formatAmount(wallet.balance) }}
                             </div>
                         </div>
                         <Wallet class="w-20 h-20"/>
                     </div>
                     <div class="flex flex-col gap-3 bg-gray-700 py-3 px-4 justify-center h-20">
-                        <!-- <div class="flex flex-row gap-3 justify-center">
-                                test
-                        </div> -->
                         <div class="flex justify-center">
                             <Action
                                 type="wallet"
@@ -233,31 +232,8 @@ const backButton = () => {
                         </div>
                     </div>
                 </div>
-                <!-- <div class="flex flex-col overflow-hidden rounded-[20px] w-80">
-                    <div class="flex justify-between  py-5 px-4 shadow-md bg-gradient-to-bl from-pink-400 to-pink-600">
-                        <div class="space-y-2">
-                            <div class="text-base font-semibold dark:text-white">
-                                TEST
-                            </div>
-                            <div class="text-xl font-semibold dark:text-white">
-                                $ 1000000.00
-                            </div>
-                        </div>
-                        <Wallet class="w-20 h-20"/>
-                    </div>
-                    <div class="flex flex-col gap-3 bg-gray-700 py-3 px-4 justify-center h-20">
-                        <div class="flex flex-row gap-3 justify-center">
-                                test
-                        </div>
-                        <div class="flex justify-center">
-                            <Action
-                                type="wallet"
-                            />
-                        </div>
-                    </div>
-                </div> -->
             </div>
-            
+
         </div>
 
         <div class="flex flex-col md:flex-row items-start gap-8 text-base text-gray-800 dark:text-white">
