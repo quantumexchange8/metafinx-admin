@@ -24,10 +24,14 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/getTotalMembers', [DashboardController::class, 'getTotalMembers'])->name('getTotalMembers');
     Route::get('/getTotalMembersByDays', [DashboardController::class, 'getTotalMembersByDays'])->name('getTotalMembersByDays');
+    Route::get('/getTotalTransactionByDays', [DashboardController::class, 'getTotalTransactionByDays'])->name('getTotalTransactionByDays');
+    Route::get('/getTotalTransactionByMonths', [DashboardController::class, 'getTotalTransactionByMonths'])->name('getTotalTransactionByMonths');
+    Route::get('/getTotalInvestmentByDays', [DashboardController::class, 'getTotalInvestmentByDays'])->name('getTotalInvestmentByDays');
+    Route::get('/getTotalInvestmentByMonths', [DashboardController::class, 'getTotalInvestmentByMonths'])->name('getTotalInvestmentByMonths');
     Route::get('/getPendingKyc', [DashboardController::class, 'getPendingKyc'])->name('getPendingKyc');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -482,7 +482,6 @@ class MemberController extends Controller
     protected function getValidAffiliateDeposit($user)
     {
         $ids = $user->getChildrenIds();
-        $ids[] = $user->id;
 
         return InvestmentSubscription::query()
             ->whereIn('user_id', $ids)

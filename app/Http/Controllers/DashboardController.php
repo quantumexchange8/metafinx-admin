@@ -39,10 +39,14 @@ class DashboardController extends Controller
             $user_transaction->user->profile_photo_url = $user_transaction->user->getFirstMediaUrl('profile_photo');
         });
 
+        $currentTotalInvestment = InvestmentSubscription::whereIn('status', ['CoolingPeriod', 'OngoingPeriod'])
+            ->sum('amount');
+
         return Inertia::render('Dashboard', [
             'totalDeposit' => $totalDeposit,
             'totalWithdrawal' => $totalWithdrawal,
             'totalInvestment' => InvestmentSubscription::all()->sum('amount'),
+            'currentTotalInvestment' => number_format($currentTotalInvestment, 2),
             'totalMembers' => User::where('status', 1)->count(),
             'pendingMemberCount' => $pendingMemberCount,
             'pendingTransactions' => $pendingTransactions,
@@ -90,6 +94,206 @@ class DashboardController extends Controller
                 'backgroundColor' => $backgroundColors[$settingRankId],
                 'borderRadius' => PHP_INT_MAX,
                 'barPercentage' => 0.4
+            ];
+
+            $chartData['datasets'][] = $dataset;
+        }
+
+        return response()->json($chartData);
+    }
+
+    public function getTotalTransactionByDays(Request $request)
+    {
+        $transactions = Payment::query()
+            ->when($request->filled('month'), function ($query) use ($request) {
+                $month = $request->input('month');
+                $query->whereMonth('created_at', $month);
+            })
+            ->where('status', '=', 'Success')
+            ->select(
+                DB::raw('DAY(created_at) as day'),
+                'type',
+                DB::raw('SUM(amount) as amount')
+            )
+            ->groupBy('day', 'type')
+            ->get();
+
+        // Get unique type to create datasets
+        $uniqueTransactionType = $transactions->pluck('type')->unique();
+
+        $year = Carbon::now()->year;
+        $month = $request->month;
+        // Initialize the chart data structure
+        $chartData = [
+            'labels' => range(1, cal_days_in_month(CAL_GREGORIAN, $month, $year)), // Generate an array of days
+            'datasets' => [],
+        ];
+
+        $backgroundColors = ['Deposit' => '#fdb022', 'Withdrawal' => '#FF2D55'];
+
+        // Loop through each unique type and create a dataset
+        foreach ($uniqueTransactionType as $transactionType) {
+            $transactionData = $transactions->where('type', $transactionType);
+
+            $dataset = [
+                'label' => $transactionData->first()->type,
+                'data' => array_map(function ($day) use ($transactionData) {
+                    return $transactionData->firstWhere('day', $day)->amount ?? 0;
+                }, $chartData['labels']),
+                'borderColor' => $backgroundColors[$transactionType],
+                'borderWidth' => 2,
+                'pointStyle' => false,
+                'fill' => true
+            ];
+
+            $chartData['datasets'][] = $dataset;
+        }
+
+        return response()->json($chartData);
+    }
+
+    public function getTotalTransactionByMonths(Request $request)
+    {
+        $transactions = Payment::query()
+            ->when($request->filled('year'), function ($query) use ($request) {
+                $year = $request->input('year');
+                $query->whereYear('created_at', $year);
+            })
+            ->where('status', '=', 'Success')
+            ->select(
+                DB::raw('MONTH(created_at) as month'), // Change DAY to MONTH
+                'type',
+                DB::raw('SUM(amount) as amount')
+            )
+            ->groupBy('month', 'type') // Change 'day' to 'month'
+            ->get();
+
+        $uniqueTransactionType = $transactions->pluck('type')->unique();
+
+        // Initialize the chart data structure with short month names as labels
+        $shortMonthNames = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $shortMonthNames[] = date('M', mktime(0, 0, 0, $month, 1));
+        }
+
+        $chartData = [
+            'labels' => $shortMonthNames,
+            'datasets' => [],
+        ];
+
+        $backgroundColors = ['Deposit' => '#fdb022', 'Withdrawal' => '#FF2D55'];
+
+        foreach ($uniqueTransactionType as $transactionType) {
+            $transactionData = $transactions->where('type', $transactionType);
+
+            $dataset = [
+                'label' => $transactionData->first()->type,
+                'data' => array_map(function ($month) use ($transactionData) {
+                    return $transactionData->firstWhere('month', $month)->amount ?? 0;
+                }, range(1, 12)), // Use month numbers 1-12
+                'borderColor' => $backgroundColors[$transactionType],
+                'borderWidth' => 2,
+                'pointStyle' => false,
+                'fill' => true
+            ];
+
+            $chartData['datasets'][] = $dataset;
+        }
+
+        return response()->json($chartData);
+    }
+
+    public function getTotalInvestmentByDays(Request $request)
+    {
+        $subscriptions = InvestmentSubscription::query()
+            ->when($request->filled('month'), function ($query) use ($request) {
+                $month = $request->input('month');
+                $query->whereMonth('created_at', $month);
+            })
+            ->select(
+                DB::raw('DAY(created_at) as day'),
+                'status', // No need for CASE statement
+                DB::raw('SUM(amount) as amount')
+            )
+            ->groupBy('day', 'status')
+            ->get();
+
+        // Get unique type to create datasets
+        $uniqueSubscriptionsType = $subscriptions->pluck('status')->unique();
+
+        $year = Carbon::now()->year;
+        $month = $request->month;
+        // Initialize the chart data structure
+        $chartData = [
+            'labels' => range(1, cal_days_in_month(CAL_GREGORIAN, $month, $year)), // Generate an array of days
+            'datasets' => [],
+        ];
+
+        $backgroundColors = ['CoolingPeriod' => '#32ADE6', 'OngoingPeriod' => '#FDB022', 'MaturityPeriod' => '#00C7BE', 'Terminated' => '#FF2D55'];
+
+        // Loop through each unique type and create a dataset
+        foreach ($uniqueSubscriptionsType as $subscription_type) {
+            $subscription_data = $subscriptions->where('status', $subscription_type);
+
+            $dataset = [
+                'label' => $subscription_type, // Use the 'type' directly
+                'data' => array_map(function ($day) use ($subscription_data) {
+                    return $subscription_data->firstWhere('day', $day)->amount ?? 0;
+                }, $chartData['labels']),
+                'borderColor' => $backgroundColors[$subscription_type],
+                'borderWidth' => 2,
+                'pointStyle' => false,
+                'fill' => true
+            ];
+
+            $chartData['datasets'][] = $dataset;
+        }
+
+        return response()->json($chartData);
+    }
+
+    public function getTotalInvestmentByMonths(Request $request)
+    {
+        $subscriptions = InvestmentSubscription::query()
+            ->when($request->filled('year'), function ($query) use ($request) {
+                $year = $request->input('year');
+                $query->whereYear('created_at', $year);
+            })
+            ->select(
+                DB::raw('MONTH(created_at) as month'), // Change DAY to MONTH
+                'status',
+                DB::raw('SUM(amount) as amount')
+            )
+            ->groupBy('month', 'status') // Change 'day' to 'month'
+            ->get();
+
+        $uniqueSubscriptionsType = $subscriptions->pluck('status')->unique();
+
+        // Initialize the chart data structure with short month names as labels
+        $shortMonthNames = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $shortMonthNames[] = date('M', mktime(0, 0, 0, $month, 1));
+        }
+
+        $chartData = [
+            'labels' => $shortMonthNames,
+            'datasets' => [],
+        ];
+
+        $backgroundColors = ['CoolingPeriod' => '#32ADE6', 'OngoingPeriod' => '#FDB022', 'MaturityPeriod' => '#00C7BE', 'Terminated' => '#FF2D55'];
+
+        foreach ($uniqueSubscriptionsType as $subscription_type) {
+            $subscription_data = $subscriptions->where('status', $subscription_type);
+
+            $dataset = [
+                'label' => $subscription_type,
+                'data' => array_map(function ($month) use ($subscription_data) {
+                    return $subscription_data->firstWhere('month', $month)->amount ?? 0;
+                }, range(1, 12)), // Use month numbers 1-12
+                'borderColor' => $backgroundColors[$subscription_type],
+                'borderWidth' => 2,
+                'pointStyle' => false,
+                'fill' => true
             ];
 
             $chartData['datasets'][] = $dataset;

@@ -9,8 +9,8 @@ const props = defineProps({
 
 const chartData = ref({
     labels: [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ],
     datasets: [],
 });
