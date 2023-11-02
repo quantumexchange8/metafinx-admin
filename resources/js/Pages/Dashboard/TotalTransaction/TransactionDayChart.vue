@@ -31,39 +31,42 @@ const fetchData = async () => {
         chartData.value.datasets = datasets;
 
         if(datasets.length > 0) {
-            datasets[0].backgroundColor = (context) => {
-                const bgColor = [
-                    'rgba(253, 176, 34, 0.40)',
-                    'rgba(253, 176, 34, 0.00)'
-                ];
+            if(datasets[0]) {
+                datasets[0].backgroundColor = (context) => {
+                    const bgColor = [
+                        'rgba(253, 176, 34, 0.40)',
+                        'rgba(253, 176, 34, 0.00)'
+                    ];
 
-                if (!context.chart.chartArea) {
-                    return;
-                }
+                    if (!context.chart.chartArea) {
+                        return;
+                    }
 
-                const { ctx, data, chartArea: {top, bottom} } = context.chart;
-                const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
-                gradientBg.addColorStop(0, bgColor[0]);
-                gradientBg.addColorStop(1, bgColor[1]);
-                return gradientBg;
-            };
+                    const { ctx, data, chartArea: {top, bottom} } = context.chart;
+                    const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
+                    gradientBg.addColorStop(0, bgColor[0]);
+                    gradientBg.addColorStop(1, bgColor[1]);
+                    return gradientBg;
+                };
+            }
+            if(datasets[1]) {
+                datasets[1].backgroundColor = (context) => {
+                    const bgColor = [
+                        'rgba(255, 45, 85, 0.40)',
+                        'rgba(255, 45, 85, 0.00)'
+                    ];
 
-            datasets[1].backgroundColor = (context) => {
-                const bgColor = [
-                    'rgba(255, 45, 85, 0.40)',
-                    'rgba(255, 45, 85, 0.00)'
-                ];
+                    if (!context.chart.chartArea) {
+                        return;
+                    }
 
-                if (!context.chart.chartArea) {
-                    return;
-                }
-
-                const { ctx, data, chartArea: {top, bottom} } = context.chart;
-                const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
-                gradientBg.addColorStop(0, bgColor[0]);
-                gradientBg.addColorStop(1, bgColor[1]);
-                return gradientBg;
-            };
+                    const { ctx, data, chartArea: {top, bottom} } = context.chart;
+                    const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
+                    gradientBg.addColorStop(0, bgColor[0]);
+                    gradientBg.addColorStop(1, bgColor[1]);
+                    return gradientBg;
+                };
+            }
         }
 
         isLoading.value = false

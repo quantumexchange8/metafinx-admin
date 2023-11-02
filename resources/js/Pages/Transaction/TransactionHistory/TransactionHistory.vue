@@ -3,6 +3,8 @@ import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
 import {ref} from "vue";
 import DepositHistoryTable from "@/Pages/Transaction/TransactionHistory/DepositHistoryTable.vue";
 import WithdrawalHistoryTable from "@/Pages/Transaction/TransactionHistory/WithdrawalHistoryTable.vue";
+import WalletAdjustmentHistory from "@/Pages/Transaction/TransactionHistory/WalletAdjustmentHistory.vue";
+import InternalTransferHistory from "@/Pages/Transaction/TransactionHistory/InternalTransferHistory.vue";
 import PendingWithdrawal from "@/Pages/Transaction/PendingTransaction/PendingWithdrawal.vue";
 import PendingDeposit from "@/Pages/Transaction/PendingTransaction/PendingDeposit.vue";
 
@@ -29,7 +31,7 @@ const updateTransactionType = (transaction_type) => {
         <span class="flex items-center text-xs font-normal text-gray-900 dark:text-white"><span class="flex w-2 h-2 bg-red-500 dark:bg-success-500 rounded-full mr-2 flex-shrink-0"></span>Success</span>
     </div>
     <TabGroup>
-        <TabList class="max-w-xs flex py-1">
+        <TabList class="max-w-xl flex py-1">
             <Tab
                 as="template"
                 v-slot="{ selected }"
@@ -64,6 +66,40 @@ const updateTransactionType = (transaction_type) => {
                     Withdrawal
                 </button>
             </Tab>
+            <Tab
+                as="template"
+                v-slot="{ selected }"
+            >
+                <button
+                    @click="updateTransactionType('WalletAdjustment')"
+                    :class="[
+                              'w-full py-2.5 text-sm font-semibold dark:text-gray-400',
+                              'ring-white ring-offset-0 focus:outline-none focus:ring-0',
+                              selected
+                                ? 'dark:text-white border-b-2'
+                                : 'border-b border-gray-400',
+                           ]"
+                >
+                    Wallet Adjustment
+                </button>
+            </Tab>
+            <Tab
+                as="template"
+                v-slot="{ selected }"
+            >
+                <button
+                    @click="updateTransactionType('InternalTransfer')"
+                    :class="[
+                              'w-full py-2.5 text-sm font-semibold dark:text-gray-400',
+                              'ring-white ring-offset-0 focus:outline-none focus:ring-0',
+                              selected
+                                ? 'dark:text-white border-b-2'
+                                : 'border-b border-gray-400',
+                           ]"
+                >
+                    Internal Transfer
+                </button>
+            </Tab>
         </TabList>
         <TabPanels>
             <TabPanel>
@@ -80,6 +116,30 @@ const updateTransactionType = (transaction_type) => {
             </TabPanel>
             <TabPanel>
                 <WithdrawalHistoryTable
+                    :refresh="refresh"
+                    :isLoading="isLoading"
+                    :search="search"
+                    :date="date"
+                    :exportStatus="exportStatus"
+                    @update:loading="$emit('update:loading', $event)"
+                    @update:refresh="$emit('update:refresh', $event)"
+                    @update:export="$emit('update:export', $event)"
+                />
+            </TabPanel>
+            <TabPanel>
+                <WalletAdjustmentHistory
+                    :refresh="refresh"
+                    :isLoading="isLoading"
+                    :search="search"
+                    :date="date"
+                    :exportStatus="exportStatus"
+                    @update:loading="$emit('update:loading', $event)"
+                    @update:refresh="$emit('update:refresh', $event)"
+                    @update:export="$emit('update:export', $event)"
+                />
+            </TabPanel>
+            <TabPanel>
+                <InternalTransferHistory
                     :refresh="refresh"
                     :isLoading="isLoading"
                     :search="search"

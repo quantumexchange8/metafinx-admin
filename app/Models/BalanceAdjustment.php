@@ -21,4 +21,14 @@ class BalanceAdjustment extends Model
         'description',
         'handle_by',
     ];
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function to_user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'to_user_id', 'id');
+    }
 }
