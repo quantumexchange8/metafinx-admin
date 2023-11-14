@@ -152,8 +152,8 @@ const paginationActiveClass = [
             class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
         >
             <td class="px-3 py-2.5 inline-flex items-center gap-2">
-                <img :src="referral.upline?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                {{ referral.upline ? referral.upline.name : 'N/A' }}
+                <img :src="referral.user?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                {{ referral.user ? referral.user.name : 'N/A' }}
             </td>
             <td class="px-3 py-2.5">
                 <div class="flex flex-col">

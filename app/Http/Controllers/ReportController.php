@@ -35,7 +35,7 @@ class ReportController extends Controller
                     $downline->where('name', 'like', $search)
                         ->orWhere('email', 'like', $search);
                 })
-                ->orWhere('upline', function ($upline) use ($search){
+                ->orWhereHas('user', function ($upline) use ($search){
                     $upline->where('name', 'like', $search);
                 });
             });
@@ -69,7 +69,7 @@ class ReportController extends Controller
         $results = $query->latest()->paginate(10);
 
         $results->each(function ($user_deposit) {
-            $user_deposit->upline->profile_photo_url = $user_deposit->upline->getFirstMediaUrl('profile_photo');
+            $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
         });
 
         return response()->json([
