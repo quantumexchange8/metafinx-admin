@@ -1,15 +1,14 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/Authenticated.vue'
-import Button from '@/Components/Button.vue'
-import { GithubIcon } from '@/Components/Icons/brands'
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import {transactionFormat} from "@/Composables/index.js";
-import MemberChart from "@/Pages/Dashboard/MemberChart.vue";
+import MemberChart from "@/Pages/Dashboard/TotalMember/MemberChart.vue";
 import PendingKYC from "@/Pages/Dashboard/PendingKYC.vue";
 import PendingTransaction from "@/Pages/Dashboard/PendingTransaction.vue";
+import TotalTransaction from "@/Pages/Dashboard/TotalTransaction/TotalTransaction.vue";
+import TotalInvestment from "@/Pages/Dashboard/TotalInvestment/TotalInvestment.vue";
 
 const props = defineProps({
-    newMemberCount: Number,
     totalDeposit: Number,
     totalWithdrawal: Number,
     totalInvestment: Number,
@@ -19,22 +18,46 @@ const props = defineProps({
     pendingDeposits: Object,
     pendingWithdrawals: Object,
     pendingTransactions: Object,
-    pendingTransactionCount: Number
+    pendingTransactionCount: Number,
+    currentTotalInvestment: String,
 })
 
-const currentMonth = ref('');
 const { formatAmount } = transactionFormat();
+const currentYear = new Date().getFullYear();
+const activeStats = ref('totalMemberStats');
 
-onMounted(() => {
-    const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
+const statistics = [
+    {
+        key: 'totalMemberStats',
+        label: 'Total Members',
+        value: props.totalMembers,
+    },
+    {
+        key: 'totalDepositStats',
+        label: 'Total Deposit',
+        value: '$ ' + formatAmount(props.totalDeposit),
+    },
+    {
+        key: 'totalWithdrawalStats',
+        label: 'Total Withdrawal',
+        value: '$ ' + formatAmount(props.totalWithdrawal),
+    },
+    {
+        key: 'totalInvestmentStats',
+        label: 'Total Investment',
+        value: '$ ' + formatAmount(props.totalInvestment),
+    },
+];
 
-    const currentDate = new Date();
-    const currentMonthIndex = currentDate.getMonth();
-    currentMonth.value = months[currentMonthIndex];
-});
+const selectStats = (stats) => {
+    activeStats.value = stats;
+};
+
+const isActiveStatistic = (key) => {
+    return activeStats.value === key
+        ? 'border-2 dark:border-white dark:bg-gray-600'
+        : 'dark:bg-gray-700';
+};
 </script>
 
 <template>
@@ -48,55 +71,36 @@ onMounted(() => {
         </template>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-            <div class="px-5 py-3 flex flex-col overflow-hidden bg-white rounded-xl shadow-md dark:bg-gray-700">
+            <div
+                v-for="statistic in statistics"
+                :key="statistic.key"
+                class="px-5 py-3 flex flex-col overflow-hidden bg-white rounded-xl shadow-md dark:hover:bg-gray-600 cursor-pointer"
+                :class="isActiveStatistic(statistic.key)"
+                @click="selectStats(statistic.key)"
+            >
                 <div class="text-xs dark:text-gray-400">
-                    New Member Joined ({{ currentMonth }})
+                    {{ statistic.label }}
                 </div>
                 <div class="text-xl font-semibold">
-                    {{ props.newMemberCount }}
-                </div>
-            </div>
-            <div class="px-5 py-3 flex flex-col overflow-hidden bg-white rounded-xl shadow-md dark:bg-gray-700">
-                <div class="text-xs dark:text-gray-400">
-                   Total Deposit
-                </div>
-                <div class="text-xl font-semibold">
-                    $ {{ formatAmount(props.totalDeposit) }}
-                </div>
-            </div>
-            <div class="px-5 py-3 flex flex-col overflow-hidden bg-white rounded-xl shadow-md dark:bg-gray-700">
-                <div class="text-xs dark:text-gray-400">
-                    Total Withdrawal
-                </div>
-                <div class="text-xl font-semibold">
-                    $ {{ formatAmount(props.totalWithdrawal) }}
-                </div>
-            </div>
-            <div class="px-5 py-3 flex flex-col overflow-hidden bg-white rounded-xl shadow-md dark:bg-gray-700">
-                <div class="text-xs dark:text-gray-400">
-                    Total Investment
-                </div>
-                <div class="text-xl font-semibold">
-                    $ {{ formatAmount(props.totalInvestment) }}
+                    {{ statistic.value }}
                 </div>
             </div>
         </div>
 
-        <div class="p-5 rounded-[10px] dark:bg-gray-700 my-8">
-            <div class="flex justify-between">
-                <div class="grid">
-                    <span class="text-xl font-semibold dark:text-white">Total Members</span>
-                    <span class="text-xs font-normal dark:text-gray-400">Yearly Total Members Data</span>
-                </div>
-                <div>
-                    <span class="text-[32px] font-semibold dark:text-white">{{ props.totalMembers }}</span> <span class="text-xl dark:text-gray-400">members</span>
-                </div>
-            </div>
-            <hr class="h-px my-3 bg-gray-200 border-0 dark:bg-gray-600">
-
-            <MemberChart />
-
-        </div>
+        <MemberChart
+            v-if="activeStats==='totalMemberStats'"
+            :totalMem="currentYear"
+            :totalMembers="totalMembers"
+        />
+        <TotalTransaction
+            v-if="activeStats==='totalDepositStats' || activeStats==='totalWithdrawalStats'"
+            :currentYear="currentYear"
+        />
+        <TotalInvestment
+            v-if="activeStats==='totalInvestmentStats'"
+            :currentYear="currentYear"
+            :currentTotalInvestment="currentTotalInvestment"
+        />
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 my-8">
             <PendingKYC

@@ -130,7 +130,7 @@ const closeModal = () => {
                 </div>
             </div>
             <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
-                <span class="text-sm dark:text-white">Password</span>
+                <Label class="text-sm dark:text-white" for="password" value="Password" />
                 <div class="md:col-span-3">
                     <InputIconWrapper class="relative flex flex-row items-center gap-3 w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600">
                         <template #icon>

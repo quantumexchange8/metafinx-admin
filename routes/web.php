@@ -25,9 +25,14 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/getTotalMembers', [DashboardController::class, 'getTotalMembers'])->name('getTotalMembers');
+    Route::get('/getTotalMembersByDays', [DashboardController::class, 'getTotalMembersByDays'])->name('getTotalMembersByDays');
+    Route::get('/getTotalTransactionByDays', [DashboardController::class, 'getTotalTransactionByDays'])->name('getTotalTransactionByDays');
+    Route::get('/getTotalTransactionByMonths', [DashboardController::class, 'getTotalTransactionByMonths'])->name('getTotalTransactionByMonths');
+    Route::get('/getTotalInvestmentByDays', [DashboardController::class, 'getTotalInvestmentByDays'])->name('getTotalInvestmentByDays');
+    Route::get('/getTotalInvestmentByMonths', [DashboardController::class, 'getTotalInvestmentByMonths'])->name('getTotalInvestmentByMonths');
     Route::get('/getPendingKyc', [DashboardController::class, 'getPendingKyc'])->name('getPendingKyc');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -52,6 +57,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/verifyMember', [MemberController::class, 'verifyMember'])->name('member.verify_member');
         Route::patch('/editMember', [MemberController::class, 'editMember'])->name('member.edit_member');
         Route::delete('/unsubscribePlan', [MemberController::class, 'unsubscribePlan'])->name('member.unsubscribe_plan');
+        Route::post('/wallet_adjustment', [MemberController::class, 'wallet_adjustment'])->name('member.wallet_adjustment');
+        Route::post('/internal_transfer', [MemberController::class, 'internal_transfer'])->name('member.internal_transfer');
     });
 
     /**
@@ -79,6 +86,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/approveTransaction', [TransactionController::class, 'approveTransaction'])->name('transaction.approveTransaction');
         Route::post('/rejectTransaction', [TransactionController::class, 'rejectTransaction'])->name('transaction.rejectTransaction');
         Route::get('/getTransactionHistory/{type}', [TransactionController::class, 'getTransactionHistory'])->name('transaction.getTransactionHistory');
+        Route::get('/getBalanceHistory/{type}', [TransactionController::class, 'getBalanceHistory'])->name('transaction.getBalanceHistory');
     });
 
     /**

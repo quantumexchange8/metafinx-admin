@@ -29,7 +29,7 @@ class KycApprovalNotification extends Notification implements ShouldQueue
             ->subject('KYC Approval Status')
             ->greeting('Dear ' . $this->user->name)
             ->line($this->getMessage())
-            ->action('METAFINX', url('https://login.metafinx.com/login'))
+            ->action('Login Portal', url('/'))
             ->line('Thank you for using our application!');
     }
 

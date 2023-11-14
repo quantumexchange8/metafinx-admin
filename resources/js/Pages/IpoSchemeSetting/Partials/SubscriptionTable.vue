@@ -224,7 +224,7 @@ const closeModal = () => {
         </div>
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Investment Plan</span>
-            <span class="text-black dark:text-white py-2">{{ subscriptionDetail.investment_plan.name }}</span>
+            <span class="text-black dark:text-white py-2">{{ subscriptionDetail.investment_plan.name.en }}</span>
         </div>
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Amount</span>

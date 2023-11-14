@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddMemberRequest;
 use App\Http\Requests\EditMemberRequest;
 use App\Http\Requests\KycApprovalRequest;
+use App\Http\Requests\WalletAdjustmentRequest;
+use App\Models\BalanceAdjustment;
+use App\Models\SettingCountry;
 use App\Models\SettingRank;
 use App\Models\User;
 use App\Models\InvestmentSubscription;
+use App\Models\Wallet;
 use App\Notifications\KycApprovalNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Redirect;
@@ -22,9 +28,30 @@ class MemberController extends Controller
 {
     public function listing()
     {
+        $settingRanks = SettingRank::all();
+
+        $formattedRanks = $settingRanks->map(function ($country) {
+            return [
+                'value' => $country->id,
+                'label' => $country->name,
+            ];
+        });
+
+        $settingCountries = SettingCountry::all();
+
+        $formattedCountries = $settingCountries->map(function ($country) {
+            return [
+                'value' => $country->name_en,
+                'label' => $country->name_en,
+                'phone_code' => $country->phone_code,
+            ];
+        });
+
         return Inertia::render('Member/MemberListing', [
             'pendingKycCount' => User::where('kyc_approval', '=', 'pending')->count(),
             'unverifiedKycCount' => User::where('kyc_approval', '=', 'unverified')->count(),
+            'settingRanks' => $formattedRanks,
+            'countries' => $formattedCountries,
         ]);
     }
 
@@ -76,39 +103,38 @@ class MemberController extends Controller
         return response()->json($members);
     }
 
-    public function addMember(Request $request)
+    public function addMember(AddMemberRequest $request)
     {
-        $validator = Validator::make($request->all(),[
-            'name' => 'required|regex:/^[a-zA-Z0-9\p{Han}. ]+$/u|max:255',
-            'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:8|unique:' . User::class,
-            'email' => 'required|string|email|max:255|unique:' . User::class,
-            'password' => ['required', Password::defaults()],
-            'ranking' => 'required',
+        $upline_id = $request->upline_id['value'];
+        $upline = User::find($upline_id);
 
+        if(empty($upline->hierarchyList)) {
+            $hierarchyList = "-" . $upline_id . "-";
+        } else {
+            $hierarchyList = $upline->hierarchyList . $upline_id . "-";
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'country' => $request->country,
+            'phone' => $request->phone,
+            'verification_type' => $request->verification_type,
+            'upline_id' => $upline_id,
+            'hierarchyList' => $hierarchyList,
+            'setting_rank_id' => $request->ranking,
+            'password' => Hash::make($request->password),
+            'identity_number' => $request->identity_number,
+            'role' => 'user',
+            'kyc_approval' => 'unverified',
         ]);
 
-        $attributes = [
-            'name' => 'Name',
-            'phone' => 'Phone Number',
-            'email' => 'Email',
-            'password' => 'Password',
-            'ranking' => 'Ranking',
-        ];
-
-        $validator->setAttributeNames($attributes);
-        $validatedData = $validator->validate();
-
-        User::create([
-
-            'name' => $validatedData['name'],
-            'phone' => $validatedData['phone'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'setting_rank_id' => $validatedData['ranking'],
-            'referral_code' => $request->refCode,
-            'status' => 1,
-            'country' => "Malaysia"
+        Wallet::create([
+            'user_id' => $user->id,
+            'name' => 'Internal Wallet'
         ]);
+
+        $user->setReferralId();
 
         return redirect()->back()->with('title', 'New member added!')->with('success', 'The new member has been added successfully.');
     }
@@ -126,7 +152,7 @@ class MemberController extends Controller
     {
         $user = User::find($request->id);
         $approvalType = $request->type;
-        
+
         $title = '';
         $message = '';
 
@@ -223,11 +249,21 @@ class MemberController extends Controller
             ];
         });
 
+        $wallets = Wallet::where('user_id', $user->id)->get();
+        $walletSum = Wallet::where('user_id', $user->id)->sum('balance');
+        $referralCount = User::where('upline_id', $user->id)->count();
+
         return Inertia::render('Member/MemberDetails/MemberDetail', [
             'member_details' => $user,
             'upline_member' => $upline,
             'investments' => $investmentSubscriptions,
-            'settingRank' => $formattedRanks
+            'settingRank' => $formattedRanks,
+            'wallets' => $wallets,
+            'walletSum' => floatval($walletSum),
+            'referralCount' => $referralCount,
+            // 'total_affiliate' => count($user->getChildrenIds()),
+            'self_deposit' => floatval($this->getSelfDeposit($user)),
+            'valid_affiliate_deposit' => floatval($this->getValidAffiliateDeposit($user)),
         ]);
     }
 
@@ -247,6 +283,89 @@ class MemberController extends Controller
         ]);
 
         return redirect()->back()->with('title', 'Subscription terminated!')->with('success', 'The investment plan has been terminated successfully.');
+    }
+
+    public function wallet_adjustment(WalletAdjustmentRequest $request)
+    {
+        $amount = $request->amount;
+
+        $wallet = Wallet::find($request->wallet_id);
+        $new_balance = $wallet->balance + $amount;
+
+        if ($new_balance < 0 || $amount == 0) {
+            throw ValidationException::withMessages(['amount' => 'Insufficient balance']);
+        }
+
+        $wallet_balance = BalanceAdjustment::create([
+            'user_id' => $request->user_id,
+            'wallet_id' => $request->wallet_id,
+            'type' => 'WalletAdjustment',
+            'old_balance' => $wallet->balance,
+            'amount' => $amount,
+            'description' => $request->description,
+            'handle_by' => Auth::id(),
+        ]);
+
+        $wallet->update([
+            'balance' => $new_balance
+        ]);
+
+        $wallet_balance->update([
+            'new_balance' => $new_balance
+        ]);
+
+        return redirect()->back()->with('title', 'Wallet Adjusted!')->with('success', 'This wallet has been adjusted successfully.');
+    }
+
+    public function internal_transfer(Request $request)
+    {
+        $amount = $request->amount;
+
+        //transfer from
+        $user_id = $request->user_id;
+        $wallet = Wallet::find($request->wallet_id);
+
+        //transfer to
+        $to_user_id = $request->to_user_id['value'];
+        $to_user = User::find($to_user_id);
+        $to_wallet = Wallet::where('user_id', $to_user_id)->first();
+
+        if ($wallet->balance < $amount || $amount == 0) {
+            throw ValidationException::withMessages(['amount' => 'Insufficient balance']);
+        }
+
+        if ($to_user_id == $user_id) {
+            throw ValidationException::withMessages(['to_user_id' => 'Cannot transfer to his own account']);
+        }
+
+        $from_user_after_balance = $wallet->balance - $amount;
+        $to_user_after_balance = $to_wallet->balance + $amount;
+
+        $wallet_balance = BalanceAdjustment::create([
+            'user_id' => $user_id,
+            'wallet_id' => $request->wallet_id,
+            'to_user_id' => $to_user_id,
+            'to_wallet_id' => $to_wallet->id,
+            'type' => 'InternalTransfer',
+            'old_balance' => $wallet->balance,
+            'amount' => $amount,
+            'description' => $request->description,
+            'handle_by' => Auth::id(),
+        ]);
+
+        $wallet->update([
+            'balance' => $from_user_after_balance
+        ]);
+
+        $to_wallet->update([
+            'balance' => $to_user_after_balance
+        ]);
+
+        $wallet_balance->update([
+            'new_balance' => $from_user_after_balance
+        ]);
+
+        return redirect()->back()->with('title', 'Balance Transferred!')->with('success', 'The amount is transferred successfully to ' . $to_user->name . '.');
     }
 
     public function affiliate_tree($id)
@@ -363,7 +482,6 @@ class MemberController extends Controller
     protected function getValidAffiliateDeposit($user)
     {
         $ids = $user->getChildrenIds();
-        $ids[] = $user->id;
 
         return InvestmentSubscription::query()
             ->whereIn('user_id', $ids)

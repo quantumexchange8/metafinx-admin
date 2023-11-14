@@ -1,24 +1,34 @@
 <script setup>
-import Chart from 'chart.js/auto'
-import {onMounted, ref} from "vue";
 import Loading from "@/Components/Loading.vue";
+import {onMounted, ref, watch} from "vue";
+import Chart from 'chart.js/auto'
+
+const props = defineProps({
+    selectedYear: Number
+})
 
 const chartData = ref({
     labels: [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ],
     datasets: [],
 });
 const isLoading = ref(false)
+const year = ref(props.selectedYear)
+let chartInstance = null;
 
-onMounted(async () => {
-    const ctx = document.getElementById('totalMembers');
-
+const fetchData = async () => {
     try {
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        const ctx = document.getElementById('totalMembers');
+
         isLoading.value = true;
 
-        const response = await axios.get('/getTotalMembers', { params: { year: 2023 } });
+        const response = await axios.get('/getTotalMembers', { params: { year: year.value } });
         const data = response.data.data;
         const backgroundColors = ['#FFB2AB', '#FF2D55', '#FEC84B', '#F79009'];
         const dataLabels = ['Member', 'LVL 1', 'LVL 2', 'LVL 3'];
@@ -36,10 +46,11 @@ onMounted(async () => {
 
             chartData.value.datasets.push(dataset);
         }
+
         isLoading.value = false
 
         // Create the chart after updating chartData
-        new Chart(ctx, {
+        chartInstance = new Chart(ctx, {
             type: 'bar',
             data: chartData.value,
             options: {
@@ -90,15 +101,31 @@ onMounted(async () => {
         isLoading.value = false
         console.error('Error fetching chart data:', error);
     }
-});
+}
 
+onMounted(async () => {
+    await fetchData(); // Fetch data on mount
+
+    // Watch for changes in the date and fetch data when it changes
+
+    watch(
+        () => props.selectedYear, // Expression to watch
+        (newYear) => {
+            // This callback will be called when selectedMonth changes.
+            year.value = newYear;
+            fetchData();
+        }
+    );
+
+});
 </script>
 
 <template>
+    <div v-if="isLoading" class="flex justify-center">
+        <Loading />
+    </div>
     <div>
-        <div v-if="isLoading" class="flex justify-center mt-8">
-            <Loading />
-        </div>
         <canvas id="totalMembers" height="350"></canvas>
     </div>
+
 </template>

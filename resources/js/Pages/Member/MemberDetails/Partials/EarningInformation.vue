@@ -25,11 +25,11 @@ function refreshTable() {
         </div>
         <div class="flex items-center gap-8">
             <p class="text-sm font-semibold text-gray-400 w-full">Total Monthly Return</p>
-            <p class="text-sm dark:text-white w-full">$ 888.00</p>
+            <p class="text-sm dark:text-white w-full">$ 0.00</p>
         </div>
         <div class="flex items-center gap-8">
             <p class="text-sm font-semibold text-gray-400 w-full">Total Divended</p>
-            <p class="text-sm dark:text-white w-full">$ 88,000.00</p>
+            <p class="text-sm dark:text-white w-full">$ 0.00</p>
         </div>
         <div class="flex items-center gap-8">
             <p class="text-sm font-semibold text-gray-400 w-full">Total Ticket Bonus</p>
@@ -37,15 +37,15 @@ function refreshTable() {
         </div>
         <div class="flex items-center gap-8">
             <p class="text-sm font-semibold text-gray-400 w-full">Total Referral Earning</p>
-            <p class="text-sm dark:text-white w-full">$ 88,000.00</p>
+            <p class="text-sm dark:text-white w-full">$ 0.00</p>
         </div>
         <div class="flex items-center gap-8">
             <p class="text-sm font-semibold text-gray-400 w-full">Total Affiliate Earning</p>
-            <p class="text-sm dark:text-white w-full">$ 88,000.00</p>
+            <p class="text-sm dark:text-white w-full">$ 0.00</p>
         </div>
         <div class="flex items-center gap-8">
             <p class="text-sm font-semibold text-gray-400 w-full">Total Dividend Earning</p>
-            <p class="text-sm dark:text-white w-full">$ 88,000.00</p>
+            <p class="text-sm dark:text-white w-full">$ 0.00</p>
         </div>
     </div>
 </template>

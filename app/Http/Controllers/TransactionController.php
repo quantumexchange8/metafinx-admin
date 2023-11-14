@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Exports\DepositExport;
 use App\Exports\WithdrawalExport;
+use App\Exports\BalanceAdjustmentExport;
 use App\Models\Payment;
 use App\Models\Wallet;
+use App\Models\BalanceAdjustment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -73,6 +75,12 @@ class TransactionController extends Controller
                 $payment->update([
                     'status' => 'Success'
                 ]);
+
+                if ($payment->type == 'Deposit') {
+                    $wallet = Wallet::find($payment->wallet_id);
+                    $wallet->balance += $payment->amount;
+                    $wallet->save();
+                }
             }
         } else {
             $payment = Payment::find($request->id);
@@ -80,6 +88,12 @@ class TransactionController extends Controller
             $payment->update([
                 'status' => 'Success'
             ]);
+
+            if ($payment->type == 'Deposit') {
+                $wallet = Wallet::find($payment->wallet_id);
+                $wallet->balance += $payment->amount;
+                $wallet->save();
+            }
         }
 
         return redirect()->back()->with('title', 'Approved successfully')->with('success', 'The transaction request has been approved successfully.');
@@ -99,10 +113,12 @@ class TransactionController extends Controller
                         'status' => 'Rejected'
                     ]);
 
-                    $wallet = Wallet::find($payment->wallet_id);
+                    if ($payment->type == 'Withdrawal') {
+                        $wallet = Wallet::find($payment->wallet_id);
 
-                    $wallet->balance += $payment->amount;
-                    $wallet->save();
+                        $wallet->balance += $payment->amount;
+                        $wallet->save();
+                    }
                 }
             }
         } else {
@@ -112,10 +128,12 @@ class TransactionController extends Controller
                 'status' => 'Rejected'
             ]);
 
-            $wallet = Wallet::find($payment->wallet_id);
+            if ($payment->type == 'Withdrawal') {
+                $wallet = Wallet::find($payment->wallet_id);
 
-            $wallet->balance += $payment->amount;
-            $wallet->save();
+                $wallet->balance += $payment->amount;
+                $wallet->save();
+            }
         }
 
         return redirect()->back()->with('title', 'Rejected successfully')->with('success', 'The transaction request has been rejected successfully.');
@@ -164,4 +182,55 @@ class TransactionController extends Controller
 
         return response()->json([$type => $results]);
     }
+
+    public function getBalanceHistory(Request $request, $type)
+    {
+        $query = BalanceAdjustment::query()->with('user', 'to_user')
+            ->where('type', $type);
+
+        if ($request->filled('search')) {
+            $search = '%' . $request->input('search') . '%';
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($user_query) use ($search) {
+                    $user_query->where('name', 'like', $search);
+                })
+                ->orWhereHas('to_user', function ($to_user_query) use ($search) {
+                    $to_user_query->where('name', 'like', $search);
+                })
+                ->orWhere('new_balance', 'like', $search)
+                ->orWhere('amount', 'like', $search)
+                ->orWhere('description', 'like', $search);
+            });
+        }
+
+        if ($request->filled('date')) {
+            $date = $request->input('date');
+            $dateRange = explode(' - ', $date);
+            $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+            $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+
+            $query->whereBetween('created_at', [$start_date, $end_date]);
+        }
+
+        if ($request->has('exportStatus')) {
+            if ($type == 'WalletAdjustment') {
+                return Excel::download(new BalanceAdjustmentExport($query, $type), Carbon::now() . '-' . $type . '_History-report.xlsx');
+            } elseif ($type == 'InternalTransfer') {
+                return Excel::download(new BalanceAdjustmentExport($query, $type), Carbon::now() . '-' . $type . '_History-report.xlsx');
+            }
+        }
+
+        $results = $query->latest()->paginate(10);
+
+        $results->each(function ($user_deposit) use ($type) {
+            $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
+        
+            if ($type != 'WalletAdjustment') {
+                $user_deposit->to_user->profile_photo_url = $user_deposit->to_user->getFirstMediaUrl('profile_photo');
+            }
+        });
+
+        return response()->json([$type => $results]);
+    }
+
 }
