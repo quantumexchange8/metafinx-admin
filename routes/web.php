@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IpoSchemeController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ReportController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -78,6 +79,19 @@ Route::middleware('auth')->group(function () {
         Route::post('/approveTransaction', [TransactionController::class, 'approveTransaction'])->name('transaction.approveTransaction');
         Route::post('/rejectTransaction', [TransactionController::class, 'rejectTransaction'])->name('transaction.rejectTransaction');
         Route::get('/getTransactionHistory/{type}', [TransactionController::class, 'getTransactionHistory'])->name('transaction.getTransactionHistory');
+    });
+
+    /**
+     * ========================
+     *          Report
+     * ========================
+     */
+    Route::prefix('report')->group(function () {
+        Route::get('/view', [ReportController::class, 'index'])->name('report.view');
+        Route::get('/getPayoutDetails', [ReportController::class, 'getPayoutDetails'])->name('report.getPayoutDetails');
+
+        // Route::get('/getTotalPayoutByDays', [ReportController::class, 'getTotalPayoutByDays'])->name('getTotalPayoutByDays');
+        // Route::get('/getTotalTPayoutByMonths', [ReportController::class, 'getTotalPayoutnByMonths'])->name('getTotalPayoutByMonths');
     });
 });
 

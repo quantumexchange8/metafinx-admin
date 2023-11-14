@@ -1,7 +1,7 @@
 <script setup>
 import PerfectScrollbar from '@/Components/PerfectScrollbar.vue'
 import SidebarLink from '@/Components/Sidebar/SidebarLink.vue'
-import {DashboardIcon, UserIcon, IPOIcon, TransactionIcon, LogoutIcon} from '@/Components/Icons/outline'
+import {DashboardIcon, UserIcon, IPOIcon, TransactionIcon, LogoutIcon, ReportIcon} from '@/Components/Icons/outline'
 import SidebarCollapsible from '@/Components/Sidebar/SidebarCollapsible.vue'
 import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.vue'
 </script>
@@ -58,6 +58,19 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
         >
             <template #icon>
                 <TransactionIcon
+                    class="flex-shrink-0 w-6 h-6"
+                    aria-hidden="true"
+                />
+            </template>
+        </SidebarLink>
+
+        <SidebarLink
+            title="Report"
+            :href="route('report.view')"
+            :active="route().current('report.*')"
+        >
+            <template #icon>
+                <ReportIcon
                     class="flex-shrink-0 w-6 h-6"
                     aria-hidden="true"
                 />
