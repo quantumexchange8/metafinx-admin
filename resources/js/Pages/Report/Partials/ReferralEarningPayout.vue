@@ -60,7 +60,7 @@ const getResults = async (page = 1, search = '', type= '', date = '') => {
         referrals.value = response.data.results;
         // console.log(response.data.referralEarning);
     } catch (error) {
-        console.error(error.response.data);
+        console.error(error);
     } finally {
         isLoading.value = false
         emit('update:loading', false);

@@ -7,7 +7,9 @@ import PayoutMonthChart from "@/Pages/Report/Charts/PayoutMonthChart.vue";
 
 const props = defineProps({
     currentYear: Number,
-    activePayout: String
+    activePayout: String,
+    search: String,
+    date: String,
 })
 
 const categories = ref({
@@ -84,7 +86,7 @@ const selectFilterType = (type) => {
                     </div>
                 </div>
 
-                <!-- <TabPanels class="mt-2">
+                <TabPanels class="mt-2">
                     <TabPanel
                         :class="[
                         'rounded-xl dark:bg-transparent p-3',
@@ -92,6 +94,8 @@ const selectFilterType = (type) => {
                     >
                         <PayoutDayChart
                             :selectedMonth="selectedMonth"
+                            :search="props.search"
+                            :date="props.date"
                         />
                     </TabPanel>
                     <TabPanel
@@ -101,9 +105,11 @@ const selectFilterType = (type) => {
                     >
                         <PayoutMonthChart
                             :selectedYear="selectedYear"
+                            :search="props.search"
+                            :date="props.date"
                         />
                     </TabPanel>
-                </TabPanels> -->
+                </TabPanels>
             </TabGroup>
         </div>
     </div>

@@ -48,7 +48,7 @@ const payoutStats = ref([
         value: '$ ' + formatAmount(quarterlyDividend.value),
     },
     {
-        key: 'Referral_Earning',
+        key: 'referral_earnings',
         label: 'Total Referral Earning Payout',
         value: '$ ' + formatAmount(referralEarning.value),
     },
@@ -69,7 +69,7 @@ const payoutStats = ref([
     },
 ]);
 
-const totalReferralEarningStat = payoutStats.value.find((stat) => stat.key === 'Referral_Earning');
+const totalReferralEarningStat = payoutStats.value.find(stat => stat.key === 'referral_earnings');
 
 const getResults = async (page = 1, search = '', date = '') => {
     isLoading.value = true
@@ -121,7 +121,7 @@ watch(
     [() => search.value, () => date.value],
     debounce(([search, date]) => {
         getResults(1, search, date);
-    }, 300),
+    }, 500),
 );
 
 const activePayoutLabel = computed(() => {
@@ -179,6 +179,8 @@ const activePayoutLabel = computed(() => {
                 <PayoutChart 
                 :currentYear="currentYear"
                 :activePayout="activePayoutLabel"
+                :search="search"
+                :date="date"
                 />
             </div>
         </div>

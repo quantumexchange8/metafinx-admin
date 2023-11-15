@@ -98,8 +98,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/view', [ReportController::class, 'index'])->name('report.view');
         Route::get('/getPayoutDetails', [ReportController::class, 'getPayoutDetails'])->name('report.getPayoutDetails');
 
-        // Route::get('/getTotalPayoutByDays', [ReportController::class, 'getTotalPayoutByDays'])->name('getTotalPayoutByDays');
-        // Route::get('/getTotalTPayoutByMonths', [ReportController::class, 'getTotalPayoutnByMonths'])->name('getTotalPayoutByMonths');
+        Route::get('/getTotalPayoutByDays', [ReportController::class, 'getTotalPayoutByDays'])->name('report.getTotalPayoutByDays');
+        Route::get('/getTotalPayoutByMonths', [ReportController::class, 'getTotalPayoutByMonths'])->name('report.getTotalPayoutByMonths');
     });
 });
 

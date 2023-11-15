@@ -1,10 +1,13 @@
 <script setup>
 import Loading from "@/Components/Loading.vue";
 import {onMounted, ref, watch} from "vue";
+import debounce from "lodash/debounce.js";
 import Chart from 'chart.js/auto'
 
 const props = defineProps({
-    selectedYear: Number
+    selectedYear: Number,
+    search: String,
+    date: String,
 })
 
 const chartData = ref({
@@ -12,61 +15,90 @@ const chartData = ref({
     datasets: [],
 });
 const isLoading = ref(false)
-const month = ref(props.selectedYear)
+const year = ref(props.selectedYear)
+const searchChart = ref(props.search);
+const dateChart = ref(props.date);
 let chartInstance = null;
 
 const fetchData = async () => {
     try {
         if (chartInstance) {
+            chartInstance.clear();
             chartInstance.destroy();
         }
 
-        const ctx = document.getElementById('dailyTotalMembers');
+        const ctx = document.getElementById('monthlyPayout');
 
         isLoading.value = true;
 
-        const response = await axios.get('/getTotalTransactionByMonths', { params: { year: month.value } });
+        const response = await axios.get('/report/getTotalPayoutByMonths', { params: { year: year.value , search: searchChart.value , date: dateChart.value } });
         const { labels, datasets } = response.data;
         chartData.value.labels = labels;
         chartData.value.datasets = datasets;
 
-        if(datasets.length > 0) {
-            if(datasets[0]) {
-                datasets[0].backgroundColor = (context) => {
-                    const bgColor = [
-                        'rgba(253, 176, 34, 0.40)',
-                        'rgba(253, 176, 34, 0.00)'
-                    ];
+        const gradientColors = [
+            [
+                'rgba(50, 173, 230, 0.40)',
+                'rgba(50, 173, 230, 0.00)',
+                'Monthly_Return',
+                'Monthly Return'
+            ],
+            [
+                'rgba(253, 176, 34, 0.40)',
+                'rgba(253, 176, 34, 0.00)',
+                'Quarterly_Dividend',
+                'Quarterly Dividend'
+            ],
+            [
+                'rgba(0, 199, 190, 0.4)',
+                'rgba(0, 199, 190, 0)',
+                'referral_earnings',
+                'Referral Earning'
+            ],
+            [
+                'rgba(253, 176, 34, 0.40)',
+                'rgba(253, 176, 34, 0.00)',
+                'Affiliate_Earning',
+                'Affiliate Earning'
+            ],
+            [
+                'rgba(0, 199, 190, 0.40)',
+                'rgba(0, 199, 190, 0.00)',
+                'Dividend_Earning',
+                'Dividend Earning'
+            ],
+            [
+                'rgba(255, 45, 85, 0.40)',
+                'rgba(255, 45, 85, 0.00)',
+                'Ticket_Bonus',
+                'Ticket Bonus'
+            ]
+        ];
 
-                    if (!context.chart.chartArea) {
-                        return;
+        if (datasets.length > 0) {
+            datasets.forEach((dataset, index) => {
+                if (dataset) {
+                    const label = dataset.label;
+                    const matchingColor = gradientColors.find(colorData => colorData[2] === label);
+
+                    if (matchingColor) {
+                        dataset.backgroundColor = (context) => {
+                            const bgColor = matchingColor;
+
+                            if (!context.chart.chartArea) {
+                                return;
+                            }
+
+                            const { ctx, chartArea: { top, bottom } } = context.chart;
+                            const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
+                            gradientBg.addColorStop(0, bgColor[0]);
+                            gradientBg.addColorStop(1, bgColor[1]);
+                            dataset.label = bgColor[3];
+                            return gradientBg;
+                        };
                     }
-
-                    const { ctx, data, chartArea: {top, bottom} } = context.chart;
-                    const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
-                    gradientBg.addColorStop(0, bgColor[0]);
-                    gradientBg.addColorStop(1, bgColor[1]);
-                    return gradientBg;
-                };
-            }
-            if(datasets[1]) {
-                datasets[1].backgroundColor = (context) => {
-                    const bgColor = [
-                        'rgba(255, 45, 85, 0.40)',
-                        'rgba(255, 45, 85, 0.00)'
-                    ];
-
-                    if (!context.chart.chartArea) {
-                        return;
-                    }
-
-                    const { ctx, data, chartArea: {top, bottom} } = context.chart;
-                    const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
-                    gradientBg.addColorStop(0, bgColor[0]);
-                    gradientBg.addColorStop(1, bgColor[1]);
-                    return gradientBg;
-                };
-            }
+                }
+            });
         }
 
         isLoading.value = false
@@ -139,7 +171,7 @@ const fetchData = async () => {
             }
         });
     } catch (error) {
-        const ctx = document.getElementById('dailyTotalMembers');
+        const ctx = document.getElementById('monthlyPayout');
 
         isLoading.value = false
         console.error('Error fetching chart data:', error);
@@ -153,13 +185,21 @@ onMounted(async () => {
 
     watch(
         () => props.selectedYear, // Expression to watch
-        (newMonth) => {
+        (newYear) => {
             // This callback will be called when selectedMonth changes.
-            month.value = newMonth;
+            year.value = newYear;
             fetchData();
         }
     );
 
+    watch(
+        [() => props.search, () => props.date],
+        debounce(([searchValue, dateValue]) => {
+            searchChart.value = searchValue;
+            dateChart.value = dateValue;
+            fetchData();
+        }, 500)
+    );
 });
 </script>
 
@@ -168,6 +208,6 @@ onMounted(async () => {
         <Loading />
     </div>
     <div>
-        <canvas id="dailyTotalMembers" height="350"></canvas>
+        <canvas id="monthlyPayout" height="350"></canvas>
     </div>
 </template>

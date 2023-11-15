@@ -104,7 +104,7 @@ watch(
             @update:export="$emit('update:export', $event)"
         />
         <ReferralEarningPayout
-            v-if="activePayout==='Referral_Earning'"
+            v-if="activePayout==='referral_earnings'"
             :refresh="refresh"
             :isLoading="isLoading"
             :search="search"
