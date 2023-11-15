@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IpoSchemeController;
 use App\Http\Controllers\MemberController;
@@ -86,6 +87,21 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/rejectTransaction', [TransactionController::class, 'rejectTransaction'])->name('transaction.rejectTransaction');
         Route::get('/getTransactionHistory/{type}', [TransactionController::class, 'getTransactionHistory'])->name('transaction.getTransactionHistory');
         Route::get('/getBalanceHistory/{type}', [TransactionController::class, 'getBalanceHistory'])->name('transaction.getBalanceHistory');
+    });
+
+    /**
+     * ==============================
+     *         Configuration
+     * ==============================
+     */
+    Route::prefix('configuration')->group(function () {
+        Route::get('/index', [ConfigurationController::class, 'index'])->name('configuration.index');
+
+        //Announcement
+        Route::get('/getAnnouncement', [ConfigurationController::class, 'getAnnouncement'])->name('configuration.getAnnouncement');
+        Route::post('/addAnnouncement', [ConfigurationController::class, 'addAnnouncement'])->name('configuration.addAnnouncement');
+        Route::post('/upload/tmp_img', [ConfigurationController::class, 'upload']);
+        Route::post('/upload/image-revert', [ConfigurationController::class, 'image_revert']);
     });
 });
 
