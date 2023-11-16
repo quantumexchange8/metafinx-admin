@@ -175,12 +175,17 @@ class TransactionController extends Controller
 
         $results = $query->latest()->paginate(10);
 
+        $totalAmount = $query->sum('amount');
+
         $results->each(function ($user_deposit) {
             $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
         });
 
 
-        return response()->json([$type => $results]);
+        return response()->json([
+            $type => $results,
+            'totalAmount' => $totalAmount
+        ]);
     }
 
     public function getBalanceHistory(Request $request, $type)
@@ -224,7 +229,7 @@ class TransactionController extends Controller
 
         $results->each(function ($user_deposit) use ($type) {
             $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
-        
+
             if ($type != 'WalletAdjustment') {
                 $user_deposit->to_user->profile_photo_url = $user_deposit->to_user->getFirstMediaUrl('profile_photo');
             }

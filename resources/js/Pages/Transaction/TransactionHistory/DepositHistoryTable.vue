@@ -16,7 +16,9 @@ const props = defineProps({
     exportStatus: Boolean,
 })
 
+const { formatAmount } = transactionFormat();
 const deposits = ref({data: []});
+const totalAmount = ref(0);
 const currentPage = ref(1);
 const refreshDeposit = ref(props.refresh);
 const depositLoading = ref(props.isLoading);
@@ -47,6 +49,7 @@ const getResults = async (page = 1, search = '', date = '') => {
 
         const response = await axios.get(url);
         deposits.value = response.data.Deposit;
+        totalAmount.value = response.data.totalAmount;
     } catch (error) {
         console.error(error);
     } finally {
@@ -196,6 +199,9 @@ const closeModal = () => {
                     <span class="flex gap-2">Next <ArrowRightIcon class="w-5 h-5" /></span>
                 </template>
             </TailwindPagination>
+        </div>
+        <div class="text-xl font-semibold">
+            Total Amount: ${{ formatAmount(totalAmount) }}
         </div>
     </div>
 
