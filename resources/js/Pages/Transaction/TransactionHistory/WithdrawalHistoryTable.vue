@@ -11,6 +11,7 @@ import Modal from "@/Components/Modal.vue";
 const props = defineProps({
     search: String,
     date: String,
+    filter: String,
     refresh: Boolean,
     isLoading: Boolean,
     exportStatus: Boolean,
@@ -28,13 +29,13 @@ const withdrawalHistoryModal = ref(false);
 const withdrawalDetail = ref();
 
 watch(
-    [() => props.search, () => props.date],
-    debounce(([searchValue, dateValue]) => {
-        getResults(1, searchValue, dateValue);
+    [() => props.search, () => props.date, () => props.filter],
+    debounce(([searchValue, dateValue, filterValue]) => {
+        getResults(1, searchValue, dateValue, filterValue);
     }, 300)
 );
 
-const getResults = async (page = 1, search = '', date = '') => {
+const getResults = async (page = 1, search = '', date = '', filter = '') => {
     depositLoading.value = true
     try {
         let url = `/transaction/getTransactionHistory/Withdrawal?page=${page}`;
@@ -45,6 +46,10 @@ const getResults = async (page = 1, search = '', date = '') => {
 
         if (date) {
             url += `&date=${date}`;
+        }
+
+        if (filter) {
+            url += `&filter=${filter}`;
         }
 
         const response = await axios.get(url);
@@ -87,6 +92,10 @@ watch(() => props.exportStatus, (newVal) => {
 
         if (props.search) {
             url += `&search=${props.search}`;
+        }
+
+        if (props.filter) {
+            url += `&search=${props.filter}`;
         }
 
         window.location.href = url;

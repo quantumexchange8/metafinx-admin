@@ -3,6 +3,8 @@ import AuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import ConfigurationContent from "@/Pages/Configuration/Partials/ConfigurationContent.vue";
 import {ref} from "vue";
 import Announcement from "@/Pages/Configuration/Announcement/Announcement.vue";
+import DividendBonus from "@/Pages/Configuration/DividendBonus/DividendBonus.vue";
+import TicketBonus from "@/Pages/Configuration/TicketBonus/TicketBonus.vue";
 
 const props = defineProps({
     users: Array
@@ -45,6 +47,12 @@ const updateContent = (newContent) => {
             <Announcement
                 v-if="content==='Announcement'"
             />
+            <!-- <DividendBonus
+                v-if="content==='DividendBonus'"
+            />
+            <TicketBonus
+                v-if="content==='TicketBonus'"
+            /> -->
         </div>
 
     </AuthenticatedLayout>

@@ -13,6 +13,7 @@ const props = defineProps({
     isLoading: Boolean,
     search: String,
     date: String,
+    filter: String,
     exportStatus: Boolean,
 })
 
@@ -108,6 +109,7 @@ const updateTransactionType = (transaction_type) => {
                     :isLoading="isLoading"
                     :search="search"
                     :date="date"
+                    :filter="filter"
                     :exportStatus="exportStatus"
                     @update:loading="$emit('update:loading', $event)"
                     @update:refresh="$emit('update:refresh', $event)"
@@ -120,6 +122,7 @@ const updateTransactionType = (transaction_type) => {
                     :isLoading="isLoading"
                     :search="search"
                     :date="date"
+                    :filter="filter"
                     :exportStatus="exportStatus"
                     @update:loading="$emit('update:loading', $event)"
                     @update:refresh="$emit('update:refresh', $event)"

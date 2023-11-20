@@ -1,7 +1,7 @@
 <script setup>
 import PerfectScrollbar from '@/Components/PerfectScrollbar.vue'
 import ConfigurationLink from "@/Pages/Configuration/Partials/ConfigurationLink.vue";
-import {AnnouncementIcon, AffiliateSettingIcon} from '@/Components/Icons/outline'
+import {AnnouncementIcon, DividendBonusIcon, TicketBonusIcon, AffiliateSettingIcon} from '@/Components/Icons/outline'
 
 const props = defineProps({
     content: String
@@ -32,6 +32,32 @@ const updateContent = (newContent) => {
                 />
             </template>
         </ConfigurationLink>
+
+        <!-- <ConfigurationLink
+            title="Dividend Bonus"
+            @click="updateContent('DividendBonus')"
+            :active="props.content==='DividendBonus'"
+        >
+            <template #icon>
+                <DividendBonusIcon
+                    class="flex-shrink-0 w-6 h-6"
+                    aria-hidden="true"
+                />
+            </template>
+        </ConfigurationLink>
+
+        <ConfigurationLink
+            title="Ticket Bonus"
+            @click="updateContent('TicketBonus')"
+            :active="props.content==='TicketBonus'"
+        >
+            <template #icon>
+                <TicketBonusIcon
+                    class="flex-shrink-0 w-6 h-6"
+                    aria-hidden="true"
+                />
+            </template>
+        </ConfigurationLink> -->
 
 <!--        <ConfigurationLink-->
 <!--            title="Affiliate Setting"-->

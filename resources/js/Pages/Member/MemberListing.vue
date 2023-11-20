@@ -32,6 +32,9 @@ const formatter = ref({
 });
 
 function refreshTable() {
+    search.value = '';
+    date.value = '';
+    rank.value = '';
     isLoading.value = !isLoading.value;
     refresh.value = true;
 }
@@ -102,8 +105,8 @@ onMounted(() => {
                 />
             </div>
 
-            <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div class="w-full">
+            <div class="mt-5 grid grid-cols-5 md:grid-cols-7 gap-3">
+                <div class="w-full col-span-5 md:col-span-2">
                     <InputIconWrapper class="md:col-span-2">
                         <template #icon>
                             <SearchIcon aria-hidden="true" class="w-5 h-5" />
@@ -111,25 +114,23 @@ onMounted(() => {
                         <Input withIcon id="search" type="text" class="block w-full" placeholder="Search" v-model="search" />
                     </InputIconWrapper>
                 </div>
-                <div class="flex gap-3">
-                    <div>
-                        <vue-tailwind-datepicker
-                            placeholder="Select dates"
-                            :formatter="formatter"
-                            separator=" - "
-                            v-model="date"
-                            input-classes="py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-                        />
-                    </div>
-                    <div>
-                        <BaseListbox
-                            id="rankID"
-                            class="w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600"
-                            v-model="rank"
-                            :options="rankList"
-                            placeholder="Filter rank"
-                        />
-                    </div>
+                <div class="w-full col-span-3 md:col-span-1">
+                    <vue-tailwind-datepicker
+                        placeholder="Select dates"
+                        :formatter="formatter"
+                        separator=" - "
+                        v-model="date"
+                        input-classes="py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+                    />
+                </div>
+                <div class="w-full col-span-2 md:col-span-1">
+                    <BaseListbox
+                        id="rankID"
+                        class="w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600"
+                        v-model="rank"
+                        :options="rankList"
+                        placeholder="Filter rank"
+                    />
                 </div>
 
 <!--                <div class="flex justify-end">-->

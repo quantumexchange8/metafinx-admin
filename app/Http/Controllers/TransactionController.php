@@ -165,6 +165,13 @@ class TransactionController extends Controller
             $query->whereBetween('created_at', [$start_date, $end_date]);
         }
 
+        if ($request->filled('filter')) {
+            $filter = $request->input('filter') ;
+            $query->where(function ($q) use ($filter) {
+                $q->where('status', $filter);
+            });
+        }
+
         if ($request->has('exportStatus')) {
             if ($type == 'Deposit') {
                 return Excel::download(new DepositExport($query), Carbon::now() . '-' . $type . '_History-report.xlsx');

@@ -102,6 +102,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/addAnnouncement', [ConfigurationController::class, 'addAnnouncement'])->name('configuration.addAnnouncement');
         Route::post('/upload/tmp_img', [ConfigurationController::class, 'upload']);
         Route::post('/upload/image-revert', [ConfigurationController::class, 'image_revert']);
+        Route::post('/addDividendBonus', [ConfigurationController::class, 'addDividendBonus'])->name('configuration.addDividendBonus');
+        Route::post('/addTicketBonus', [ConfigurationController::class, 'addTicketBonus'])->name('configuration.addTicketBonus');
+        Route::get('/getDividendBonus', [ConfigurationController::class, 'getDividendBonus'])->name('configuration.getDividendBonus');
+        Route::get('/getTicketBonus', [ConfigurationController::class, 'getTicketBonus'])->name('configuration.getTicketBonus');
     });
 });
 

@@ -11,6 +11,7 @@ import Modal from "@/Components/Modal.vue";
 const props = defineProps({
     search: String,
     date: String,
+    filter: String,
     refresh: Boolean,
     isLoading: Boolean,
     exportStatus: Boolean,
@@ -28,13 +29,13 @@ const depositHistoryModal = ref(false);
 const depositDetail = ref();
 
 watch(
-    [() => props.search, () => props.date],
-    debounce(([searchValue, dateValue]) => {
-        getResults(1, searchValue, dateValue);
+    [() => props.search, () => props.date, () => props.filter],
+    debounce(([searchValue, dateValue, filterValue]) => {
+        getResults(1, searchValue, dateValue, filterValue);
     }, 300)
 );
 
-const getResults = async (page = 1, search = '', date = '') => {
+const getResults = async (page = 1, search = '', date = '', filter = '') => {
     depositLoading.value = true
     try {
         let url = `/transaction/getTransactionHistory/Deposit?page=${page}`;
@@ -47,11 +48,15 @@ const getResults = async (page = 1, search = '', date = '') => {
             url += `&date=${date}`;
         }
 
+        if (filter) {
+            url += `&filter=${filter}`;
+        }
+        
         const response = await axios.get(url);
         deposits.value = response.data.Deposit;
         totalAmount.value = response.data.totalAmount;
     } catch (error) {
-        console.error(error);
+        console.error(error.response.data);
     } finally {
         depositLoading.value = false
         emit('update:loading', false);
@@ -88,6 +93,10 @@ watch(() => props.exportStatus, (newVal) => {
 
         if (props.search) {
             url += `&search=${props.search}`;
+        }
+
+        if (props.filter) {
+            url += `&filter=${props.filter}`;
         }
 
         window.location.href = url;
