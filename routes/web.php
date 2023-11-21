@@ -106,6 +106,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/addTicketBonus', [ConfigurationController::class, 'addTicketBonus'])->name('configuration.addTicketBonus');
         Route::get('/getDividendBonus', [ConfigurationController::class, 'getDividendBonus'])->name('configuration.getDividendBonus');
         Route::get('/getTicketBonus', [ConfigurationController::class, 'getTicketBonus'])->name('configuration.getTicketBonus');
+        Route::get('/getSettingRank', [ConfigurationController::class, 'getSettingRank'])->name('configuration.getSettingRank');
+        Route::post('/affiliateSetting', [ConfigurationController::class, 'affiliateSetting'])->name('configuration.affiliateSetting');
     });
 });
 

@@ -5,9 +5,11 @@ import {ref} from "vue";
 import Announcement from "@/Pages/Configuration/Announcement/Announcement.vue";
 import DividendBonus from "@/Pages/Configuration/DividendBonus/DividendBonus.vue";
 import TicketBonus from "@/Pages/Configuration/TicketBonus/TicketBonus.vue";
+import AffiliateForm from "@/Pages/Configuration/AffiliateSetting/AffliateForm.vue";
 
 const props = defineProps({
-    users: Array
+    users: Array,
+    settingRanks: Object,
 })
 
 const content = ref('Announcement');
@@ -47,12 +49,16 @@ const updateContent = (newContent) => {
             <Announcement
                 v-if="content==='Announcement'"
             />
-            <!-- <DividendBonus
+            <DividendBonus
                 v-if="content==='DividendBonus'"
             />
             <TicketBonus
                 v-if="content==='TicketBonus'"
-            /> -->
+            />
+            <AffiliateForm
+                v-if="content==='AffiliateSetting'"
+                :settingRanks="settingRanks"
+            />
         </div>
 
     </AuthenticatedLayout>

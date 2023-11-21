@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 
 defineProps({
-    modelValue: String,
+    modelValue: [String, Number],
     withIcon: {
         type: Boolean,
         default: false,
@@ -30,7 +30,7 @@ onMounted(() => {
 <template>
     <input
         :class="[
-            'py-2 rounded-lg placeholder:text-gray-400 text-gray-800 border-transparent',
+            'py-2 rounded-lg placeholder:text-gray-400 text-gray-800',
             'focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white',
             'dark:bg-gray-600 dark:text-white',
             {

@@ -17,7 +17,7 @@ const props = defineProps({
     countries: Array,
     pendingKycCount: Number,
     unverifiedKycCount: Number,
-    
+
 })
 
 const search = ref('');
@@ -111,7 +111,7 @@ onMounted(() => {
                         <template #icon>
                             <SearchIcon aria-hidden="true" class="w-5 h-5" />
                         </template>
-                        <Input withIcon id="search" type="text" class="block w-full" placeholder="Search" v-model="search" />
+                        <Input withIcon id="search" type="text" class="block w-full border border-transparent" placeholder="Search" v-model="search" />
                     </InputIconWrapper>
                 </div>
                 <div class="w-full col-span-3 md:col-span-1">

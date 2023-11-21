@@ -8,28 +8,26 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class SettingRank extends Model
+class SettingAffiliateEarning extends Model
 {
     use SoftDeletes, LogsActivity;
 
     protected $fillable = [
+        'setting_rank_id',
         'name',
-        'self_deposit',
-        'valid_direct_referral',
-        'valid_affiliate_deposit',
-        'capping_per_line',
+        'value',
     ];
 
     public function getActivitylogOptions(): LogOptions
     {
-        $rank = $this->fresh();
+        $setting_affiliate_earning = $this->fresh();
 
         return LogOptions::defaults()
-            ->useLogName('setting_rank')
-            ->logOnly(['name', 'self_deposit', 'valid_direct_referral', 'valid_affiliate_deposit', 'capping_per_line'])
-            ->setDescriptionForEvent(function (string $eventName) use ($rank) {
+            ->useLogName('setting_affiliate_earning')
+            ->logOnly(['setting_rank_id', 'name', 'value'])
+            ->setDescriptionForEvent(function (string $eventName) use ($setting_affiliate_earning) {
                 $actorName = Auth::user() ? Auth::user()->name : 'Cronjob ';
-                return "{$actorName} has {$eventName} Setting Rank ID: {$rank->id}, {$rank->name}";
+                return "{$actorName} has {$eventName} Setting Affiliate Earning ID: {$setting_affiliate_earning->id}, {$setting_affiliate_earning->name}";
             })
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();

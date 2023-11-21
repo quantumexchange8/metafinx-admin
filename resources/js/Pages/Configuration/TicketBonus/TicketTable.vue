@@ -50,7 +50,6 @@ const getResults = async (page = 1, search = '', date = '') => {
         }
 
         const response = await axios.get(url);
-        console.log(response);
         tickets.value = response.data;
     } catch (error) {
         console.error(error);
@@ -93,7 +92,7 @@ watch(() => refresh.value, (newVal) => {
 </script>
 
 <template>
-    <div class="p-5 flex flex-col gap-3 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700">
+    <div class="p-5 flex flex-col gap-3 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700 w-full md:w-4/5">
         <div class="flex justify-between">
             <h4 class="font-semibold dark:text-white">History</h4>
             <RefreshIcon
@@ -103,16 +102,23 @@ watch(() => refresh.value, (newVal) => {
                 @click="refreshTable"
             />
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <div class="md:col-span-1">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <div class="md:col-span-2">
                 <InputIconWrapper>
                     <template #icon>
                         <SearchIcon aria-hidden="true" class="w-5 h-5" />
                     </template>
-                    <Input withIcon id="search" type="text" class="block w-full" placeholder="Search" v-model="search" />
+                    <Input
+                        withIcon
+                        id="search"
+                        type="text"
+                        class="block w-full border border-gray-300 dark:border-gray-600"
+                        placeholder="Search"
+                        v-model="search"
+                    />
                 </InputIconWrapper>
             </div>
-            <div class="md:col-span-1">
+            <div class="md:col-span-2">
                 <vue-tailwind-datepicker
                     placeholder="Select dates"
                     :formatter="formatter"

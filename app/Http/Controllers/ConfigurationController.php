@@ -6,6 +6,9 @@ use App\Http\Requests\AnnouncementRequest;
 use App\Http\Requests\DividendBonusRequest;
 use App\Http\Requests\TicketBonusRequest;
 use App\Models\Announcement;
+use App\Models\SettingAffiliateEarning;
+use App\Models\SettingEarning;
+use App\Models\SettingRank;
 use App\Models\User;
 use App\Models\SettingBonus;
 use App\Notifications\AnnouncementNotification;
@@ -17,7 +20,9 @@ class ConfigurationController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Configuration/Configuration');
+        return Inertia::render('Configuration/Configuration', [
+            'settingRanks' => SettingRank::select('id', 'name')->get(),
+        ]);
     }
 
     public function getAnnouncement(Request $request)
@@ -189,5 +194,76 @@ class ConfigurationController extends Controller
             ->paginate(10);
 
         return response()->json($tickets);
+    }
+
+    public function getSettingRank(Request $request)
+    {
+        $rank_id = $request->rank_id;
+
+        $settingRank = SettingRank::find($rank_id);
+
+        $referralEarning = SettingEarning::where('setting_rank_id', $rank_id)->where('type', 'referral_earnings')->first();
+        $dividendEarning = SettingEarning::where('setting_rank_id', $rank_id)->where('type', 'dividend_earnings')->get();
+        $affiliateSettings = SettingAffiliateEarning::where('setting_rank_id', $rank_id)->get();
+
+        return response()->json([
+            'settingRank' => $settingRank,
+            'referralEarning' => $referralEarning,
+            'dividendEarning' => $dividendEarning,
+            'affiliateSettings' => $affiliateSettings,
+        ]);
+    }
+
+    public function affiliateSetting(Request $request)
+    {
+        $settingRank = SettingRank::find($request->id);
+
+        $settingRank->update([
+            'self_deposit' => $request->self_deposit,
+            'valid_direct_referral' => $request->valid_direct_referral,
+            'valid_affiliate_deposit' => $request->valid_affiliate_deposit,
+            'capping_per_line' => $request->capping_per_line,
+        ]);
+
+        $settingEarnings = SettingEarning::where('setting_rank_id', $request->id)->get();
+
+        foreach ($settingEarnings as $earning) {
+            if ($earning->type == 'dividend_earnings') {
+                $earning->delete();
+            } elseif ($earning->type == 'referral_earnings') {
+                $earning->update([
+                    'value' => $request->referral_earnings
+                ]);
+            }
+        }
+
+        $dividentEarnings = $request->dividend_earnings;
+
+        foreach ($dividentEarnings as $dividentEarning) {
+            SettingEarning::create([
+                'setting_rank_id' => $request->id,
+                'name' => 'Dividend Earnings',
+                'type' => 'dividend_earnings',
+                'value' => $dividentEarning
+            ]);
+        }
+
+        $settingAffliateEarnings = SettingAffiliateEarning::where('setting_rank_id', $request->id)->get();
+
+        foreach ($settingAffliateEarnings as $affliateEarning) {
+            $affliateEarning->delete();
+        }
+
+        $affiliateSettings = $request->affiliate_settings;
+
+        foreach ($affiliateSettings as $index => $affiliateSetting) {
+            SettingAffiliateEarning::create([
+                'setting_rank_id' => $request->id,
+                'name' => 'L' . $index + 1,
+                'value' => $affiliateSetting
+            ]);
+        }
+
+        return redirect()->back()->with('title', 'Setting Updated')->with('success', 'This Rank Setting has been updated successfully.');
     }
 }

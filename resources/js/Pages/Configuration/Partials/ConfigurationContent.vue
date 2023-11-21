@@ -33,7 +33,7 @@ const updateContent = (newContent) => {
             </template>
         </ConfigurationLink>
 
-        <!-- <ConfigurationLink
+       <ConfigurationLink
             title="Dividend Bonus"
             @click="updateContent('DividendBonus')"
             :active="props.content==='DividendBonus'"
@@ -57,20 +57,20 @@ const updateContent = (newContent) => {
                     aria-hidden="true"
                 />
             </template>
-        </ConfigurationLink> -->
+        </ConfigurationLink>
 
-<!--        <ConfigurationLink-->
-<!--            title="Affiliate Setting"-->
-<!--            @click="updateContent('AffiliateSetting')"-->
-<!--            :active="props.content==='AffiliateSetting'"-->
-<!--        >-->
-<!--            <template #icon>-->
-<!--                <AffiliateSettingIcon-->
-<!--                    class="flex-shrink-0 w-6 h-6"-->
-<!--                    aria-hidden="true"-->
-<!--                />-->
-<!--            </template>-->
-<!--        </ConfigurationLink>-->
+        <ConfigurationLink
+            title="Affiliate Setting"
+            @click="updateContent('AffiliateSetting')"
+            :active="props.content==='AffiliateSetting'"
+        >
+            <template #icon>
+                <AffiliateSettingIcon
+                    class="flex-shrink-0 w-6 h-6"
+                    aria-hidden="true"
+                />
+            </template>
+        </ConfigurationLink>
 
     </PerfectScrollbar>
 </template>
