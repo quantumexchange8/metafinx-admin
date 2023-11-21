@@ -227,8 +227,9 @@ class ConfigurationController extends Controller
 
         $settingEarnings = SettingEarning::where('setting_rank_id', $request->id)->get();
 
+        $dividendEarnings = $request->dividend_earnings;
         foreach ($settingEarnings as $earning) {
-            if ($earning->type == 'dividend_earnings') {
+            if ($earning->type == 'dividend_earnings' && !empty($dividendEarnings)) {
                 $earning->delete();
             } elseif ($earning->type == 'referral_earnings') {
                 $earning->update([
@@ -237,31 +238,31 @@ class ConfigurationController extends Controller
             }
         }
 
-        $dividentEarnings = $request->dividend_earnings;
-
-        foreach ($dividentEarnings as $dividentEarning) {
+        foreach ($dividendEarnings as $dividendEarning) {
             SettingEarning::create([
                 'setting_rank_id' => $request->id,
                 'name' => 'Dividend Earnings',
                 'type' => 'dividend_earnings',
-                'value' => $dividentEarning
+                'value' => $dividendEarning
             ]);
         }
 
         $settingAffliateEarnings = SettingAffiliateEarning::where('setting_rank_id', $request->id)->get();
 
-        foreach ($settingAffliateEarnings as $affliateEarning) {
-            $affliateEarning->delete();
-        }
-
         $affiliateSettings = $request->affiliate_settings;
+        if (!empty($request->affiliate_settings)) {
 
-        foreach ($affiliateSettings as $index => $affiliateSetting) {
-            SettingAffiliateEarning::create([
-                'setting_rank_id' => $request->id,
-                'name' => 'L' . $index + 1,
-                'value' => $affiliateSetting
-            ]);
+            foreach ($settingAffliateEarnings as $affliateEarning) {
+                $affliateEarning->delete();
+            }
+
+            foreach ($affiliateSettings as $index => $affiliateSetting) {
+                SettingAffiliateEarning::create([
+                    'setting_rank_id' => $request->id,
+                    'name' => 'L' . $index + 1,
+                    'value' => $affiliateSetting
+                ]);
+            }
         }
 
         return redirect()->back()->with('title', 'Setting Updated')->with('success', 'This Rank Setting has been updated successfully.');
