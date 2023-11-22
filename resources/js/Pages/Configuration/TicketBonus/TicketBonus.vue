@@ -40,8 +40,8 @@ const submit = () => {
 </script>
 
 <template>
-    <div class="flex flex-col gap-8 py-8 px-5 w-full">
-        <div class="flex flex-col gap-2 p-5 w-full dark:bg-gray-700 items-center rounded-lg w-full md:w-4/5">
+    <div class="flex flex-col gap-8 py-8 px-5 w-full ">
+        <div class="flex flex-col gap-2 p-5 dark:bg-gray-700 items-center rounded-lg w-full md:w-4/5">
             <span class="text-xs text-gray-400">Total Tickets Rewarded to Members</span>
             <h2>{{ ticketAmounts }}</h2>
         </div>

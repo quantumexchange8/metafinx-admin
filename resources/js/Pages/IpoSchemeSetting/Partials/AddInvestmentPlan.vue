@@ -114,21 +114,21 @@ const removeDescription = (index) => {
                                         <div class="font-semibold dark:text-white">
                                             {{ planNameEn || 'Plan Name' }}
                                         </div>
-                                        <div class="font-semibold text-[32px] dark:text-white">
+                                        <div class="font-semibold text-2xl md:text-[32px] dark:text-white text-center">
                                             {{ roiPercentage || '0' }}% p.a.
                                         </div>
                                     </div>
                                     <div class="flex flex-col gap-3 justify-center w-full">
                                         <div v-for="descriptionEn in form.descriptions" class="inline-flex items-center gap-2 text-xs">
                                             <checkIcon />
-                                            <div class="text-xs dark:text-gray-300">{{ descriptionEn.en }}</div>
+                                            <div class="text-xs flex-1 dark:text-gray-300">{{ descriptionEn.en }}</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex gap-4 mt-8">
-                            <Label class="text-sm dark:text-white w-1/4" for="plan_name" value="Plan name" />
+                        <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                            <Label class="text-sm dark:text-white md:w-1/4" for="plan_name" value="Plan name" />
                             <div class="flex flex-col w-full">
                                 <Input
                                     id="plan_name"
@@ -141,8 +141,8 @@ const removeDescription = (index) => {
                                 <InputError :message="form.errors[`plan_name.en`]" class="mt-2" />
                             </div>
                         </div>
-                        <div class="flex gap-4 mt-8">
-                            <Label class="text-sm dark:text-white w-1/4" for="description" value="Description" />
+                        <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                            <Label class="text-sm dark:text-white md:w-1/4" for="description" value="Description" />
                             <div class="flex flex-col gap-4 w-full">
                                 <div v-for="(descriptionEn, index) in form.descriptions" class="inline-flex items-center gap-3">
                                     <div class="w-full">
@@ -196,21 +196,21 @@ const removeDescription = (index) => {
                                         <div class="font-semibold dark:text-white">
                                             {{ planNameCn || 'Plan Name' }}
                                         </div>
-                                        <div class="font-semibold text-[32px] dark:text-white">
+                                        <div class="font-semibold text-2xl md:text-[32px] dark:text-white text-center">
                                             {{ roiPercentage }}% p.a.
                                         </div>
                                     </div>
                                     <div class="flex flex-col justify-center gap-3 w-full">
                                         <div v-for="descriptionCn in form.descriptions" class="inline-flex items-center gap-2 text-xs">
                                             <checkIcon />
-                                            <div class="text-xs dark:text-gray-300">{{ descriptionCn.cn }}</div>
+                                            <div class="text-xs flex-1 dark:text-gray-300">{{ descriptionCn.cn }}</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex gap-4 mt-8">
-                            <Label class="text-sm dark:text-white w-1/4" for="plan_name" value="Plan name" />
+                        <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                            <Label class="text-sm dark:text-white md:w-1/4" for="plan_name" value="Plan name" />
                             <div class="flex flex-col w-full">
                                 <Input
                                     id="plan_name"
@@ -223,8 +223,8 @@ const removeDescription = (index) => {
                                 <InputError :message="form.errors[`plan_name.cn`]" class="mt-2" />
                             </div>
                         </div>
-                        <div class="flex gap-4 mt-8">
-                            <Label class="text-sm dark:text-white w-1/4" for="description_cn" value="Description" />
+                        <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                            <Label class="text-sm dark:text-white md:w-1/4" for="description_cn" value="Description" />
                             <div class="flex flex-col gap-4 w-full">
                                 <div v-for="(descriptionCn, index) in form.descriptions" class="inline-flex items-center gap-3">
                                     <div class="w-full">
@@ -278,21 +278,21 @@ const removeDescription = (index) => {
                                         <div class="font-semibold dark:text-white">
                                             {{ planNameTw || 'Plan Name' }}
                                         </div>
-                                        <div class="font-semibold text-[32px] dark:text-white">
+                                        <div class="font-semibold text-2xl md:text-[32px] dark:text-white text-center">
                                             {{ roiPercentage }}% p.a.
                                         </div>
                                     </div>
                                     <div class="flex flex-col justify-center gap-3 w-full">
                                         <div v-for="descriptionTw in form.descriptions" class="inline-flex items-center gap-2 text-xs">
                                             <checkIcon />
-                                            <div class="text-xs dark:text-gray-300">{{ descriptionTw.tw }}</div>
+                                            <div class="text-xs flex-1 dark:text-gray-300">{{ descriptionTw.tw }}</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex gap-4 mt-8">
-                            <Label class="text-sm dark:text-white w-1/4" for="plan_name" value="Plan name" />
+                        <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                            <Label class="text-sm dark:text-white md:w-1/4" for="plan_name" value="Plan name" />
                             <div class="flex flex-col w-full">
                                 <Input
                                     id="plan_name"
@@ -305,8 +305,8 @@ const removeDescription = (index) => {
                                 <InputError :message="form.errors[`plan_name.tw`]" class="mt-2" />
                             </div>
                         </div>
-                        <div class="flex gap-4 mt-8">
-                            <Label class="text-sm dark:text-white w-1/4" for="description" value="Description" />
+                        <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                            <Label class="text-sm dark:text-white md:w-1/4" for="description" value="Description" />
                             <div class="flex flex-col gap-4 w-full">
                                 <div v-for="(descriptionTw, index) in form.descriptions" class="inline-flex items-center gap-3">
                                     <div class="w-full">
@@ -355,8 +355,8 @@ const removeDescription = (index) => {
                 <div class="pb-3 border-b dark:border-gray-700">
                     <div class="font-semibold dark:text-white">Investment Details</div>
                 </div>
-                <div class="flex gap-4 mt-8">
-                    <Label class="text-sm dark:text-white w-1/4" for="investment_min_amount" value="Min. investment amount" />
+                <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                    <Label class="text-sm dark:text-white md:w-1/4" for="investment_min_amount" value="Min. investment amount" />
                     <div class="flex flex-col w-full">
                         <Input
                             id="investment_min_amount"
@@ -370,8 +370,8 @@ const removeDescription = (index) => {
                         <InputError :message="form.errors.investment_min_amount" class="mt-2" />
                     </div>
                 </div>
-                <div class="flex gap-4 mt-8">
-                    <Label class="text-sm dark:text-white w-1/4" for="roi_per_annum" value="ROI per annum" />
+                <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                    <Label class="text-sm dark:text-white md:w-1/4" for="roi_per_annum" value="ROI per annum" />
                     <div class="flex flex-col w-full">
                         <Input
                             id="roi_per_annum"
@@ -385,8 +385,8 @@ const removeDescription = (index) => {
                         <InputError :message="form.errors.roi_per_annum" class="mt-2" />
                     </div>
                 </div>
-                <div class="flex gap-4 mt-8">
-                    <Label class="text-sm dark:text-white w-1/4" for="investment_period" value="Investment period (months)" />
+                <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                    <Label class="text-sm dark:text-white md:w-1/4" for="investment_period" value="Investment period (months)" />
                     <div class="flex flex-col w-full">
                         <Input
                             id="investment_period"

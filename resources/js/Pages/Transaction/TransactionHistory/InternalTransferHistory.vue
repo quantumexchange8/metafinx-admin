@@ -115,7 +115,7 @@ const closeModal = () => {
         <div v-if="transferLoading" class="w-full flex justify-center my-8">
             <Loading />
         </div>
-        <table v-else class="w-[650px] table-fixed md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
+        <table v-else class="w-[800px] table-fixed md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
             <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
             <tr>
                 <th scope="col" class="pl-5 py-2">
@@ -195,33 +195,33 @@ const closeModal = () => {
     </div>
 
     <Modal :show="transferHistoryModal" title="Internal Transfer Details" @close="closeModal">
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Name</span>
-            <span class="text-black dark:text-white py-2">{{ transferDetail.user.name }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ transferDetail.user.name }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Email</span>
-            <span class="text-black dark:text-white py-2">{{ transferDetail.user.email }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ transferDetail.user.email }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Date & Time</span>
-            <span class="text-black dark:text-white py-2">{{ formatDateTime(transferDetail.created_at) }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ formatDateTime(transferDetail.created_at) }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transfer To</span>
-            <span class="text-black dark:text-white py-2">{{ transferDetail.to_user.name }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ transferDetail.to_user.name }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transfer Amount</span>
-            <span class="text-black dark:text-white py-2">$ {{ formatAmount(transferDetail.amount) }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">$ {{ formatAmount(transferDetail.amount) }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Current Balance</span>
-            <span class="text-black dark:text-white py-2">$ {{ formatAmount(transferDetail.new_balance) }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">$ {{ formatAmount(transferDetail.new_balance) }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Remark</span>
-            <span class="text-black dark:text-white py-2">{{ transferDetail.description }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ transferDetail.description }}</span>
         </div>
     </Modal>
 </template>

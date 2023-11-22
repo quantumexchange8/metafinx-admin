@@ -180,33 +180,33 @@ const closeModal = () => {
     </div>
 
     <Modal :show="walletHistoryModal" title="Wallet Adjustment Details" @close="closeModal">
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Name</span>
-            <span class="text-black dark:text-white py-2">{{ walletDetail.user.name }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ walletDetail.user.name }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Email</span>
-            <span class="text-black dark:text-white py-2">{{ walletDetail.user.email }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ walletDetail.user.email }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Date & Time</span>
-            <span class="text-black dark:text-white py-2">{{ formatDateTime(walletDetail.created_at) }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ formatDateTime(walletDetail.created_at) }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Before Adjustment</span>
-            <span class="text-black dark:text-white py-2">$ {{ formatAmount(walletDetail.old_balance) }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">$ {{ formatAmount(walletDetail.old_balance) }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Adjust Amount</span>
-            <span class="text-black dark:text-white py-2">$ {{ formatAmount(walletDetail.amount) }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">$ {{ formatAmount(walletDetail.amount) }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">After Adjustment</span>
-            <span class="text-black dark:text-white py-2">$ {{ formatAmount(walletDetail.new_balance) }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">$ {{ formatAmount(walletDetail.new_balance) }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Remark</span>
-            <span class="text-black dark:text-white py-2">{{ walletDetail.description }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ walletDetail.description }}</span>
         </div>
     </Modal>
 </template>

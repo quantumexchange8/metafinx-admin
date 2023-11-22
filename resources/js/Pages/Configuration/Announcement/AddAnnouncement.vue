@@ -114,7 +114,7 @@ const handleImageRevert = (uniqueId, load, error) => {
     </Button>
 
     <Modal :show="addAnnouncementModal" title="Add new announcement" max-width="6xl" @close="closeModal">
-        <div class="grid grid-cols-2 gap-5 w-full">
+        <div class="grid grid-rows-2 md:grid-rows-1 md:grid-cols-2 gap-5 w-full">
             <form
                 @submit.prevent="submit"
                 class="flex flex-col gap-5"

@@ -237,10 +237,10 @@ const rejectTransaction = async () => {
         <div v-if="depositLoading" class="w-full flex justify-center my-8">
             <Loading />
         </div>
-        <table v-else class="w-[650px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
+        <table v-else class="w-[900px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
             <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
             <tr>
-                <th scope="col" class="py-3 flex items-center justify-center">
+                <th scope="col" class="py-3 mx-1 flex items-center justify-center">
                     <Checkbox
                         v-model="isAllSelected"
                         @click="handleSelectAll"
@@ -276,7 +276,7 @@ const rejectTransaction = async () => {
                 v-for="deposit in withdrawals.data"
                 class="bg-white dark:bg-transparent text-xs text-gray-900 dark:text-white border-b dark:border-gray-600"
             >
-                <td class="py-3 text-center">
+                <td class="py-3 mx-1 text-center">
                     <Checkbox
                         :checked="isAllSelected || isItemSelected(deposit.id, deposit.amount)"
                         :model-value="isChecked.includes(deposit.id)"

@@ -47,7 +47,7 @@ watchEffect(() => {
             <h3>
                 Pending KYC
             </h3>
-            <Link :href="route('member.member_listing', {test:'pending'})"  class="dark:bg-gray-500 dark:hover:bg-gray-600 rounded-full w-6 h-6">
+            <Link :href="route('member.member_listing', {status:'pending'})"  class="dark:bg-gray-500 dark:hover:bg-gray-600 rounded-full w-6 h-6">
                 <ChevronRightIcon aria-hidden="true" class="w-6 h-6" />
             </Link>
         </div>
@@ -55,10 +55,10 @@ watchEffect(() => {
             <div v-if="isLoading" class="w-full flex justify-center mt-8">
                 <Loading />
             </div>
-            <table v-else class="w-full text-sm text-left">
+            <table v-else class="w-[550px] sm:w-full text-sm text-left">
                 <thead class="text-xs dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                    <th scope="col" class="px-4 py-3">
+                    <th scope="col" colspan="2" class="px-4 py-3">
                         Name
                     </th>
                     <th scope="col" class="px-4 py-3 text-center">
@@ -68,7 +68,7 @@ watchEffect(() => {
                 </thead>
                 <tbody>
                 <tr v-if="pendingMembers.data.length === 0" >
-                    <th colspan="2" class="py-4 text-lg">
+                    <th colspan="3" class="py-4 text-lg">
                         <div class="flex flex-col dark:text-gray-400 mt-3 items-center">
                             <img src="/assets/no_data.png" class="w-60" alt="">
                             No data to show
@@ -76,8 +76,8 @@ watchEffect(() => {
                     </th>
                 </tr>
                 <tr v-for="member in pendingMembers.data" class="dark:odd:bg-gray-600 dark:even:bg-gray-700 dark:text-white">
-                    <th scope="row" class="px-4 py-2">
-                        <div class="inline-flex items-center justify-center gap-2">
+                    <td scope="row" colspan="2" class="px-5 py-2">
+                        <div class="inline-flex items-center gap-2 mr-4">
                             <img :src="member.profile_photo_url ? member.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-10 h-10 rounded-full" alt="">
                             <div class="grid">
                                 <div class="font-medium dark:text-white">
@@ -88,9 +88,9 @@ watchEffect(() => {
                                 </div>
                             </div>
                         </div>
-                    </th>
+                    </td>
 
-                    <td class="px-4 py-2 text-center">
+                    <td class="px-3 py-2 text-center">
                         <KycAction
                             :member = "member"
                         />

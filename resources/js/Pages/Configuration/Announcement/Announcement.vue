@@ -95,7 +95,7 @@ const closeModal = () => {
 </script>
 
 <template>
-    <div class="py-6 pl-5 w-full">
+    <div class="md:py-6 md:pl-5 w-full">
         <div class="flex justify-end">
             <AddAnnouncement />
         </div>

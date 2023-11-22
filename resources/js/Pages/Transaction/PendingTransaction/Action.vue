@@ -135,35 +135,35 @@ const submitForm = () => {
 
         <!-- View -->
         <div v-if="modalComponent === 'Transaction Details'">
-            <div class="grid grid-cols-3 items-center">
+            <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">Name</span>
                 <span class="col-span-2 text-black dark:text-white py-2">{{ transaction.user.name }}</span>
             </div>
-            <div class="grid grid-cols-3 items-center">
+            <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">Email</span>
                 <span class="col-span-2 text-black dark:text-white py-2">{{ transaction.user.email }}</span>
             </div>
-            <div class="grid grid-cols-3 items-center">
+            <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">ID Number</span>
                 <span class="col-span-2 text-black dark:text-white py-2">{{ transaction.transaction_id }}</span>
             </div>
-            <div class="grid grid-cols-3 items-center">
+            <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">Date & time</span>
                 <span class="col-span-2 text-black dark:text-white py-2">{{ formatDateTime(transaction.created_at) }}</span>
             </div>
-            <div v-if="transaction.type === 'Deposit'" class="grid grid-cols-3 items-center">
+            <div v-if="transaction.type === 'Deposit'" class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">Transaction Hash</span>
                 <span class="col-span-2 text-black dark:text-white py-2 break-all">{{ transaction.txn_hash }}</span>
             </div>
-            <div class="grid grid-cols-3 items-center">
+            <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">To Wallet Address</span>
                 <span class="col-span-2 text-black dark:text-white py-2 break-all">{{ transaction.to_wallet_address }}</span>
             </div>
-            <div class="grid grid-cols-3 items-center">
+            <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">Amount</span>
                 <span class="col-span-2 text-black dark:text-white py-2">$ {{ transaction.amount }}</span>
             </div>
-            <div class="grid grid-cols-3 items-center">
+            <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">Transaction Status</span>
                 <span class="col-span-2 text-black dark:text-white py-2">{{ formatType(transaction.status) }}</span>
             </div>

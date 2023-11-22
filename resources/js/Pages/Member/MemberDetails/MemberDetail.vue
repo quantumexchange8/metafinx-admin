@@ -94,9 +94,9 @@ const backButton = () => {
         </template>
 
         <div class="items-center p-5 mb-8 text-base text-gray-800 rounded-xl bg-gray-50 dark:bg-gray-700">
-            <div class="flex flex-col gap-3 justify-between w-full pb-5 border-b border-gray-600 md:flex-row">
+            <div class="flex gap-3 justify-between w-full pb-5 border-b border-gray-600 flex-row">
                 <div class="flex items-center gap-3">
-                    <div class="flex relative">
+                    <div class="flex flex-shrink-0 relative">
                         <img
                             class="object-cover w-16 h-16 rounded-full"
                             :src="getMediaUrlByCollection(member_details, 'profile_photo')"
@@ -114,7 +114,7 @@ const backButton = () => {
                         </p>
                     </div>
                 </div>
-                <div class="flex flex-row items-start gap-3 justify-center">
+                <div class="flex flex-row items-end gap-3 justify-end">
                     <Action
                         type="member"
                         :member_details="member_details"
@@ -253,7 +253,7 @@ const backButton = () => {
                 />
         </div>
         <template #asideRight>
-            <div class="inset-y-0 p-6 flex flex-col space-y-6 bg-white shadow-lg dark:bg-gray-800 border-l dark:border-gray-700 w-96 fixed right-0">
+            <div class="inset-y-0 p-6 flex flex-col space-y-6 bg-white shadow-lg dark:bg-gray-800 border-l dark:border-gray-700 w-80 lg:w-96 fixed right-0">
                 <MemberInvestment
                     :investments="investments"
                 />

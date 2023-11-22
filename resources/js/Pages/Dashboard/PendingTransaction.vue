@@ -27,23 +27,23 @@ const { formatAmount } = transactionFormat();
             </Link>
         </div>
         <div class="relative overflow-x-auto mt-2">
-            <table class="w-full text-sm text-left">
+            <table class="w-[550px] sm:w-full text-sm text-left">
                 <thead class="text-xs dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                    <th scope="col" class="px-4 py-3">
+                    <th colspan="2" scope="col" class="px-4 py-3">
                         Name
                     </th>
-                    <th scope="col" class="px-4 py-3">
+                    <th colspan="1" scope="col" class="px-4 py-3">
                         Transaction ID
                     </th>
-                    <th scope="col" class="px-4 py-3 ">
+                    <th colspan="1" scope="col" class="px-4 py-3 ">
                         Amount
                     </th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-if="pendingTransactions.length === 0" >
-                    <th colspan="3" class="py-4 text-lg">
+                    <th colspan="4" class="py-4 text-lg">
                         <div class="flex flex-col dark:text-gray-400 mt-3 items-center">
                             <img src="/assets/no_data.png" class="w-60" alt="">
                             No data to show
@@ -51,7 +51,7 @@ const { formatAmount } = transactionFormat();
                     </th>
                 </tr>
                 <tr v-for="pendingTransaction in props.pendingTransactions" class="dark:odd:bg-gray-600 dark:even:bg-gray-700 dark:text-white">
-                    <th scope="row" class="px-4 py-2">
+                    <td scope="row" colspan="2" class=" px-5 py-2">
                         <div class="inline-flex items-center justify-center gap-2">
                             <img :src="pendingTransaction.user.profile_photo_url ? pendingTransaction.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-10 h-10 rounded-full" alt="">
                             <div class="grid">
@@ -63,11 +63,11 @@ const { formatAmount } = transactionFormat();
                                 </div>
                             </div>
                         </div>
-                    </th>
-                    <td class="px-4 py-2">
+                    </td>
+                    <td colspan="1" class="px-4 py-2">
                         {{ pendingTransaction.transaction_id }}
                     </td>
-                    <td class="px-4 py-2">
+                    <td colspan="1" class="px-4 py-2">
                         $ {{ formatAmount(pendingTransaction.amount) }}
                     </td>
                 </tr>

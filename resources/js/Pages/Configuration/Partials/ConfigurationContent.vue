@@ -18,9 +18,10 @@ const updateContent = (newContent) => {
     <PerfectScrollbar
         tagname="nav"
         aria-label="main"
-        class="relative flex flex-col flex-1 max-h-full gap-2 pr-6"
+        class="relative grid grid-cols-4 md:flex md:flex-col md:flex-1 md:max-h-full gap-2 md:pr-6 [overflow-wrap:anywhere]"
     >
         <ConfigurationLink
+            class="flex-col md:flex-row"
             title="Announcement"
             @click="updateContent('Announcement')"
             :active="props.content==='Announcement'"
@@ -33,7 +34,8 @@ const updateContent = (newContent) => {
             </template>
         </ConfigurationLink>
 
-       <ConfigurationLink
+         <ConfigurationLink
+            class="flex-col md:flex-row"
             title="Dividend Bonus"
             @click="updateContent('DividendBonus')"
             :active="props.content==='DividendBonus'"
@@ -47,6 +49,7 @@ const updateContent = (newContent) => {
         </ConfigurationLink>
 
         <ConfigurationLink
+            class="flex-col md:flex-row"
             title="Ticket Bonus"
             @click="updateContent('TicketBonus')"
             :active="props.content==='TicketBonus'"
@@ -60,6 +63,7 @@ const updateContent = (newContent) => {
         </ConfigurationLink>
 
         <ConfigurationLink
+            class="flex-col md:flex-row"
             title="Affiliate Setting"
             @click="updateContent('AffiliateSetting')"
             :active="props.content==='AffiliateSetting'"

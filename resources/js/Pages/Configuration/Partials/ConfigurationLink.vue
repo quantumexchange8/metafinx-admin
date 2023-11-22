@@ -31,7 +31,7 @@ const Tag = !props.external ? Link : 'a'
         v-if="href"
         :href="href"
         :class="[
-            'p-2 flex items-center gap-2 rounded-md transition-colors',
+            'md:p-2 py-1 flex items-center gap-2 rounded-md transition-colors',
             {
                 'text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700':
                     !active,
@@ -45,8 +45,7 @@ const Tag = !props.external ? Link : 'a'
         </slot>
 
         <span
-            class="text-base font-medium"
-            v-show="sidebarState.isOpen || sidebarState.isHovered"
+            class="text-xs md:text-base font-medium"
         >
             {{ title }}
         </span>
@@ -55,7 +54,7 @@ const Tag = !props.external ? Link : 'a'
         v-else
         type="button"
         :class="[
-            'p-2 w-full flex items-center gap-2 rounded-md transition-colors',
+            'md:p-2 py-1 w-full flex items-center gap-2 rounded-md transition-colors',
             {
                 'text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700':
                     !active,
@@ -69,8 +68,7 @@ const Tag = !props.external ? Link : 'a'
         </slot>
 
         <span
-            class="text-base font-medium"
-            v-show="sidebarState.isOpen || sidebarState.isHovered"
+            class="text-xs md:text-base font-medium"        
         >
             {{ title }}
         </span>

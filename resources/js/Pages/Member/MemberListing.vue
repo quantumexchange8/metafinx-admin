@@ -63,12 +63,10 @@ function changeTab(index) {
 }
 
 onMounted(() => {
-    // const urlParams = new URLSearchParams(window.location.search);
-    // const params = urlParams.get('test');
     const params = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop) => searchParams.get(prop),
     });
-    if (params.test === 'pending'){
+    if (params.status === 'pending'){
         selectedTab.value = 1;
     }
 });

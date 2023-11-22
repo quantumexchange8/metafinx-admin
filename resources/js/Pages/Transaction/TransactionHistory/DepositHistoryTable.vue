@@ -127,7 +127,7 @@ const closeModal = () => {
         <div v-if="depositLoading" class="w-full flex justify-center my-8">
             <Loading />
         </div>
-        <table v-else class="w-[650px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
+        <table v-else class="w-[800px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
             <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
             <tr>
                 <th scope="col" class="pl-5 py-2">
@@ -215,37 +215,37 @@ const closeModal = () => {
     </div>
 
     <Modal :show="depositHistoryModal" title="Transaction Details" @close="closeModal">
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Name</span>
-            <span class="text-black dark:text-white py-2">{{ depositDetail.user.name }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ depositDetail.user.name }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Email</span>
-            <span class="text-black dark:text-white py-2">{{ depositDetail.user.email }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ depositDetail.user.email }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction Type</span>
-            <span class="text-black dark:text-white py-2">{{ depositDetail.type }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ depositDetail.type }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction ID</span>
-            <span class="text-black dark:text-white py-2">{{ depositDetail.transaction_id }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ depositDetail.transaction_id }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Date & Time</span>
-            <span class="text-black dark:text-white py-2">{{ formatDateTime(depositDetail.created_at) }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ formatDateTime(depositDetail.created_at) }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">To</span>
-            <span class="text-black dark:text-white py-2">{{ depositDetail.to_wallet_address }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2 break-words">{{ depositDetail.to_wallet_address }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Amount</span>
-            <span class="text-black dark:text-white py-2">$ {{ depositDetail.amount }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">$ {{ depositDetail.amount }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction Status</span>
-            <span class="text-black dark:text-white py-2">{{ depositDetail.status }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ depositDetail.status }}</span>
         </div>
     </Modal>
 </template>

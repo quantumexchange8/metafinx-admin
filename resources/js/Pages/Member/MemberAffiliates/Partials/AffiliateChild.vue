@@ -125,8 +125,8 @@ export default {
                                 alt="userPic"
                             />
                             <div class="flex-col ml-3">
-                                <div class="flex gap-2 text-sm font-semibold">
-                                    {{ node.name }}
+                                <div class="flex whitespace-nowrap items-center gap-2 text-sm font-semibold">
+                                    <div class="whitespace-normal">{{ node.name }}</div>
                                     <LVL1Icon class="h-5" v-if="node.rank === 2" />
                                     <LVL2Icon class="h-5" v-if="node.rank === 3" />
                                     <LVL3Icon class="h-5" v-if="node.rank === 4" />

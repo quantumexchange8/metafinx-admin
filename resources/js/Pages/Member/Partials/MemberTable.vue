@@ -105,28 +105,28 @@ const paginationActiveClass = [
         <div v-if="isLoading" class="w-full flex justify-center my-8">
             <Loading />
         </div>
-        <table v-else class="w-[650px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
+        <table v-else class="w-[850px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
             <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
             <tr>
-                <th scope="col" class="px-3 py-2.5">
+                <th scope="col" colspan="4" class="px-3 py-2.5">
                     Name
                 </th>
-                <th scope="col" class="px-3 py-2.5 text-right w-56">
+                <th scope="col" colspan="2" class="px-3 py-2.5 text-right w-56">
                     Joining Date
                 </th>
-                <th scope="col" class="px-3 py-2.5 text-right w-56">
+                <th scope="col" colspan="2" class="px-3 py-2.5 text-right w-56">
                     Wallet Balance
                 </th>
-                <th scope="col" class="px-3 py-2.5 text-right w-56">
+                <th scope="col" colspan="2" class="px-3 py-2.5 text-right w-56">
                     Active Investment
                 </th>
-                <th scope="col" class="px-3 py-2.5 text-center w-24">
+                <th scope="col" colspan="1" class="px-3 py-2.5 text-center w-24">
                     Rank
                 </th>
-                <th v-if="kycStatus !== 'pending'" scope="col" class="px-3 py-2.5 text-center w-24">
+                <th v-if="kycStatus !== 'pending'" scope="col" colspan="1"  class="px-3 py-2.5 text-center w-24">
                     Status
                 </th>
-                <th scope="col" class="px-3 py-2.5 text-center w-36">
+                <th scope="col" colspan="2" class="px-3 py-2.5 text-center w-36">
                     Action
                 </th>
             </tr>
@@ -136,8 +136,8 @@ const paginationActiveClass = [
                 v-for="member in members.data"
                 class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600"
             >
-                <td class="pl-3 py-2.5">
-                    <div class="inline-flex items-center gap-2">
+                <td class="pl-3 py-2.5" colspan="4">
+                    <div class="inline-flex items-center gap-2 mr-3">
                         <img :src="member.profile_photo_url ? member.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
                         <div class="flex flex-col">
                             <div>
@@ -149,27 +149,27 @@ const paginationActiveClass = [
                         </div>
                     </div>
                 </td>
-                <td class="px-3 py-2.5 text-right">
+                <td class="px-3 py-2.5 text-right" colspan="2">
                     {{ formatDateTime(member.created_at, false) }}
                 </td>
-                <td class="px-3 py-2.5 text-right">
+                <td class="px-3 py-2.5 text-right" colspan="2">
                     $ {{ formatAmount(member.wallets_sum_balance) }}
                 </td>
-                <td class="px-3 py-2.5 text-right">
+                <td class="px-3 py-2.5 text-right" colspan="2">
                     $ {{ formatAmount(member.active_investment_amount) }}
                 </td>
-                <td class="px-3 py-2.5 text-center uppercase">
+                <td class="px-3 py-2.5 text-center uppercase" colspan="1">
                     <span v-if="member.rank.id === 1">{{ member.rank.name }}</span>
                     <Rank1Icon class="h-5" v-if="member.rank.id === 2" />
                     <Rank2Icon class="h-5" v-if="member.rank.id === 3" />
                     <Rank3Icon class="h-5" v-if="member.rank.id === 4" />
                 </td>
-                <td v-if="kycStatus !== 'pending'" class="px-3 py-2.5 text-center">
+                <td v-if="kycStatus !== 'pending'" class="px-3 py-2.5 text-center" colspan="1">
                     <span v-if="member.kyc_approval === 'pending'" class="flex w-2 h-2 bg-green-500 dark:bg-blue-500 mx-auto rounded-full"></span>
                     <span v-else-if="member.kyc_approval === 'verified'" class="flex w-2 h-2 bg-green-500 dark:bg-success-500 mx-auto rounded-full"></span>
                     <span v-else-if="member.kyc_approval === 'unverified'" class="flex w-2 h-2 bg-red-500 dark:bg-warning-500 mx-auto rounded-full"></span>
                 </td>
-                <td class="px-3 py-2.5 text-center">
+                <td class="px-3 py-2.5 text-center" colspan="2">
                     <Action
                         v-if="kycStatus !== 'pending'"
                         :members="member"
