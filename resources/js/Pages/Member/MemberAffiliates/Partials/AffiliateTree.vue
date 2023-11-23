@@ -24,10 +24,8 @@ const getResults = async (search = '') => {
     isLoading.value = true;
     try {
         let url = `/member/getTreeData/${props.user.id}`;
-        console.log(url)
 
         if (search) {
-            console.log(search)
             url += `?search=${search}`;
         }
 
@@ -65,21 +63,21 @@ getResults();
             </div>
         </div>
     </div>
-<!--    <div class="pt-8">-->
-<!--        <InputIconWrapper>-->
-<!--            <template #icon>-->
-<!--                <SearchIcon aria-hidden="true" class="w-5 h-5" />-->
-<!--            </template>-->
-<!--            <Input-->
-<!--                withIcon-->
-<!--                id="search"-->
-<!--                type="text"-->
-<!--                class="block"-->
-<!--                placeholder="Search"-->
-<!--                v-model="search"-->
-<!--            />-->
-<!--        </InputIconWrapper>-->
-<!--    </div>-->
+    <div class="pt-8">
+        <InputIconWrapper>
+            <template #icon>
+                <SearchIcon aria-hidden="true" class="w-5 h-5" />
+            </template>
+            <Input
+                withIcon
+                id="search"
+                type="text"
+                class="block border-transparent w-full md:w-1/3"
+                placeholder="Search"
+                v-model="search"
+            />
+        </InputIconWrapper>
+    </div>
     <AffiliateChild
         :node="root"
         :isLoading="isLoading"

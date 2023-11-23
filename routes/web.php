@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IpoSchemeController;
@@ -102,12 +103,29 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/addAnnouncement', [ConfigurationController::class, 'addAnnouncement'])->name('configuration.addAnnouncement');
         Route::post('/upload/tmp_img', [ConfigurationController::class, 'upload']);
         Route::post('/upload/image-revert', [ConfigurationController::class, 'image_revert']);
+        //Dividend Bonus
         Route::post('/addDividendBonus', [ConfigurationController::class, 'addDividendBonus'])->name('configuration.addDividendBonus');
-        Route::post('/addTicketBonus', [ConfigurationController::class, 'addTicketBonus'])->name('configuration.addTicketBonus');
         Route::get('/getDividendBonus', [ConfigurationController::class, 'getDividendBonus'])->name('configuration.getDividendBonus');
+        //Ticket Bonus
+        Route::post('/addTicketBonus', [ConfigurationController::class, 'addTicketBonus'])->name('configuration.addTicketBonus');
         Route::get('/getTicketBonus', [ConfigurationController::class, 'getTicketBonus'])->name('configuration.getTicketBonus');
+        //Affiliate Setting
         Route::get('/getSettingRank', [ConfigurationController::class, 'getSettingRank'])->name('configuration.getSettingRank');
         Route::post('/affiliateSetting', [ConfigurationController::class, 'affiliateSetting'])->name('configuration.affiliateSetting');
+    });
+
+    /**
+     * ==============================
+     *          Admin User
+     * ==============================
+     */
+    Route::prefix('admin_user')->group(function () {
+        Route::get('/admin_listing', [AdminUserController::class, 'admin_listing'])->name('admin_user.admin_listing');
+        Route::get('/add_sub_admin', [AdminUserController::class, 'add_sub_admin'])->name('admin_user.add_sub_admin');
+        Route::get('/edit_sub_admin/{id}', [AdminUserController::class, 'edit_sub_admin'])->name('admin_user.edit_sub_admin');
+        Route::post('/addSubAdmin', [AdminUserController::class, 'addSubAdmin'])->name('admin_user.addSubAdmin');
+        Route::post('/editSubAdmin', [AdminUserController::class, 'editSubAdmin'])->name('admin_user.editSubAdmin');
+        Route::delete('/deleteSubAdmin', [AdminUserController::class, 'deleteSubAdmin'])->name('admin_user.deleteSubAdmin');
     });
 });
 

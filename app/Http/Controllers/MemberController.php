@@ -395,15 +395,17 @@ class MemberController extends Controller
 
         $user = $searchUser ?? User::find($id);
 
-        $query = User::whereHas('upline', function ($query) use ($user) {
+        $users = User::whereHas('upline', function ($query) use ($user) {
             $query->where('id', $user->id);
-        });
+        })
+            ->where('role', 'user')
+            ->get();
 
-        if ($searchUser) {
-            $query->orWhere('id', $searchUser->id);
-        }
-
-        $users = $query->get();
+//        if ($searchUser) {
+//            $query->orWhere('id', $searchUser->id);
+//        }
+//
+//        $users = $query->get();
 
         $level = 0;
         $rootNode = [

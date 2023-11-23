@@ -1,7 +1,7 @@
 <script setup>
 import PerfectScrollbar from '@/Components/PerfectScrollbar.vue'
 import SidebarLink from '@/Components/Sidebar/SidebarLink.vue'
-import {DashboardIcon, UserIcon, IPOIcon, TransactionIcon, ConfigurationIcon, LogoutIcon} from '@/Components/Icons/outline'
+import {DashboardIcon, UserIcon, IPOIcon, TransactionIcon, ConfigurationIcon, AdminUserIcon, LogoutIcon} from '@/Components/Icons/outline'
 import SidebarCollapsible from '@/Components/Sidebar/SidebarCollapsible.vue'
 import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.vue'
 </script>
@@ -76,6 +76,19 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
                 />
             </template>
         </SidebarLink>
+
+<!--        <SidebarLink-->
+<!--            title="Admin User"-->
+<!--            :href="route('admin_user.admin_listing')"-->
+<!--            :active="route().current('admin_user.*')"-->
+<!--        >-->
+<!--            <template #icon>-->
+<!--                <AdminUserIcon-->
+<!--                    class="flex-shrink-0 w-6 h-6"-->
+<!--                    aria-hidden="true"-->
+<!--                />-->
+<!--            </template>-->
+<!--        </SidebarLink>-->
 
         <SidebarLink
             title="Log Out"

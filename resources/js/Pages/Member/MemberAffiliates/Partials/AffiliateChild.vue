@@ -150,7 +150,7 @@ export default {
                             </div>
                             <div class="flex flex-col text-center">
                                 <span class="text-sm font-semibold">$ {{ formatAmount(node.self_deposit) }}</span>
-                                <span class="text-xs font-normal dark:text-gray-400">Self Deposit</span>
+                                <span class="text-xs font-normal dark:text-gray-400">Valid Self Deposit</span>
                             </div>
                             <div class="flex flex-col text-center">
                                 <span class="text-sm font-semibold">$ {{ formatAmount(node.valid_affiliate_deposit) }}</span>
@@ -162,7 +162,7 @@ export default {
             </div>
         </div>
         <Tree
-            v-if="expanded"
+            v-if="expanded && !isLoading"
             v-for="child in node.children"
             :key="child.name"
             :node="child"
