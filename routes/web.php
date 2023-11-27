@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IpoSchemeController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ReportController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -126,6 +127,19 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/addSubAdmin', [AdminUserController::class, 'addSubAdmin'])->name('admin_user.addSubAdmin');
         Route::post('/editSubAdmin', [AdminUserController::class, 'editSubAdmin'])->name('admin_user.editSubAdmin');
         Route::delete('/deleteSubAdmin', [AdminUserController::class, 'deleteSubAdmin'])->name('admin_user.deleteSubAdmin');
+    });
+
+    /**
+     * ========================
+     *          Report
+     * ========================
+     */
+    Route::prefix('report')->group(function () {
+        Route::get('/view', [ReportController::class, 'index'])->name('report.view');
+        Route::get('/getPayoutDetails', [ReportController::class, 'getPayoutDetails'])->name('report.getPayoutDetails');
+
+        Route::get('/getTotalPayoutByDays', [ReportController::class, 'getTotalPayoutByDays'])->name('report.getTotalPayoutByDays');
+        Route::get('/getTotalPayoutByMonths', [ReportController::class, 'getTotalPayoutByMonths'])->name('report.getTotalPayoutByMonths');
     });
 });
 
