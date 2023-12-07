@@ -13,7 +13,7 @@ class AnnouncementRequest extends FormRequest
             'details' => ['required'],
             'receiver_type' => ['required'],
             'receiver' => ['nullable', 'required_if:receiver_type,specific_member'],
-            'image' => ['nullable', 'image'],
+            'image' => ['nullable'],
         ];
     }
 
