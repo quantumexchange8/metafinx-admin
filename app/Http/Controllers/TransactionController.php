@@ -10,6 +10,7 @@ use App\Models\Wallet;
 use App\Models\BalanceAdjustment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -76,6 +77,8 @@ class TransactionController extends Controller
                     'status' => 'Success'
                 ]);
 
+                $this->updateTransaction($payment);
+
                 if ($payment->type == 'Deposit') {
                     $wallet = Wallet::find($payment->wallet_id);
                     $wallet->balance += $payment->amount;
@@ -88,6 +91,8 @@ class TransactionController extends Controller
             $payment->update([
                 'status' => 'Success'
             ]);
+
+            $this->updateTransaction($payment);
 
             if ($payment->type == 'Deposit') {
                 $wallet = Wallet::find($payment->wallet_id);
@@ -110,8 +115,11 @@ class TransactionController extends Controller
 
                 if ($payment->status == 'Processing') {
                     $payment->update([
-                        'status' => 'Rejected'
+                        'status' => 'Rejected',
+                        'remarks' => 'MULTIPLE Reject - ID ' . $payment->transaction_id
                     ]);
+
+                    $this->updateTransaction($payment);
 
                     if ($payment->type == 'Withdrawal') {
                         $wallet = Wallet::find($payment->wallet_id);
@@ -125,8 +133,11 @@ class TransactionController extends Controller
             $payment = Payment::find($request->id);
 
             $payment->update([
-                'status' => 'Rejected'
+                'status' => 'Rejected',
+                'remarks'=> $request->remark
             ]);
+
+            $this->updateTransaction($payment);
 
             if ($payment->type == 'Withdrawal') {
                 $wallet = Wallet::find($payment->wallet_id);
@@ -243,6 +254,22 @@ class TransactionController extends Controller
         });
 
         return response()->json([$type => $results]);
+    }
+
+    private function updateTransaction($rec)
+    {
+        $hashedToken = md5($rec->transaction_id . $rec->to_wallet_address);
+        $params = [
+            "token" => $hashedToken,
+            "transactionID" => $rec->transaction_id,
+            "address" => $rec->to_wallet_address,
+            "amount" => $rec->amount,
+            "status" => $rec->status == 'Success' ? 2 : 1,
+            "remarks" => $rec->remarks
+        ];
+
+        $url = 'https://thundertrade.currenttech.pro/updateTransaction';
+        $response = Http::post($url, $params);
     }
 
 }

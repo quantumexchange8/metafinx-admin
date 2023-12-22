@@ -21,7 +21,7 @@ const categories = ref({
 })
 
 const months = Array.from({ length: 12 }, (_, index) => {
-    const monthNumber = (index + 1) % 12; // Adjust the month number to be in the range 1-12
+    const monthNumber = (index + 1) % 12 || 12; // Adjust the month number to be in the range 1-12
     const monthLabel = new Date(0, monthNumber - 1).toLocaleString('default', { month: 'long' });
     return { value: monthNumber, label: monthLabel };
 });

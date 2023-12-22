@@ -107,7 +107,7 @@ class IpoSchemeController extends Controller
         foreach ($descriptionItems as $descriptionItem) {
             InvestmentPlanDescription::create([
                 'investment_plan_id' => $investmentPlan->id,
-                'description' => json_encode($descriptionItem)
+                'description' => $descriptionItem
             ]);
         }
 

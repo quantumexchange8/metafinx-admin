@@ -23,6 +23,7 @@ class Payment extends Model
         'to_wallet_address',
         'type',
         'status',
+        'remarks',
     ];
 
     public function getActivitylogOptions(): LogOptions

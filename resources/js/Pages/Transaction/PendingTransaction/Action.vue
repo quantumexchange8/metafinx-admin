@@ -7,6 +7,9 @@ import Button from "@/Components/Button.vue";
 import Modal from "@/Components/Modal.vue";
 import {transactionFormat} from "@/Composables/index.js";
 import {useForm} from "@inertiajs/vue3";
+import Label from "@/Components/Label.vue";
+import Input from "@/Components/Input.vue";
+import InputError from "@/Components/InputError.vue";
 
 const props = defineProps({
     transaction: Object
@@ -22,6 +25,8 @@ const openTransactionModal = (ibId, componentType) => {
         modalComponent.value = 'Approve Transaction';
     } else if (componentType === 'reject') {
         modalComponent.value = 'Reject Transaction';
+    } else if (componentType === 'rejectRemarks') {
+        modalComponent.value = 'Reject Remark';
     } else if (componentType === 'view') {
         modalComponent.value = 'Transaction Details';
     }
@@ -35,13 +40,14 @@ const closeModal = () => {
 const form = useForm({
     id: props.transaction.id,
     type: 'single',
+    remark: '',
 });
 
 const submitForm = () => {
     let submitRoute;
     if (modalComponent.value === 'Approve Transaction') {
         submitRoute = route('transaction.approveTransaction');
-    } else if (modalComponent.value === 'Reject Transaction') {
+    } else if (modalComponent.value === 'Reject Remark') {
         submitRoute = route('transaction.rejectTransaction');
     }
 
@@ -126,6 +132,30 @@ const submitForm = () => {
                 </div>
             </div>
             <div class="pt-5 px-2 grid grid-cols-2 gap-4">
+                <Button type="button" variant="secondary" class="px-6 justify-center" @click="closeModal">
+                    Cancel
+                </Button>
+                <Button class="px-6 justify-center" @click="openTransactionModal(transaction.id, 'rejectRemarks')">Confirm</Button>
+            </div>
+        </div>
+
+        <!-- Reject Remarks -->
+        <div v-if="modalComponent === 'Reject Remark'">
+            <div class="flex gap-2 mt-3 mb-8">
+                <Label class="text-sm dark:text-white w-1/4 pt-0.5" for="remark" value="Remark" />
+                <div class="flex flex-col w-full">
+                    <Input
+                        id="remark"
+                        type="text"
+                        placeholder="Enter remark (visible to member)"
+                        class="block w-full"
+                        :class="form.errors.remark ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                        v-model="form.remark"
+                    />
+                    <InputError :message="form.errors.remark" class="mt-2" />
+                </div>
+            </div>
+            <div class="pt-5 px-2 grid grid-cols-2 gap-4 border-t dark:border-gray-700">
                 <Button type="button" variant="secondary" class="px-6 justify-center" @click="closeModal">
                     Cancel
                 </Button>
