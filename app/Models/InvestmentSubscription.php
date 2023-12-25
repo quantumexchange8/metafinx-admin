@@ -22,6 +22,8 @@ class InvestmentSubscription extends Model
         'remark',
         'next_roi_date',
         'expired_date',
+        'document_status',
+        'document_approval_date'
     ];
 
     public function getActivitylogOptions(): LogOptions

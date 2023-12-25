@@ -52,6 +52,40 @@ class IpoSchemeController extends Controller
         return response()->json($selectedPlans);
     }
 
+    public function getPendingSubscription(Request $request)
+    {
+        $selectedPlans = InvestmentSubscription::with(['investment_plan:id,name,type', 'user:id,name,email'])
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->input('search');
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->whereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%')
+                            ->orWhere('email', 'like', '%' . $search . '%');
+                    })
+                        ->orWhere('subscription_id', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($request->filled('date'), function ($query) use ($request) {
+                $date = $request->input('date');
+                $dateRange = explode(' - ', $date);
+                $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+                $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+                $query->whereBetween('created_at', [$start_date, $end_date]);
+            })
+            ->whereHas('investment_plan', function ($planQuery) {
+                $planQuery->where('type', 'ebmi');
+            })
+            ->whereNot('document_status', 'approve')
+            ->latest()
+            ->paginate(10);
+
+        $selectedPlans->each(function ($user_deposit) {
+            $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
+        });
+
+        return response()->json($selectedPlans);
+    }
+
     public function getSelectedPlans(Request $request)
     {
         $selectedPlans = InvestmentSubscription::with('investment_plan')
@@ -73,6 +107,18 @@ class IpoSchemeController extends Controller
             'labels' => $labels,
             'datasetData' => $datasetData
         ]);
+    }
+
+    public function approveEbmi(Request $request)
+    {
+        $subscription = InvestmentSubscription::find($request->id);
+
+        $subscription->update([
+            'document_status' => 'approve',
+            'document_approval_date' => Carbon::now()
+        ]);
+
+        return redirect()->back()->with('title', 'EBMI approved')->with('success', 'This EBMI plan has been approved successfully.');
     }
 
     public function updateStatus(Request $request)

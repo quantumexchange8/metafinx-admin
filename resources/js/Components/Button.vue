@@ -85,13 +85,13 @@ const classes = computed(() => [
             'p-3': size === 'lg',
         }
         : {
-            'px-2.5 py-1.5 text-sm': size === 'sm',
+            'px-3 py-1 text-sm': size === 'sm',
             'px-4 py-2 text-base': size === 'base',
             'px-5 py-2 text-xl': size === 'lg',
         },
     variantClasses(variant),
     {
-        'rounded-md': !squared && !pill,
+        'rounded-lg': !squared && !pill,
         'rounded-full': pill,
     },
     {

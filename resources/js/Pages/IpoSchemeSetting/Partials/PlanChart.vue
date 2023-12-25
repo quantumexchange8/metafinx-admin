@@ -18,7 +18,8 @@ const chartData = ref({
         backgroundColor: [
             '#FF2D55',
             '#FDB022',
-            '#6C737F'
+            '#6C737F',
+            '#209CEE',
         ],
         hoverOffset: 4
     }]
