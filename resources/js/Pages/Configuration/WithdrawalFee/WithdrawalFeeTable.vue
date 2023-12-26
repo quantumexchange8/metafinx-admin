@@ -15,7 +15,7 @@ const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
 });
-const tickets = ref({data: []});
+const fees = ref({data: []});
 const search = ref('');
 const date = ref('');
 const currentPage = ref(1);
@@ -39,7 +39,7 @@ watch(
 const getResults = async (page = 1, search = '', date = '') => {
     isLoading.value = true
     try {
-        let url = `/configuration/getTicketBonus?page=${page}`;
+        let url = `/configuration/getWithdrawalFee?page=${page}`;
 
         if (search) {
             url += `&search=${search}`;
@@ -50,7 +50,7 @@ const getResults = async (page = 1, search = '', date = '') => {
         }
 
         const response = await axios.get(url);
-        tickets.value = response.data;
+        fees.value = response.data;
     } catch (error) {
         console.error(error);
     } finally {
@@ -139,37 +139,31 @@ watch(() => refresh.value, (newVal) => {
                         Date
                     </th>
                     <th scope="col" class="px-3 py-4 text-center">
-                        Release Date
-                    </th>
-                    <th scope="col" class="px-3 py-4 text-center">
-                        Total Tickets
-                    </th>
-                    <th scope="col" class="px-3 py-4 text-center">
                         Amount
+                    </th>
+                    <th scope="col" class="px-3 py-4 text-center">
+                        Updated By
                     </th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-if="tickets.data.length === 0">
+                <tr v-if="fees.data.length === 0">
                     <th colspan="4" class="py-4 text-lg text-center">
                         No History
                     </th>
                 </tr>
                 <tr
-                    v-for="ticket in tickets.data"
+                    v-for="fee in fees.data"
                     class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 dark:hover:bg-gray-600"
                 >
                     <td class="px-3 py-4">
-                        {{ formatDateTime(ticket.created_at) }}
+                        {{ formatDateTime(fee.created_at) }}
                     </td>
                     <td class="px-3 py-4 text-center">
-                        {{ formatDateTime(ticket.release_date, false) }}
+                        ${{ formatAmount(fee.amount) }}
                     </td>
                     <td class="px-3 py-4 text-center">
-                        2000
-                    </td>
-                    <td class="px-3 py-4 text-center">
-                        ${{ formatAmount(ticket.amount) }}
+                        {{ fee.user.name }}
                     </td>
                 </tr>
                 </tbody>
@@ -178,7 +172,7 @@ watch(() => refresh.value, (newVal) => {
                 <TailwindPagination
                     :item-classes=paginationClass
                     :active-classes=paginationActiveClass
-                    :data="tickets"
+                    :data="fees"
                     :limit=2
                     @pagination-change-page="handlePageChange"
                 >

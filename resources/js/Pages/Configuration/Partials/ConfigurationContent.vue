@@ -50,12 +50,12 @@ const updateContent = (newContent) => {
 
         <ConfigurationLink
             class="flex-col md:flex-row"
-            title="Ticket Bonus"
-            @click="updateContent('TicketBonus')"
-            :active="props.content==='TicketBonus'"
+            title="Affiliate Setting"
+            @click="updateContent('AffiliateSetting')"
+            :active="props.content==='AffiliateSetting'"
         >
             <template #icon>
-                <TicketBonusIcon
+                <AffiliateSettingIcon
                     class="flex-shrink-0 w-6 h-6"
                     aria-hidden="true"
                 />
@@ -64,12 +64,12 @@ const updateContent = (newContent) => {
 
         <ConfigurationLink
             class="flex-col md:flex-row"
-            title="Affiliate Setting"
-            @click="updateContent('AffiliateSetting')"
-            :active="props.content==='AffiliateSetting'"
+            title="Withdrawal Fee"
+            @click="updateContent('WithdrawalFee')"
+            :active="props.content==='WithdrawalFee'"
         >
             <template #icon>
-                <AffiliateSettingIcon
+                <TicketBonusIcon
                     class="flex-shrink-0 w-6 h-6"
                     aria-hidden="true"
                 />

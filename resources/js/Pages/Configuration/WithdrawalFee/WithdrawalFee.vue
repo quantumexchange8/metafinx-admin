@@ -8,7 +8,11 @@ import {useForm} from "@inertiajs/vue3";
 import {transactionFormat} from "@/Composables/index.js";
 import {ref} from "vue";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
-import TicketTable from "@/Pages/Configuration/TicketBonus/TicketTable.vue";
+import WithdrawalFeeTable from "@/Pages/Configuration/WithdrawalFee/WithdrawalFeeTable.vue";
+
+const props = defineProps({
+    withdrawalFee: Object
+})
 
 const formatter = ref({
     date: 'YYYY-MM-DD',
@@ -16,7 +20,6 @@ const formatter = ref({
 });
 
 const { formatAmount } = transactionFormat();
-const ticketAmounts = ref(50);
 
 const form = useForm({
     amount: '',
@@ -29,7 +32,7 @@ function clearField() {
 }
 
 const submit = () => {
-    form.post(route('configuration.addTicketBonus'), {
+    form.post(route('configuration.editWithdrawalFee'), {
         onSuccess: () => {
             form.reset();
             clearField();
@@ -42,17 +45,17 @@ const submit = () => {
 <template>
     <div class="flex flex-col gap-8 py-8 px-5 w-full ">
         <div class="flex flex-col gap-2 p-5 dark:bg-gray-700 items-center rounded-lg w-full md:w-4/5">
-            <span class="text-xs text-gray-400">Total Tickets Rewarded to Members</span>
-            <h2>{{ ticketAmounts }}</h2>
+            <span class="text-xs text-gray-400">Withdrawal Fee</span>
+            <h2>$ {{ withdrawalFee.amount }}</h2>
         </div>
 
         <form @submit.prevent="submit" class="flex flex-col gap-8 w-full md:w-4/5">
             <div class="flex flex-col gap-5">
                 <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
-                    <Label class="text-sm dark:text-white" for="ticket_bonus_amount" value="Ticket Bonus Amount" />
+                    <Label class="text-sm dark:text-white" for="amount" value="Withdrawal Fee" />
                     <div class="md:col-span-3">
                         <Input
-                            id="ticket_bonus_amount"
+                            id="amount"
                             type="number"
                             min="0"
                             class="flex flex-row items-center gap-3 w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600 px-3 py-0"
@@ -62,21 +65,6 @@ const submit = () => {
                             v-model="form.amount"
                         />
                         <InputError :message="form.errors.amount" class="mt-2" />
-                        <span class="text-xs text-pink-500">Each ticket holder will gain ${{ formatAmount(form.amount / ticketAmounts) }} per ticket.</span>
-                    </div>
-                </div>
-                <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
-                    <Label class="text-sm dark:text-white" for="ticket_bonus_date" value="Ticket Bonus Release Date" />
-                    <div class="md:col-span-3">
-                        <vue-tailwind-datepicker
-                            placeholder="Select date"
-                            :formatter="formatter"
-                            v-model="form.date"
-                            as-single
-                            :input-classes="form.errors.date ? 'py-2.5 border-error-500 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-error-500 dark:bg-gray-600 dark:text-white' :
-                            'py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white'"
-                        />
-                        <InputError :message="form.errors.date" class="mt-2" />
                     </div>
                 </div>
             </div>
@@ -91,7 +79,7 @@ const submit = () => {
                 </Button>
             </div>
         </form>
-        <TicketTable />
+        <WithdrawalFeeTable />
     </div>
 
 </template>

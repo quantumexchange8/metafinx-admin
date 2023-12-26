@@ -9,6 +9,7 @@ use App\Models\Announcement;
 use App\Models\SettingAffiliateEarning;
 use App\Models\SettingEarning;
 use App\Models\SettingRank;
+use App\Models\SettingWithdrawalFee;
 use App\Models\User;
 use App\Models\SettingBonus;
 use App\Notifications\AnnouncementNotification;
@@ -22,6 +23,7 @@ class ConfigurationController extends Controller
     {
         return Inertia::render('Configuration/Configuration', [
             'settingRanks' => SettingRank::select('id', 'name')->get(),
+            'withdrawalFee' => SettingWithdrawalFee::latest()->first(),
         ]);
     }
 
@@ -134,16 +136,14 @@ class ConfigurationController extends Controller
         return redirect()->back()->with('title', 'Dividend Bonus')->with('success', 'A dividend bonus of $ ' . $request->amount . ' will be released on ' . $request->date . '.');
     }
 
-    public function addTicketBonus(TicketBonusRequest $request)
+    public function editWithdrawalFee(TicketBonusRequest $request)
     {
-        $settingBonus = SettingBonus::create([
-            'name' => 'Ticket Bonus',
-            'type' => 'ticket_bonuses',
+        SettingWithdrawalFee::create([
             'amount' => $request->amount,
-            'release_date' => $request->date,
+            'updated_by' => \Auth::id(),
         ]);
 
-        return redirect()->back()->with('title', 'Ticket Bonus')->with('success', 'A ticket bonus of $ ' . $request->amount . ' will be released on ' . $request->date . '.');
+        return redirect()->back()->with('title', 'Withdrawal Fee')->with('success', 'Withdrawal fee of $ ' . $request->amount . ' has been updated successfully.');
     }
 
     public function getDividendBonus(Request $request)
@@ -172,13 +172,16 @@ class ConfigurationController extends Controller
         return response()->json($dividends);
     }
 
-    public function getTicketBonus(Request $request)
+    public function getWithdrawalFee(Request $request)
     {
-        $tickets = SettingBonus::query()
+        $tickets = SettingWithdrawalFee::query()
+            ->with('user:id,name')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->input('search');
-                $query->where(function ($innerQuery) use ($search) {
-                    $innerQuery->where('amount', 'like', '%' . $search . '%');
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->whereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%');
+                    });
                 });
             })
             ->when($request->filled('date'), function ($query) use ($request) {
@@ -186,10 +189,8 @@ class ConfigurationController extends Controller
                 $dateRange = explode(' - ', $date);
                 $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
                 $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
-                $query->whereBetween('created_at', [$start_date, $end_date])
-                ->orwhereBetween('release_date', [$start_date, $end_date]);
+                $query->whereBetween('created_at', [$start_date, $end_date]);
             })
-            ->where('type', 'ticket_bonuses')
             ->latest()
             ->paginate(10);
 

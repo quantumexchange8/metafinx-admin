@@ -10,7 +10,6 @@ class TicketBonusRequest extends FormRequest
     {
         return [
             'amount' => ['required', 'numeric', 'min:0'],
-            'date' => ['required']
         ];
     }
 
@@ -22,8 +21,7 @@ class TicketBonusRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'amount' => 'Ticket Bonus Amount',
-            'date' => 'Ticket Bonus Release Date',
+            'amount' => 'Withdrawal Fee',
         ];
     }
 }
