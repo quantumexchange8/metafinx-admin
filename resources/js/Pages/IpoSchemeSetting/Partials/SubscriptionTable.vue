@@ -29,6 +29,10 @@ function refreshTable() {
     isLoading.value = !isLoading.value;
     refresh.value = true;
 }
+
+const exportSubscription = () => {
+    exportStatus.value = true;
+}
 </script>
 
 <template>
@@ -63,6 +67,7 @@ function refreshTable() {
                 type="button"
                 class="justify-center w-full md:w-2/3 gap-2 border border-gray-600 text-white text-sm dark:hover:bg-gray-600"
                 variant="transparent"
+                @click="exportSubscription"
             >
                 <CloudDownloadIcon aria-hidden="true" class="w-5 h-5" />
                 <span>Export as Excel</span>
@@ -115,6 +120,7 @@ function refreshTable() {
                     :exportStatus="exportStatus"
                     @update:loading="isLoading = $event"
                     @update:refresh="refresh = $event"
+                    @update:export="exportStatus = $event"
                 />
             </TabPanel>
             <TabPanel>
@@ -126,6 +132,7 @@ function refreshTable() {
                     :exportStatus="exportStatus"
                     @update:loading="isLoading = $event"
                     @update:refresh="refresh = $event"
+                    @update:export="exportStatus = $event"
                 />
             </TabPanel>
         </TabPanels>

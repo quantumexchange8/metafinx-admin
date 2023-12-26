@@ -83,6 +83,24 @@ watch(() => props.refresh, (newVal) => {
     }
 });
 
+watch(() => props.exportStatus, (newVal) => {
+    historyLoading.value = newVal;
+    if (newVal) {
+        let url = `/ipo_scheme/getSubscriptionDetails?exportStatus=yes`;
+
+        if (props.date) {
+            url += `&date=${props.date}`;
+        }
+
+        if (props.search) {
+            url += `&search=${props.search}`;
+        }
+
+        window.location.href = url;
+        emit('update:export', false);
+    }
+});
+
 const paginationClass = [
     'bg-transparent border-0 dark:text-gray-400'
 ];
@@ -119,6 +137,9 @@ const closeModal = () => {
                     ID Number
                 </th>
                 <th scope="col" class="px-3 py-2.5">
+                    Plan Name
+                </th>
+                <th scope="col" class="px-3 py-2.5">
                     Amount
                 </th>
                 <th scope="col" class="px-3 py-2.5">
@@ -148,10 +169,16 @@ const closeModal = () => {
                     {{ subscription.subscription_id }}
                 </td>
                 <td class="px-3 py-2.5">
+                    {{ subscription.investment_plan.name.en }}
+                </td>
+                <td class="px-3 py-2.5">
                     $ {{ formatAmount(subscription.amount) }}
                 </td>
                 <td class="px-3 py-2.5 uppercase">
-                    {{ formatType(subscription.status) }}
+                    <span class="uppercase dark:text-error-500 font-semibold" v-if="subscription.status === 'Terminated'">{{ formatType(subscription.status) }}</span>
+                    <span class="uppercase dark:text-blue-500 font-semibold" v-if="subscription.status === 'CoolingPeriod'">{{ formatType(subscription.status) }}</span>
+                    <span class="uppercase dark:text-warning-500 font-semibold" v-if="subscription.status === 'OnGoingPeriod'">{{ formatType(subscription.status) }}</span>
+                    <span class="uppercase dark:text-success-500 font-semibold" v-if="subscription.status === 'MaturityPeriod'">{{ formatType(subscription.status) }}</span>
                 </td>
             </tr>
             </tbody>
@@ -206,6 +233,10 @@ const closeModal = () => {
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Investment Status</span>
             <span class="text-black dark:text-white py-2">{{ formatType(subscriptionDetail.status) }}</span>
+        </div>
+        <div v-if="subscriptionDetail.investment_plan.type === 'ebmi'" class="grid grid-cols-3 items-center">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">EBMI Document Status</span>
+            <span class="text-black dark:text-white py-2">{{ formatType(subscriptionDetail.document_status) }}</span>
         </div>
     </Modal>
 

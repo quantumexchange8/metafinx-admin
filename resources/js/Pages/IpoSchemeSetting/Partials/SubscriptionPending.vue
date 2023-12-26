@@ -86,6 +86,24 @@ watch(() => props.refresh, (newVal) => {
     }
 });
 
+watch(() => props.exportStatus, (newVal) => {
+    historyLoading.value = newVal;
+    if (newVal) {
+        let url = `/ipo_scheme/getPendingSubscription?exportStatus=yes`;
+
+        if (props.date) {
+            url += `&date=${props.date}`;
+        }
+
+        if (props.search) {
+            url += `&search=${props.search}`;
+        }
+
+        window.location.href = url;
+        emit('update:export', false);
+    }
+});
+
 watchEffect(() => {
     if (usePage().props.title !== null) {
         getResults();

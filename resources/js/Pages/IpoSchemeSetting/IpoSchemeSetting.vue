@@ -9,7 +9,10 @@ import Button from "@/Components/Button.vue";
 import EditInvestmentPlan from "@/Pages/IpoSchemeSetting/Partials/EditInvestmentPlan.vue";
 
 const props = defineProps({
-    investmentPlans: Object
+    investmentPlans: Object,
+    totalInvestmentCount: String,
+    totalEarningCount: String,
+    onGoingAmountCount: String,
 })
 
 const enabled = ref(false);
@@ -48,43 +51,43 @@ const updateStatus = async (planId, newStatus) => {
 
         <div class="grid grid-cols-1 md:grid-cols-5 md:gap-5">
             <div class="grid grid-cols-2 md:grid-cols-1 gap-5 col-span-2">
-                <div class="px-5 py-2.5 rounded-[10px] dark:bg-gray-700">
+                <div class="px-5 py-2.5 flex items-center rounded-[10px] dark:bg-gray-700">
                     <div class="grid gap-2">
                         <div class="text-xs font-medium dark:text-gray-400">
                             Total Payout Amount
                         </div>
                         <div class="text-xl font-semibold">
-                            200
+                            $ {{ totalEarningCount }}
                         </div>
                     </div>
                 </div>
-                <div class="px-5 py-2.5 rounded-[10px] dark:bg-gray-700">
+                <div class="px-5 py-2.5 flex items-center rounded-[10px] dark:bg-gray-700">
                     <div class="grid gap-2">
                         <div class="text-xs font-medium dark:text-gray-400">
                             Total Investment Amount
                         </div>
                         <div class="text-xl font-semibold">
-                            200
+                            $ {{ totalInvestmentCount }}
                         </div>
                     </div>
                 </div>
-                <div class="px-5 py-2.5 rounded-[10px] dark:bg-gray-700">
+                <div class="px-5 py-2.5 flex items-center rounded-[10px] dark:bg-gray-700">
                     <div class="grid gap-2">
                         <div class="text-xs font-medium dark:text-gray-400">
                             Current Total Monthly Return
                         </div>
                         <div class="text-xl font-semibold">
-                            200
+                            $ {{ totalEarningCount }}
                         </div>
                     </div>
                 </div>
-                <div class="px-5 py-2.5 rounded-[10px] dark:bg-gray-700">
+                <div class="px-5 py-2.5 flex items-center rounded-[10px] dark:bg-gray-700">
                     <div class="grid gap-2">
                         <div class="text-xs font-medium dark:text-gray-400">
                             Current Ongoing Investment Amount
                         </div>
                         <div class="text-xl font-semibold">
-                            200
+                            $ {{ onGoingAmountCount }}
                         </div>
                     </div>
                 </div>

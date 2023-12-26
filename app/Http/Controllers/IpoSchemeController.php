@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SubscriptionExport;
 use App\Http\Requests\InvestmentPlanRequest;
 use App\Models\InvestmentPlan;
 use App\Models\InvestmentPlanDescription;
@@ -10,80 +11,98 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class IpoSchemeController extends Controller
 {
     public function setting()
     {
         $investmentPlans = InvestmentPlan::with('descriptions:id,investment_plan_id,description')->get();
+        $totalInvestmentCount = InvestmentSubscription::sum('amount');
+        $totalEarningCount = InvestmentSubscription::sum('total_earning');
+        $onGoingAmountCount = InvestmentSubscription::where('status', 'OnGoingPeriod')->sum('amount');
 
         return Inertia::render('IpoSchemeSetting/IpoSchemeSetting', [
-            'investmentPlans' => $investmentPlans
+            'investmentPlans' => $investmentPlans,
+            'totalInvestmentCount' => $totalInvestmentCount,
+            'totalEarningCount' => $totalEarningCount,
+            'onGoingAmountCount' => $onGoingAmountCount,
         ]);
     }
 
     public function getSubscriptionDetails(Request $request)
     {
-        $selectedPlans = InvestmentSubscription::with(['investment_plan:id,name', 'user:id,name,email'])
-            ->when($request->filled('search'), function ($query) use ($request) {
-                $search = $request->input('search');
-                $query->where(function ($subQuery) use ($search) {
-                    $subQuery->whereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('name', 'like', '%' . $search . '%')
-                            ->orWhere('email', 'like', '%' . $search . '%');
-                    })
-                        ->orWhere('subscription_id', 'like', '%' . $search . '%');
-                });
-            })
-            ->when($request->filled('date'), function ($query) use ($request) {
-                $date = $request->input('date');
-                $dateRange = explode(' - ', $date);
-                $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
-                $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
-                $query->whereBetween('created_at', [$start_date, $end_date]);
-            })
-            ->latest()
-            ->paginate(10);
+        $selectedPlans = InvestmentSubscription::with(['investment_plan:id,name,type', 'user:id,name,email']);
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $selectedPlans->where(function ($subQuery) use ($search) {
+                $subQuery->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                })
+                    ->orWhere('subscription_id', 'like', '%' . $search . '%');
+            });
+        }
 
-        $selectedPlans->each(function ($user_deposit) {
+        if ($request->filled('date')) {
+            $date = $request->input('date');
+            $dateRange = explode(' - ', $date);
+            $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+            $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+            $selectedPlans->whereBetween('created_at', [$start_date, $end_date]);
+        }
+
+        if ($request->has('exportStatus')) {
+            return Excel::download(new SubscriptionExport($selectedPlans), Carbon::now() . '-Subscription_History-report.xlsx');
+        }
+
+        $results = $selectedPlans->latest()->paginate(10);
+
+        $results->each(function ($user_deposit) {
             $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
         });
 
-        return response()->json($selectedPlans);
+        return response()->json($results);
     }
 
     public function getPendingSubscription(Request $request)
     {
         $selectedPlans = InvestmentSubscription::with(['investment_plan:id,name,type', 'user:id,name,email'])
-            ->when($request->filled('search'), function ($query) use ($request) {
-                $search = $request->input('search');
-                $query->where(function ($subQuery) use ($search) {
-                    $subQuery->whereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('name', 'like', '%' . $search . '%')
-                            ->orWhere('email', 'like', '%' . $search . '%');
-                    })
-                        ->orWhere('subscription_id', 'like', '%' . $search . '%');
-                });
+            ->whereHas('investment_plan', function ($query) {
+                $query->where('type', 'ebmi');
             })
-            ->when($request->filled('date'), function ($query) use ($request) {
-                $date = $request->input('date');
-                $dateRange = explode(' - ', $date);
-                $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
-                $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
-                $query->whereBetween('created_at', [$start_date, $end_date]);
-            })
-            ->whereHas('investment_plan', function ($planQuery) {
-                $planQuery->where('type', 'ebmi');
-            })
-            ->whereNot('document_status', 'approve')
-            ->latest()
-            ->paginate(10);
+            ->whereNot('document_status', 'approve');
 
-        $selectedPlans->each(function ($user_deposit) {
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $selectedPlans->where(function ($subQuery) use ($search) {
+                $subQuery->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                })
+                    ->orWhere('subscription_id', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('date')) {
+            $date = $request->input('date');
+            $dateRange = explode(' - ', $date);
+            $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+            $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+            $selectedPlans->whereBetween('created_at', [$start_date, $end_date]);
+        }
+
+        if ($request->has('exportStatus')) {
+            return Excel::download(new SubscriptionExport($selectedPlans), Carbon::now() . '-Pending_Subscription-report.xlsx');
+        }
+
+        $results = $selectedPlans->latest()->paginate(10);
+
+        $results->each(function ($user_deposit) {
             $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
         });
 
-        return response()->json($selectedPlans);
+        return response()->json($results);
     }
 
     public function getSelectedPlans(Request $request)
