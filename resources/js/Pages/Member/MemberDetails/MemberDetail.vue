@@ -15,7 +15,8 @@ import {
     Rank3Icon,
     ReferralIcon,
     ProofIcon,
-    Wallet
+    Wallet,
+    MUSDWallet
 } from "@/Components/Icons/outline.jsx";
 import {RefreshIcon} from "@heroicons/vue/outline";
 import Modal from "@/Components/Modal.vue";
@@ -142,76 +143,82 @@ const backButton = () => {
                     <div class="flex items-center gap-3 w-full">
                         <IdNoIcon aria-hidden="true" class="w-5 h-5" />
                         <p class="text-base dark:text-white">{{ member_details.identity_number }}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-5 font-semibold">
+                        <div class="flex flex-row items-center gap-3 w-full">
+                            <RankIcon aria-hidden="true" class="w-5 h-5" />
+                            <div class="">
+                                <span v-if="member_details.setting_rank_id === 1" class="flex flex-row items-center gap-2 text-base dark:text-white">Member</span>
+                                <span v-if="member_details.setting_rank_id === 2" class="flex flex-row items-center gap-2 text-base dark:text-white">
+                                    <Rank1Icon class="w-5 h-5" />LVL 1
+                                </span>
+                                <span v-if="member_details.setting_rank_id === 3" class="flex flex-row items-center gap-2 text-base dark:text-white">
+                                    <Rank2Icon class="w-5 h-5" />LVL 2
+                                </span>
+                                <span v-if="member_details.setting_rank_id === 4" class="flex flex-row items-center gap-2 text-base dark:text-white">
+                                    <Rank3Icon class="w-5 h-5" />LVL 3
+                                </span>
+                            </div>
+                       </div>
+                       <div class="flex items-center gap-3 w-full">
+                            <ReferralIcon aria-hidden="true" class="w-5 h-5" />
+                            <div class="inline-flex items-center justify-center gap-2">
+                                <img
+                                    class="object-cover w-5 h-5 rounded-full"
+                                    :src="getMediaUrlByCollection(upline_member, 'profile_photo')"
+                                    alt="uplinePic"
+                                />
+                                <span class="text-base dark:text-white">{{ upline_member.name }}</span>
+                            </div>
+                       </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-5">
+                        <div class="flex items-center gap-3 w-full">
+                            <Modal :show="frontIdentityModal" :title="'Proof of ID (FRONT)'" @close="backButton">
+                                <div class="relative bg-white rounded-lg shadow dark:bg-dark-eval-1">
+                                    <div class="flex justify-center">
+                                        <img class="rounded" :src="getMediaUrlByCollection(member_details, 'front_identity')" alt="Proof of Identity (Front)">
+                                    </div>
+                                </div>
+                            </Modal>
+                            <ProofIcon aria-hidden="true" class="w-5 h-5" />
+                            <a v-if="hasMediaCollection(member_details, 'front_identity')" href="javascript:void(0);" @click.prevent="openFrontIdentityModal" class="hover:text-pink-500 dark:text-white dark:hover:text-pink-400 underline">
+                                {{ getMediaNameByCollection(member_details, 'front_identity') }}
+                            </a>
+                            <span v-else class="dark:text-white">No File Submitted</span>
+                       </div>
+                       <div class="flex items-center gap-3 w-full">
+                            <Modal :show="backIdentityModal" :title="'Proof of ID (BACK)'" @close="backButton">
+                                <div class="relative bg-white rounded-lg shadow dark:bg-dark-eval-1">
+                                    <div class="flex justify-center">
+                                        <img class="rounded" :src="getMediaUrlByCollection(member_details, 'back_identity')" alt="Proof of Identity (Back)">
+                                    </div>
+                                </div>
+                            </Modal>
+                            <ProofIcon aria-hidden="true" class="w-5 h-5" />
+                            <a v-if="hasMediaCollection(member_details, 'back_identity')" href="javascript:void(0);" @click.prevent="openBackIdentityModal" class="hover:text-pink-500 dark:text-white dark:hover:text-pink-400 underline">
+                            {{ getMediaNameByCollection(member_details, 'back_identity') }}
+                            </a>
+                            <span v-else class="dark:text-white">No File Submitted</span>
+                       </div>
                     </div>
                 </div>
-                <div class="flex flex-col md:flex-row gap-5 font-semibold">
-                    <div class="flex flex-row items-center gap-3 w-full">
-                        <RankIcon aria-hidden="true" class="w-5 h-5" />
-                        <div class="">
-                            <span v-if="member_details.setting_rank_id === 1" class="flex flex-row items-center gap-2 text-base dark:text-white">Member</span>
-                            <span v-if="member_details.setting_rank_id === 2" class="flex flex-row items-center gap-2 text-base dark:text-white">
-                                <Rank1Icon class="w-5 h-5" />LVL 1
-                            </span>
-                            <span v-if="member_details.setting_rank_id === 3" class="flex flex-row items-center gap-2 text-base dark:text-white">
-                                <Rank2Icon class="w-5 h-5" />LVL 2
-                            </span>
-                            <span v-if="member_details.setting_rank_id === 4" class="flex flex-row items-center gap-2 text-base dark:text-white">
-                                <Rank3Icon class="w-5 h-5" />LVL 3
-                            </span>
-                        </div>
-                   </div>
-                   <div class="flex items-center gap-3 w-full">
-                        <ReferralIcon aria-hidden="true" class="w-5 h-5" />
-                        <div class="inline-flex items-center justify-center gap-2">
-                            <img
-                                class="object-cover w-5 h-5 rounded-full"
-                                :src="getMediaUrlByCollection(upline_member, 'profile_photo')"
-                                alt="uplinePic"
-                            />
-                            <span class="text-base dark:text-white">{{ upline_member.name }}</span>
-                        </div>
-                   </div>
-                </div>
-                <div class="flex flex-col md:flex-row gap-5">
-                    <div class="flex items-center gap-3 w-full">
-                        <Modal :show="frontIdentityModal" :title="'Proof of ID (FRONT)'" @close="backButton">
-                            <div class="relative bg-white rounded-lg shadow dark:bg-dark-eval-1">
-                                <div class="flex justify-center">
-                                    <img class="rounded" :src="getMediaUrlByCollection(member_details, 'front_identity')" alt="Proof of Identity (Front)">
-                                </div>
-                            </div>
-                        </Modal>
-                        <ProofIcon aria-hidden="true" class="w-5 h-5" />
-                        <a v-if="hasMediaCollection(member_details, 'front_identity')" href="javascript:void(0);" @click.prevent="openFrontIdentityModal" class="hover:text-pink-500 dark:text-white dark:hover:text-pink-400 underline">
-                            {{ getMediaNameByCollection(member_details, 'front_identity') }}
-                        </a>
-                        <span v-else class="dark:text-white">No File Submitted</span>
-                   </div>
-                   <div class="flex items-center gap-3 w-full">
-                        <Modal :show="backIdentityModal" :title="'Proof of ID (BACK)'" @close="backButton">
-                            <div class="relative bg-white rounded-lg shadow dark:bg-dark-eval-1">
-                                <div class="flex justify-center">
-                                    <img class="rounded" :src="getMediaUrlByCollection(member_details, 'back_identity')" alt="Proof of Identity (Back)">
-                                </div>
-                            </div>
-                        </Modal>
-                        <ProofIcon aria-hidden="true" class="w-5 h-5" />
-                        <a v-if="hasMediaCollection(member_details, 'back_identity')" href="javascript:void(0);" @click.prevent="openBackIdentityModal" class="hover:text-pink-500 dark:text-white dark:hover:text-pink-400 underline">
-                        {{ getMediaNameByCollection(member_details, 'back_identity') }}
-                        </a>
-                        <span v-else class="dark:text-white">No File Submitted</span>
-                   </div>
-                </div>
             </div>
-        </div>
 
-        <div class="flex flex-col gap-5 mb-8">
+            <div class="flex flex-col gap-5 mb-8">
             <h3 class="text-base font-semibold border-b border-gray-700 pb-5">
                 Wallet
             </h3>
             <div class="overflow-x-auto grid grid-flow-col justify-start gap-5">
                 <div v-for="wallet in props.wallets" class="flex flex-col overflow-hidden rounded-[20px] w-96">
-                    <div class="flex justify-between py-5 px-4 bg-gradient-to-bl from-pink-400 to-pink-600">
+                    <div
+                        class="flex justify-between py-5 px-4"
+                        :class="{
+                            'bg-gradient-to-bl from-pink-400 to-pink-600': wallet.name === 'Internal Wallet',
+                            'bg-gradient-to-bl from-warning-300 to-warning-500': wallet.name === 'MUSD Wallet',
+                        }"
+                    >
                         <div class="space-y-2">
                             <div class="text-base font-semibold dark:text-white">
                                 {{ wallet.name }}
@@ -220,21 +227,18 @@ const backButton = () => {
                                 $ {{ formatAmount(wallet.balance) }}
                             </div>
                         </div>
-                        <Wallet class="w-20 h-20"/>
-                    </div>
-                    <div class="flex flex-col gap-3 bg-gray-700 py-3 px-4 justify-center h-20">
-                        <div class="flex justify-center">
-                            <Action
-                                type="wallet"
-                                :member_details="member_details"
-                                :wallet="wallet"
-                            />
+                        <div v-if="wallet.name === 'Internal Wallet'">
+                            <Wallet class="w-24 h-24"/>
+                        </div>
+                        <div v-else-if="wallet.name === 'MUSD Wallet'">
+                            <MUSDWallet class="w-24 h-24"/>
                         </div>
                     </div>
+                    
                 </div>
             </div>
-
         </div>
+
 
         <div class="flex flex-col md:flex-row items-start gap-8 text-base text-gray-800 dark:text-white">
             <AccountInformation
