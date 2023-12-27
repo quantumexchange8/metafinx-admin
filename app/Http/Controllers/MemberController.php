@@ -186,12 +186,19 @@ class MemberController extends Controller
         $user = User::find($request->user_id);
         $upline_id = $request->upline_id['value'];
 
+        $currentRank = $user->setting_rank_id;
+
         $user->update([
             'name' => $request->name,
             'phone' => $request->phone,
             'identity_number' => $request->identity_number,
             'setting_rank_id' => $request->rank,
         ]);
+
+        if ($currentRank != $user->setting_rank_id) {
+            $user->rank_up_status = 'manual';
+            $user->save();
+        }
 
         if ($request->password) {
             $user->update([
