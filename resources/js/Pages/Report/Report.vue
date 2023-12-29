@@ -21,11 +21,9 @@ const date = ref('');
 const currentYear = new Date().getFullYear();
 const activePayout = ref('Monthly_Return');
 const monthlyPayout = ref(0);
-const quarterlyDividend = ref(0);
 const referralEarning = ref(0);
 const affiliateEarning = ref(0);
 const dividendEarning = ref(0);
-const ticketBonus = ref(0);
 const exportStatus = ref(false);
 
 const tableSearch = (searchValue) => {
@@ -42,11 +40,11 @@ const payoutStats = ref([
         label: 'Total Monthly Return Payout',
         value: '$ ' + formatAmount(monthlyPayout.value),
     },
-    {
-        key: 'Quarterly_Dividend',
-        label: 'Total Quarterly Dividend Payout',
-        value: '$ ' + formatAmount(quarterlyDividend.value),
-    },
+    // {
+    //     key: 'Quarterly_Dividend',
+    //     label: 'Total Quarterly Dividend Payout',
+    //     value: '$ ' + formatAmount(quarterlyDividend.value),
+    // },
     {
         key: 'referral_earnings',
         label: 'Total Referral Earning Payout',
@@ -62,11 +60,11 @@ const payoutStats = ref([
         label: 'Total Dividend Earning Payout',
         value: '$ ' + formatAmount(dividendEarning.value),
     },
-    {
-        key: 'Ticket_Bonus',
-        label: 'Total Ticket Bonus Payout',
-        value: '$ ' + formatAmount(ticketBonus.value),
-    },
+    // {
+    //     key: 'Ticket_Bonus',
+    //     label: 'Total Ticket Bonus Payout',
+    //     value: '$ ' + formatAmount(ticketBonus.value),
+    // },
 ]);
 
 const totalReferralEarningStat = payoutStats.value.find(stat => stat.key === 'referral_earnings');

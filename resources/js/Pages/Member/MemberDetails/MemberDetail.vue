@@ -215,8 +215,8 @@ const backButton = () => {
                     <div
                         class="flex justify-between py-5 px-4"
                         :class="{
-                            'bg-gradient-to-bl from-pink-400 to-pink-600': wallet.name === 'Internal Wallet',
-                            'bg-gradient-to-bl from-warning-300 to-warning-500': wallet.name === 'MUSD Wallet',
+                            'bg-gradient-to-bl from-pink-400 to-pink-600': wallet.type === 'internal_wallet',
+                            'bg-gradient-to-bl from-warning-300 to-warning-500': wallet.type === 'musd_wallet',
                         }"
                     >
                         <div class="space-y-2">
@@ -227,10 +227,10 @@ const backButton = () => {
                                 $ {{ formatAmount(wallet.balance) }}
                             </div>
                         </div>
-                        <div v-if="wallet.name === 'Internal Wallet'">
+                        <div v-if="wallet.type === 'internal_wallet'">
                             <Wallet class="w-24 h-24"/>
                         </div>
-                        <div v-else-if="wallet.name === 'MUSD Wallet'">
+                        <div v-else-if="wallet.type === 'musd_wallet'">
                             <MUSDWallet class="w-24 h-24"/>
                         </div>
                     </div>

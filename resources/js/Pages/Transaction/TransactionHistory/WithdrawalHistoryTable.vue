@@ -2,7 +2,7 @@
 import debounce from "lodash/debounce.js";
 import {ref, watch} from "vue";
 import {ArrowLeftIcon, ArrowRightIcon} from "@heroicons/vue/outline";
-import {InternalWalletIcon} from "@/Components/Icons/outline.jsx";
+import {InternalWalletIcon, InternalMUSDWalletIcon} from "@/Components/Icons/outline.jsx";
 import Loading from "@/Components/Loading.vue";
 import {transactionFormat} from "@/Composables/index.js";
 import {TailwindPagination} from "laravel-vue-pagination";
@@ -168,8 +168,11 @@ const closeModal = () => {
                 </td>
                 <td class="py-2">
                     <div class="inline-flex items-center gap-2">
-                        <div class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                        <div v-if="withdrawal.wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
                             <InternalWalletIcon class="mt-0.5 ml-0.5"/>
+                        </div>
+                        <div v-else-if="withdrawal.wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                            <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
                         </div>
                         {{ withdrawal.wallet.name }}
                     </div>
