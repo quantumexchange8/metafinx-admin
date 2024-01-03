@@ -28,6 +28,10 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/xlc_setting', function () {
+        return Inertia::render('XLCSetting/XLCSetting');
+    });
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/getTotalMembers', [DashboardController::class, 'getTotalMembers'])->name('getTotalMembers');
     Route::get('/getTotalMembersByDays', [DashboardController::class, 'getTotalMembersByDays'])->name('getTotalMembersByDays');
