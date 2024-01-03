@@ -1,6 +1,6 @@
 <script setup>
 import Button from "@/Components/Button.vue";
-import {UnsubscribeIcon, VerifyMemberIcon, EditIcon, CreditEditIcon, SwitchIcon} from "@/Components/Icons/outline.jsx";
+import {UnsubscribeIcon, AccessIcon, EditIcon, CreditEditIcon, SwitchIcon} from "@/Components/Icons/outline.jsx";
 import {ref} from "vue";
 import Modal from "@/Components/Modal.vue";
 import UnsubscribePlan from "@/Pages/Member/MemberDetails/Partials/UnsubscribePlan.vue";
@@ -44,6 +44,9 @@ const closeModal = () => {
     modalComponent.value = null;
 }
 
+const openInNewTab = (url) => {
+    window.open(url, '_blank');
+}
 
 </script>
 
@@ -71,6 +74,15 @@ const closeModal = () => {
             <EditIcon aria-hidden="true" class="w-5 h-5" />
             <span class="text-sm">Edit</span>
         </Button>
+        <Button
+            type="button"
+            class="justify-center px-3 py-2 ml-2 gap-2 grow focus:outline-none"
+            variant="success"
+            @click="openInNewTab(route('member.impersonate', props.member_details.id))"
+        >
+            <AccessIcon aria-hidden="true" class="w-5 h-5" />
+            <span class="text-sm">Access</span>
+        </Button>
         <Tooltip content="Wallet Adjustment" placement="bottom" v-if="type === 'wallet'">
             <Button
                 type="button"
@@ -95,7 +107,6 @@ const closeModal = () => {
                 <span class="sr-only">Internal Transfer</span>
             </Button>
         </Tooltip>
-        
     </div>
 
     <Modal :show="memberDetailModal" :title="modalComponent" @close="closeModal" max-width="xl">

@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Spatie\Activitylog\Models\Activity;
 
 class MemberController extends Controller
 {
@@ -563,6 +564,34 @@ class MemberController extends Controller
                 $this->updateHierarchyList($child, $list, $id . $child->id . '-');
             }
         }
+    }
+
+    public function impersonate(User $user): \Symfony\Component\HttpFoundation\Response
+    {
+        $dataToHash = $user->name . $user->email . $user->id;
+        $hashedToken = md5($dataToHash);
+
+        Activity::create([
+            'log_name' => 'user', // Specify the log name here
+            'description' => Auth::user()->name . ' has IMPERSONATE ' . $user->name . ' with ID: ' . $user->id,
+            'subject_type' => User::class,
+            'subject_id' => Auth::id(),
+            'causer_type' => get_class(auth()->user()),
+            'causer_id' => auth()->id(),
+            'event' => 'impersonate',
+        ]);
+
+        $domain = $_SERVER['HTTP_HOST'];
+
+        if ($domain === 'secure-admin.metafinx.com') {
+            $url = "https://secure-admin.metafinx.com/admin_login/{$hashedToken}";
+        } elseif ($domain === 'metafinx-admin.currenttech.pro') {
+            $url = "https://metafinx-admin.currenttech.pro/admin_login/{$hashedToken}";
+        } else {
+            return back();
+        }
+
+        return Inertia::location($url);
     }
 
 }
