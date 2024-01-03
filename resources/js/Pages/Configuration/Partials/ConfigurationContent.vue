@@ -1,7 +1,7 @@
 <script setup>
 import PerfectScrollbar from '@/Components/PerfectScrollbar.vue'
 import ConfigurationLink from "@/Pages/Configuration/Partials/ConfigurationLink.vue";
-import {AnnouncementIcon, DividendBonusIcon, TicketBonusIcon, AffiliateSettingIcon} from '@/Components/Icons/outline'
+import {AnnouncementIcon, DividendBonusIcon, TicketBonusIcon, AffiliateSettingIcon, CoinSettingIcon} from '@/Components/Icons/outline'
 
 const props = defineProps({
     content: String
@@ -83,7 +83,7 @@ const updateContent = (newContent) => {
             :active="props.content==='CoinSetting'"
         >
             <template #icon>
-                <TicketBonusIcon
+                <CoinSettingIcon
                     class="flex-shrink-0 w-6 h-6"
                     aria-hidden="true"
                 />
