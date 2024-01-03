@@ -111,9 +111,21 @@ export function transactionFormat() {
         return `${day}/${month}/${year}`;
     }
 
+    function formatDateString(date) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const formattedDate = new Date(date * 1000);
+
+        const day = formattedDate.getDate().toString().padStart(2, '0');
+        const month = months[formattedDate.getMonth()];
+        const year = formattedDate.getFullYear();
+
+        return `${day} ${month} ${year}`;
+    }
+
     return {
         formatDateTime,
         formatDate,
+        formatDateString,
         getStatusClass,
         formatAmount,
         formatType

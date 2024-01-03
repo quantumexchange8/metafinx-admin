@@ -179,6 +179,7 @@ const closeModal = () => {
                         :load-options="loadUsers"
                         v-model="form.upline_id"
                         :error="form.errors.upline_id"
+                        image
                     />
                 </div>
             </div>

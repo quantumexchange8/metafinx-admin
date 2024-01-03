@@ -115,7 +115,7 @@ const backButton = () => {
                         </p>
                     </div>
                 </div>
-                <div class="flex flex-row items-end gap-3 justify-end">
+                <div class="flex flex-row items-start gap-3 justify-end">
                     <Action
                         type="member"
                         :member_details="member_details"
@@ -234,7 +234,7 @@ const backButton = () => {
                             <MUSDWallet class="w-24 h-24"/>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </div>

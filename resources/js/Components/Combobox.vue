@@ -26,6 +26,10 @@ const props = defineProps({
     id: String,
     error: String,
     ariaDescribedBy: String,
+    image: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const field = inject("field", props);
@@ -286,7 +290,7 @@ function clearSelection() {
                               }"
                             class="relative inline-flex items-center gap-2 w-full cursor-default select-none whitespace-pre py-2 px-3 text-sm dark:text-white active:bg-gray-300 dark:bg-gray-600"
                         >
-                            <img :src="option.img ? option.img : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                            <img v-if="image" :src="option.img ? option.img : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
                             <span
                                 class="block truncate"
                                 :class="{ 'font-medium': selected, 'font-normal': !selected }"

@@ -76,5 +76,19 @@ const updateContent = (newContent) => {
             </template>
         </ConfigurationLink>
 
+        <ConfigurationLink
+            class="flex-col md:flex-row"
+            title="XLC Coin"
+            @click="updateContent('CoinSetting')"
+            :active="props.content==='CoinSetting'"
+        >
+            <template #icon>
+                <TicketBonusIcon
+                    class="flex-shrink-0 w-6 h-6"
+                    aria-hidden="true"
+                />
+            </template>
+        </ConfigurationLink>
+
     </PerfectScrollbar>
 </template>

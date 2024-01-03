@@ -109,12 +109,17 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         //Dividend Bonus
         Route::post('/addDividendBonus', [ConfigurationController::class, 'addDividendBonus'])->name('configuration.addDividendBonus');
         Route::get('/getDividendBonus', [ConfigurationController::class, 'getDividendBonus'])->name('configuration.getDividendBonus');
-        //Ticket Bonus
+        //Withdrawal Fee
         Route::post('/editWithdrawalFee', [ConfigurationController::class, 'editWithdrawalFee'])->name('configuration.editWithdrawalFee');
         Route::get('/getWithdrawalFee', [ConfigurationController::class, 'getWithdrawalFee'])->name('configuration.getWithdrawalFee');
         //Affiliate Setting
         Route::get('/getSettingRank', [ConfigurationController::class, 'getSettingRank'])->name('configuration.getSettingRank');
         Route::post('/affiliateSetting', [ConfigurationController::class, 'affiliateSetting'])->name('configuration.affiliateSetting');
+        //Coin Setting
+        Route::get('/getCoinSetting', [ConfigurationController::class, 'getCoinSetting'])->name('configuration.getCoinSetting');
+        Route::get('/getDays', [ConfigurationController::class, 'getDays'])->name('configuration.getDays');
+        Route::post('/updateCoinPrice', [ConfigurationController::class, 'updateCoinPrice'])->name('configuration.updateCoinPrice');
+        Route::post('/updateCoinMarketTime', [ConfigurationController::class, 'updateCoinMarketTime'])->name('configuration.updateCoinMarketTime');
     });
 
     /**

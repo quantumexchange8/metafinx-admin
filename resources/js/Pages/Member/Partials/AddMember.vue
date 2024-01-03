@@ -225,6 +225,7 @@ const closeModal = () => {
                         :load-options="loadUsers"
                         v-model="user"
                         :error="form.errors.upline_id"
+                        image
                     />
                     <InputError :message="form.errors.upline_id" class="mt-1 col-span-4" />
                 </div>
