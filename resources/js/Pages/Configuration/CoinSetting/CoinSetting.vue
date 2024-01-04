@@ -91,7 +91,7 @@ watch([open_time_hr, open_time_min, open_time_meridiem, close_time_hr, close_tim
 
 const submit = () => {
     form.price = price.value;
-    form.date = conversion_rate.value;
+    form.date = date.value;
     form.conversion_rate = conversion_rate.value;
 
     form.post(route('configuration.updateCoinPrice'), {

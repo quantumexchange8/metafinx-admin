@@ -347,6 +347,7 @@ class ConfigurationController extends Controller
 
         // Check if the provided date is not the expected next date
         if ($request->date > $expectedNextDate) {
+            dd($request->date > $expectedNextDate, $request->date);
             throw ValidationException::withMessages([
                 'date' => "Please fill in the missing date '{$expectedNextDate}'.",
             ]);
