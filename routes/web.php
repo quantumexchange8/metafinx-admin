@@ -56,6 +56,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
         Route::post('/addMember', [MemberController::class, 'addMember'])->name('member.addMember');
         Route::get('/member_details/{id}', [MemberController::class, 'viewMemberDetails'])->name('member.viewMemberDetails');
+        Route::get('/getMemberInformation/{id}', [MemberController::class, 'getMemberInformation'])->name('member.getMemberInformation');
         Route::get('/member_affiliates/{id}', [MemberController::class, 'affiliate_tree'])->name('member.affiliate_tree');
         Route::get('/getTreeData/{id}', [MemberController::class, 'getTreeData'])->name('member.getTreeData');
         Route::get('/getAllUsers', [MemberController::class, 'getAllUsers'])->name('member.getAllUsers');

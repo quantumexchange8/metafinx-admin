@@ -7,6 +7,7 @@ use App\Http\Requests\EditMemberRequest;
 use App\Http\Requests\KycApprovalRequest;
 use App\Http\Requests\WalletAdjustmentRequest;
 use App\Models\BalanceAdjustment;
+use App\Models\Earning;
 use App\Models\SettingCountry;
 use App\Models\SettingRank;
 use App\Models\User;
@@ -272,6 +273,34 @@ class MemberController extends Controller
             // 'total_affiliate' => count($user->getChildrenIds()),
             'self_deposit' => floatval($this->getSelfDeposit($user)),
             'valid_affiliate_deposit' => floatval($this->getValidAffiliateDeposit($user)),
+        ]);
+    }
+
+    public function getMemberInformation($id)
+    {
+        $user = User::find($id);
+
+        $referralCount = User::where('upline_id', $user->id)->count();
+        $walletSum = Wallet::where('user_id', $user->id)->sum('balance');
+        $earningSum = Earning::where('upline_id', $user->id)->sum('after_amount');
+
+        $types = ['monthly_return', 'referral_earnings', 'affiliate_earnings', 'dividend_earnings'];
+
+        $totalEarnings = [];
+        foreach ($types as $type) {
+            $totalEarnings[$type] = Earning::query()
+                ->where('upline_id', $user->id)
+                ->where('type', $type)
+                ->sum('after_amount');
+        }
+
+        return response()->json([
+            'walletSum' => floatval($walletSum),
+            'earningSum' => floatval($earningSum),
+            'referralCount' => $referralCount,
+            'self_deposit' => floatval($this->getSelfDeposit($user)),
+            'valid_affiliate_deposit' => floatval($this->getValidAffiliateDeposit($user)),
+            'totalEarnings' => $totalEarnings,
         ]);
     }
 

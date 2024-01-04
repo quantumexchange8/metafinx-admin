@@ -79,6 +79,7 @@ const openInNewTab = (url) => {
             class="justify-center px-3 py-2 ml-2 gap-2 grow focus:outline-none"
             variant="success"
             @click="openInNewTab(route('member.impersonate', props.member_details.id))"
+            v-if="type === 'member'"
         >
             <AccessIcon aria-hidden="true" class="w-5 h-5" />
             <span class="text-sm">Access</span>

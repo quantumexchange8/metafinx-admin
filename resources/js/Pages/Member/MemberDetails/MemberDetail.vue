@@ -234,7 +234,15 @@ const backButton = () => {
                             <MUSDWallet class="w-24 h-24"/>
                         </div>
                     </div>
-
+                    <div class="flex flex-col gap-3 bg-gray-700 py-3 px-4 justify-center h-20">
+                        <div class="flex justify-center">
+                            <Action
+                                type="wallet"
+                                :member_details="member_details"
+                                :wallet="wallet"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -242,13 +250,11 @@ const backButton = () => {
 
         <div class="flex flex-col md:flex-row items-start gap-8 text-base text-gray-800 dark:text-white">
             <AccountInformation
-                :walletSum="walletSum"
                 :member_details="member_details"
-                :referralCount="referralCount"
-                :self_deposit="self_deposit"
-                :valid_affiliate_deposit="valid_affiliate_deposit"
             />
-            <EarningInformation/>
+            <EarningInformation
+                :member_details="member_details"
+            />
         </div>
 
         <div class="md:hidden">
