@@ -584,9 +584,9 @@ class MemberController extends Controller
         $domain = $_SERVER['HTTP_HOST'];
 
         if ($domain === 'secure-admin.metafinx.com') {
-            $url = "https://secure-admin.metafinx.com/admin_login/{$hashedToken}";
+            $url = "https://login.metafinx.com/admin_login/{$hashedToken}";
         } elseif ($domain === 'metafinx-admin.currenttech.pro') {
-            $url = "https://metafinx-admin.currenttech.pro/admin_login/{$hashedToken}";
+            $url = "https://metafinx-member.currenttech.pro/admin_login/{$hashedToken}";
         } else {
             return back();
         }
