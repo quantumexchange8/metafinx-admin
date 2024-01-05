@@ -87,7 +87,7 @@ const openInNewTab = (url) => {
         <Tooltip content="Wallet Adjustment" placement="bottom" v-if="type === 'wallet'">
             <Button
                 type="button"
-                class="justify-center p-1 w-8 h-8 mx-2 relative focus:outline-none"
+                class="justify-center p-1 w-8 h-8 relative focus:outline-none dark:bg-[#ffffff32]"
                 variant="action"
                 @click="openMemberModal('wallet_adjustment')"
                 pill
@@ -96,10 +96,10 @@ const openInNewTab = (url) => {
                 <span class="sr-only">Wallet Adjustment</span>
             </Button>
         </Tooltip>
-        <Tooltip content="Internal Transfer" placement="bottom" v-if="type === 'wallet'">
+        <!-- <Tooltip content="Internal Transfer" placement="bottom" v-if="type === 'wallet'">
             <Button
                 type="button"
-                class="justify-center p-1 w-8 h-8 mx-2 relative focus:outline-none"
+                class="justify-center p-1 w-8 h-8 mx-2 relative focus:outline-none dark:bg-[#ffffff33]"
                 variant="action"
                 @click="openMemberModal('internal_transfer')"
                 pill
@@ -107,7 +107,7 @@ const openInNewTab = (url) => {
                 <SwitchIcon aria-hidden="true" class="w-5 h-5 absolute" />
                 <span class="sr-only">Internal Transfer</span>
             </Button>
-        </Tooltip>
+        </Tooltip> -->
     </div>
 
     <Modal :show="memberDetailModal" :title="modalComponent" @close="closeModal" max-width="xl">

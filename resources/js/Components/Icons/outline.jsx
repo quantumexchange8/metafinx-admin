@@ -275,17 +275,17 @@ export const InternalMUSDWalletIcon = defineComponent({
                 <g clip-path="url(#clip0_3635_35567)">
                     <path
                         d="M7.10743 6.03583L7.11163 6.03151L4.68319 3.61111C4.50297 3.43087 4.25852 3.3296 4.00363 3.32959H2.61427L5.32003 6.03583L0.527832 10.8272H1.91743C2.17232 10.8272 2.41677 10.7259 2.59699 10.5457L7.11079 6.03871L7.10743 6.03583Z"
-                        fill="white"/>
+                        fill="currentColor"/>
                     <path
                         d="M10.6058 2.53711H9.21656C8.96167 2.53712 8.71723 2.63839 8.537 2.81863L6.4292 4.92643L7.32296 5.81983L10.6058 2.53711Z"
-                        fill="white"/>
+                        fill="currentColor"/>
                     <path
                         d="M6.42822 7.14364L7.39182 8.107C7.48102 8.19616 7.58692 8.26688 7.70346 8.3151C7.82 8.36332 7.9449 8.38811 8.07102 8.38804H9.46038L7.32186 6.25L6.42822 7.14364Z"
-                        fill="white"/>
+                        fill="currentColor"/>
                 </g>
                 <defs>
                     <clipPath id="clip0_3635_35567">
-                        <rect width="12" height="12" fill="white"/>
+                        <rect width="12" height="12" fill="currentColor"/>
                     </clipPath>
                 </defs>
             </svg>

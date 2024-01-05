@@ -16,7 +16,7 @@ import {
     ReferralIcon,
     ProofIcon,
     Wallet,
-    MUSDWallet
+    InternalMUSDWalletIcon
 } from "@/Components/Icons/outline.jsx";
 import {RefreshIcon} from "@heroicons/vue/outline";
 import Modal from "@/Components/Modal.vue";
@@ -213,36 +213,35 @@ const backButton = () => {
             <div class="overflow-x-auto grid grid-flow-col justify-start gap-5">
                 <div v-for="wallet in props.wallets" class="flex flex-col overflow-hidden rounded-[20px] w-96">
                     <div
-                        class="flex justify-between py-5 px-4"
+                        class="flex justify-between"
                         :class="{
                             'bg-gradient-to-bl from-pink-400 to-pink-600': wallet.type === 'internal_wallet',
-                            'bg-gradient-to-bl from-warning-300 to-warning-500': wallet.type === 'musd_wallet',
+                            'bg-gradient-to-bl from-warning-300 to-warning-500 h-32': wallet.type === 'musd_wallet',
                         }"
                     >
-                        <div class="space-y-2">
-                            <div class="text-base font-semibold dark:text-white">
-                                {{ wallet.name }}
+                        <div class="py-5 px-4 flex flex-col gap-2">
+                            <div class="flex flex-col">
+                                <div class="text-base font-semibold dark:text-white">
+                                    {{ wallet.name }}
+                                </div>
+                                <div class="text-xl font-semibold dark:text-white">
+                                    $ {{ formatAmount(wallet.balance) }}
+                                </div>
                             </div>
-                            <div class="text-xl font-semibold dark:text-white">
-                                $ {{ formatAmount(wallet.balance) }}
+                            <div class="h-6">
+                                <Action
+                                    type="wallet"
+                                    :member_details="member_details"
+                                    :wallet="wallet"
+                                    class="bg-[#ffffff33]"
+                                />
                             </div>
                         </div>
-                        <div v-if="wallet.type === 'internal_wallet'">
-                            <Wallet class="w-24 h-24"/>
-                        </div>
-                        <div v-else-if="wallet.type === 'musd_wallet'">
-                            <MUSDWallet class="w-24 h-24"/>
-                        </div>
+                        <Wallet v-if="wallet.type === 'internal_wallet'" class="w-32 h-32"/>
+                        <img v-else-if="wallet.type === 'musd_wallet'" src="/assets/icon-no-color.png" alt="" >
+                        <!-- <InternalMUSDWalletIcon v-else-if="wallet.type === 'musd_wallet'" class="w-32 h-32 text-[#ffffff33]"/> -->
                     </div>
-                    <div class="flex flex-col gap-3 bg-gray-700 py-3 px-4 justify-center h-20">
-                        <div class="flex justify-center">
-                            <Action
-                                type="wallet"
-                                :member_details="member_details"
-                                :wallet="wallet"
-                            />
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>
