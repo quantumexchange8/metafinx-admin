@@ -54,6 +54,7 @@ const getResults = async (page = 1, search = '', date = '', filter = '') => {
 
         const response = await axios.get(url);
         withdrawals.value = response.data.Withdrawal;
+        totalAmount.value = response.data.totalAmount;
     } catch (error) {
         console.error(error);
     } finally {

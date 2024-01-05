@@ -130,6 +130,9 @@ const closeModal = () => {
                 <th scope="col" class="py-2">
                     Remark
                 </th>
+                <th scope="col" class="py-2">
+                    Wallet Type
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -157,6 +160,9 @@ const closeModal = () => {
                 </td>
                 <td class="py-2">
                     {{ wallet.description }}
+                </td>
+                <td class="py-2">
+                    {{ wallet.type }}
                 </td>
             </tr>
             </tbody>
