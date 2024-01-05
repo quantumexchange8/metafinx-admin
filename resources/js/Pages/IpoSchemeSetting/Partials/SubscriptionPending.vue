@@ -3,7 +3,7 @@ import Input from "@/Components/Input.vue";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
 import InputIconWrapper from "@/Components/InputIconWrapper.vue";
 import {SearchIcon, RefreshIcon, ArrowLeftIcon, ArrowRightIcon} from "@heroicons/vue/outline";
-import {ref, watch, watchEffect} from "vue";
+import {ref, watch, watchEffect, computed} from "vue";
 import {alertTriangle, MemberDetailIcon} from "@/Components/Icons/outline.jsx";
 import Button from "@/Components/Button.vue";
 import Loading from "@/Components/Loading.vue";
@@ -18,6 +18,7 @@ const props = defineProps({
     isLoading: Boolean,
     search: String,
     date: String,
+    status:String,
     exportStatus: Boolean,
 })
 
@@ -28,6 +29,7 @@ const formatter = ref({
 const subscriptions = ref({data: []});
 const search = ref('');
 const date = ref('');
+const status = ref('');
 const historyLoading = ref(props.isLoading);
 const historyRefresh = ref(props.refresh);
 const currentPage = ref(1);
@@ -39,11 +41,22 @@ const subscriptionDetail = ref();
 const emit = defineEmits(['update:loading', 'update:refresh', 'update:export']);
 
 watch(
-    [() => props.search, () => props.date],
-    debounce(([searchValue, dateValue]) => {
-        getResults(1, searchValue, dateValue);
+    [() => props.search, () => props.date, () => props.status],
+    debounce(([searchValue, dateValue, statusValue]) => {
+        getResults(1, searchValue, dateValue, statusValue);
     }, 300)
 );
+
+const TotalAmount = computed(() => {
+    let total = 0;
+
+    // Summing up the 'amount' field from subscriptions.data
+    subscriptions.value.data.forEach(subscription => {
+        total += parseFloat(subscription.amount);
+    });
+
+    return total;
+});
 
 const getResults = async (page = 1, search = '', date = '') => {
     historyLoading.value = true
@@ -56,6 +69,10 @@ const getResults = async (page = 1, search = '', date = '') => {
 
         if (date) {
             url += `&date=${date}`;
+        }
+
+        if (status) {
+            url += `&status=${status}`;
         }
 
         const response = await axios.get(url);
@@ -99,6 +116,10 @@ watch(() => props.exportStatus, (newVal) => {
             url += `&search=${props.search}`;
         }
 
+        if (props.status) {
+            url += `&status=${props.status}`;
+        }
+        
         window.location.href = url;
         emit('update:export', false);
     }
@@ -247,6 +268,10 @@ const closeModal = () => {
         </div>
     </div>
 
+    <div class="text-xl font-semibold">
+        Total Amount: ${{ formatAmount(TotalAmount) }}
+    </div>
+    
     <Modal :show="subscriptionDetailModal" :title="modalComponent" @close="closeModal" max-width="lg">
         <div v-if="modalComponent === 'EBMI Approval'">
             <div class="px-2 space-y-2">

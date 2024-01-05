@@ -54,7 +54,6 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
         <SidebarLink
             title="XLC Setting"
             :href="route('ipo_scheme.setting')"
-            :active="route().current('ipo_scheme.*')"
         >
             <template #icon>
                 <XLCIcon

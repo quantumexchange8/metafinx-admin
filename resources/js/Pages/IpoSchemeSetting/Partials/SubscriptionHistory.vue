@@ -3,7 +3,7 @@ import Input from "@/Components/Input.vue";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
 import InputIconWrapper from "@/Components/InputIconWrapper.vue";
 import {SearchIcon, RefreshIcon, ArrowLeftIcon, ArrowRightIcon} from "@heroicons/vue/outline";
-import {ref, watch} from "vue";
+import {ref, watch, computed} from "vue";
 import {CloudDownloadIcon} from "@/Components/Icons/outline.jsx";
 import Button from "@/Components/Button.vue";
 import Loading from "@/Components/Loading.vue";
@@ -17,6 +17,7 @@ const props = defineProps({
     isLoading: Boolean,
     search: String,
     date: String,
+    status: String,
     exportStatus: Boolean,
 })
 
@@ -27,6 +28,7 @@ const formatter = ref({
 const subscriptions = ref({data: []});
 const search = ref('');
 const date = ref('');
+const status = ref('');
 const historyLoading = ref(props.isLoading);
 const historyRefresh = ref(props.refresh);
 const currentPage = ref(1);
@@ -36,13 +38,24 @@ const subscriptionDetail = ref();
 const emit = defineEmits(['update:loading', 'update:refresh', 'update:export']);
 
 watch(
-    [() => props.search, () => props.date],
-    debounce(([searchValue, dateValue]) => {
-        getResults(1, searchValue, dateValue);
+    [() => props.search, () => props.date, () => props.status],
+    debounce(([searchValue, dateValue, statusValue]) => {
+        getResults(1, searchValue, dateValue, statusValue);
     }, 300)
 );
 
-const getResults = async (page = 1, search = '', date = '') => {
+const TotalAmount = computed(() => {
+    let total = 0;
+
+    // Summing up the 'amount' field from subscriptions.data
+    subscriptions.value.data.forEach(subscription => {
+        total += parseFloat(subscription.amount);
+    });
+
+    return total;
+});
+
+const getResults = async (page = 1, search = '', date = '', status = '' ) => {
     historyLoading.value = true
     try {
         let url = `/ipo_scheme/getSubscriptionDetails?page=${page}`;
@@ -53,6 +66,10 @@ const getResults = async (page = 1, search = '', date = '') => {
 
         if (date) {
             url += `&date=${date}`;
+        }
+
+        if (status) {
+            url += `&status=${status}`;
         }
 
         const response = await axios.get(url);
@@ -94,6 +111,10 @@ watch(() => props.exportStatus, (newVal) => {
 
         if (props.search) {
             url += `&search=${props.search}`;
+        }
+
+        if (props.status) {
+            url += `&status=${props.status}`;
         }
 
         window.location.href = url;
@@ -200,7 +221,11 @@ const closeModal = () => {
             </TailwindPagination>
         </div>
     </div>
-
+    
+    <div class="text-xl font-semibold">
+        Total Amount: ${{ formatAmount(TotalAmount) }}
+    </div>
+    
     <Modal :show="subscriptionDetailModal" title="Investment Details" @close="closeModal">
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Name</span>
@@ -232,7 +257,10 @@ const closeModal = () => {
         </div>
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Investment Status</span>
-            <span class="text-black dark:text-white py-2">{{ formatType(subscriptionDetail.status) }}</span>
+            <span class="uppercase dark:text-error-500 font-semibold" v-if="subscriptionDetail.status === 'Terminated'">{{ formatType(subscriptionDetail.status) }}</span>
+            <span class="uppercase dark:text-blue-500 font-semibold" v-if="subscriptionDetail.status === 'CoolingPeriod'">{{ formatType(subscriptionDetail.status) }}</span>
+            <span class="uppercase dark:text-warning-500 font-semibold" v-if="subscriptionDetail.status === 'OnGoingPeriod'">{{ formatType(subscriptionDetail.status) }}</span>
+            <span class="uppercase dark:text-success-500 font-semibold" v-if="subscriptionDetail.status === 'MaturityPeriod'">{{ formatType(subscriptionDetail.status) }}</span>
         </div>
         <div v-if="subscriptionDetail.investment_plan.type === 'ebmi'" class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">EBMI Document Status</span>

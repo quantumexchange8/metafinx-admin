@@ -52,6 +52,11 @@ class IpoSchemeController extends Controller
             $selectedPlans->whereBetween('created_at', [$start_date, $end_date]);
         }
 
+        if ($request->filled('status')) {
+            $status = $request->input('status');
+            $selectedPlans->where('status', $status);
+        }
+
         if ($request->has('exportStatus')) {
             return Excel::download(new SubscriptionExport($selectedPlans), Carbon::now() . '-Subscription_History-report.xlsx');
         }
@@ -91,6 +96,11 @@ class IpoSchemeController extends Controller
             $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
             $selectedPlans->whereBetween('created_at', [$start_date, $end_date]);
         }
+
+        if ($request->filled('status')) {
+            $status = $request->input('status');
+            $selectedPlans->where('status', $status);
+        }    
 
         if ($request->has('exportStatus')) {
             return Excel::download(new SubscriptionExport($selectedPlans), Carbon::now() . '-Pending_Subscription-report.xlsx');
