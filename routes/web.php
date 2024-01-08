@@ -66,6 +66,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('/unsubscribePlan', [MemberController::class, 'unsubscribePlan'])->name('member.unsubscribe_plan');
         Route::post('/wallet_adjustment', [MemberController::class, 'wallet_adjustment'])->name('member.wallet_adjustment');
         Route::post('/internal_transfer', [MemberController::class, 'internal_transfer'])->name('member.internal_transfer');
+        Route::post('/coin_adjustment', [MemberController::class, 'coin_adjustment'])->name('member.coin_adjustment');
 
         Route::get('/impersonate/{user}', [MemberController::class, 'impersonate'])->name('member.impersonate');
     });

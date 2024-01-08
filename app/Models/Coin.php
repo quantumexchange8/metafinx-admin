@@ -17,4 +17,9 @@ class Coin extends Model
         'price',
         'amount',
     ];
+
+    public function setting_coin(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(SettingCoin::class, 'setting_coin_id', 'id');
+    }
 }

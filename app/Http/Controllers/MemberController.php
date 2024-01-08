@@ -2,29 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AddMemberRequest;
-use App\Http\Requests\EditMemberRequest;
-use App\Http\Requests\KycApprovalRequest;
-use App\Http\Requests\WalletAdjustmentRequest;
-use App\Models\BalanceAdjustment;
-use App\Models\Earning;
-use App\Models\SettingCountry;
-use App\Models\SettingRank;
+use App\Models\Coin;
+use App\Models\CoinPrice;
 use App\Models\User;
-use App\Models\InvestmentSubscription;
+use Inertia\Inertia;
 use App\Models\Wallet;
-use App\Notifications\KycApprovalNotification;
+use App\Models\Earning;
+use App\Models\SettingCoin;
+use App\Models\SettingRank;
 use Illuminate\Http\Request;
+use App\Models\CoinAdjustment;
+use App\Models\SettingCountry;
 use Illuminate\Support\Carbon;
+use App\Models\BalanceAdjustment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Notification;
+use App\Models\InvestmentSubscription;
+use App\Http\Requests\AddMemberRequest;
+use Spatie\Activitylog\Models\Activity;
+use App\Http\Requests\EditMemberRequest;
 use Illuminate\Support\Facades\Redirect;
+use App\Http\Requests\KycApprovalRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use App\Http\Requests\CoinAdjustmentRequest;
+use Illuminate\Support\Facades\Notification;
+use App\Http\Requests\WalletAdjustmentRequest;
+use App\Notifications\KycApprovalNotification;
 use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
-use Spatie\Activitylog\Models\Activity;
 
 class MemberController extends Controller
 {
@@ -261,6 +266,7 @@ class MemberController extends Controller
         $wallets = Wallet::where('user_id', $user->id)->get();
         $walletSum = Wallet::where('user_id', $user->id)->sum('balance');
         $referralCount = User::where('upline_id', $user->id)->count();
+        $coins = Coin::with('setting_coin')->where('user_id', $user->id)->get();
 
         return Inertia::render('Member/MemberDetails/MemberDetail', [
             'member_details' => $user,
@@ -270,6 +276,8 @@ class MemberController extends Controller
             'wallets' => $wallets,
             'walletSum' => floatval($walletSum),
             'referralCount' => $referralCount,
+            'coins' => $coins,
+            'setting_coin' => SettingCoin::where('symbol', 'XLC/MYR')->first(),
             // 'total_affiliate' => count($user->getChildrenIds()),
             'self_deposit' => floatval($this->getSelfDeposit($user)),
             'valid_affiliate_deposit' => floatval($this->getValidAffiliateDeposit($user)),
@@ -403,6 +411,42 @@ class MemberController extends Controller
         ]);
 
         return redirect()->back()->with('title', 'Balance Transferred!')->with('success', 'The amount is transferred successfully to ' . $to_user->name . '.');
+    }
+
+    public function coin_adjustment(CoinAdjustmentRequest $request)
+    {
+        $unit = $request->unit;
+
+        $coin = Coin::find($request->coin_id);
+        $coin_price = CoinPrice::whereDate('price_date', today())->first();
+        $new_unit = $coin->unit + $unit;
+
+        if ($new_unit < 0 || $unit == 0) {
+            throw ValidationException::withMessages(['unit' => 'Insufficient unit']);
+        }
+
+        $coin_balance = CoinAdjustment::create([
+            'user_id' => $request->user_id,
+            'coin_id' => $request->coin_id,
+            'setting_coin_id' => $request->setting_coin_id,
+            'type' => 'CoinAdjustment',
+            'old_unit' => $coin->unit,
+            'unit' => $unit,
+            'description' => $request->description,
+            'handle_by' => Auth::id(),
+        ]);
+
+        $coin->update([
+            'unit' => $new_unit,
+            'price' => $coin_price->price,
+            'amount' => $coin->amount + $unit*$coin_price->price,
+        ]);
+
+        $coin_balance->update([
+            'new_unit' => $new_unit
+        ]);
+
+        return redirect()->back()->with('title', 'Coin Adjusted!')->with('success', 'This coin has been adjusted successfully.');
     }
 
     public function affiliate_tree($id)

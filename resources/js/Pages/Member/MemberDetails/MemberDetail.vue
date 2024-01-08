@@ -16,7 +16,8 @@ import {
     ReferralIcon,
     ProofIcon,
     Wallet,
-    InternalMUSDWalletIcon
+    InternalMUSDWalletIcon,
+    XLCoinLogo
 } from "@/Components/Icons/outline.jsx";
 import {RefreshIcon} from "@heroicons/vue/outline";
 import Modal from "@/Components/Modal.vue";
@@ -29,6 +30,8 @@ import {transactionFormat} from "@/Composables/index.js";
 const props = defineProps({
     wallets: Object,
     member_details: Object,
+    coins: Object,
+    setting_coin: Object,
     upline_member: Object,
     investments: Object,
     settingRank: Array,
@@ -77,7 +80,6 @@ const backButton = () => {
     frontIdentityModal.value = false
     backIdentityModal.value = false
 }
-
 </script>
 
 <template>
@@ -208,10 +210,10 @@ const backButton = () => {
 
             <div class="flex flex-col gap-5 mb-8">
             <h3 class="text-base font-semibold border-b border-gray-700 pb-5">
-                Wallet
+                Wallet & Assets
             </h3>
             <div class="overflow-x-auto grid grid-flow-col justify-start gap-5">
-                <div v-for="wallet in props.wallets" class="flex flex-col overflow-hidden rounded-[20px] w-96">
+                <div v-for="wallet in props.wallets" class="flex flex-col overflow-hidden rounded-[20px] w-96 border border-gray-600">
                     <div
                         class="flex justify-between"
                         :class="{
@@ -233,7 +235,6 @@ const backButton = () => {
                                     type="wallet"
                                     :member_details="member_details"
                                     :wallet="wallet"
-                                    class="bg-[#ffffff33]"
                                 />
                             </div>
                         </div>
@@ -241,7 +242,33 @@ const backButton = () => {
                         <img v-else-if="wallet.type === 'musd_wallet'" src="/assets/icon-no-color.png" alt="" >
                         <!-- <InternalMUSDWalletIcon v-else-if="wallet.type === 'musd_wallet'" class="w-32 h-32 text-[#ffffff33]"/> -->
                     </div>
-                    
+                </div>
+                <div v-for="coin in props.coins" class="flex flex-col overflow-hidden rounded-[20px] w-96 border border-gray-600">
+                    <div
+                        class="flex justify-between"
+                        style="background: linear-gradient(251deg, #00095E 2.14%, #0359E8 97.82%);"
+                    >
+                        <div class="py-5 px-4 flex flex-col gap-2">
+                            <div class="flex flex-col">
+                                <div class="text-base font-semibold dark:text-white">
+                                    {{ coin.setting_coin.name }}
+                                </div>
+                                <div class="text-xl font-semibold dark:text-white">
+                                    {{ formatAmount(coin.unit) }} XLC 
+                                </div>
+                            </div>
+                            <div class="pt-4 h-6 flex items-center gap-2">
+                                <Action
+                                    type="coin"
+                                    :member_details="member_details"
+                                    :coin="coin"
+                                    :setting_coin="setting_coin"
+                                />
+                                <span class="text-xs dark:text-white">{{ coin.address }}</span>
+                            </div>
+                        </div>
+                        <XLCoinLogo class="w-32 h-32" />
+                    </div>
                 </div>
             </div>
         </div>

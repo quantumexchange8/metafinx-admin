@@ -7,6 +7,7 @@ import UnsubscribePlan from "@/Pages/Member/MemberDetails/Partials/UnsubscribePl
 import EditMember from "@/Pages/Member/MemberDetails/Partials/EditMember.vue";
 import WalletAdjustment from "@/Pages/Member/MemberDetails/Partials/WalletAdjustment.vue";
 import InternalTransfer from "@/Pages/Member/MemberDetails/Partials/InternalTransfer.vue";
+import CoinAdjustment from "@/Pages/Member/MemberDetails/Partials/CoinAdjustment.vue";
 import Tooltip from "@/Components/Tooltip.vue";
 
 
@@ -17,6 +18,8 @@ const props = defineProps({
     settingRank: Array,
     type: String,
     wallet: Object,
+    coin: Object,
+    setting_coin: Object,
 })
 
 const memberDetailModal = ref(false);
@@ -36,6 +39,9 @@ const openMemberModal = (componentType) => {
     }
     else if (componentType === 'internal_transfer') {
         modalComponent.value = 'Internal Transfer';
+    }
+    else if (componentType === 'coin_adjustment') {
+        modalComponent.value = 'Coin Adjustment';
     }
 }
 
@@ -88,7 +94,7 @@ const openInNewTab = (url) => {
             <Button
                 type="button"
                 class="justify-center p-1 w-8 h-8 relative focus:outline-none dark:bg-[#ffffff32]"
-                variant="action"
+                variant="opacity"
                 @click="openMemberModal('wallet_adjustment')"
                 pill
             >
@@ -100,7 +106,7 @@ const openInNewTab = (url) => {
             <Button
                 type="button"
                 class="justify-center p-1 w-8 h-8 mx-2 relative focus:outline-none dark:bg-[#ffffff33]"
-                variant="action"
+                variant="opacity"
                 @click="openMemberModal('internal_transfer')"
                 pill
             >
@@ -108,6 +114,18 @@ const openInNewTab = (url) => {
                 <span class="sr-only">Internal Transfer</span>
             </Button>
         </Tooltip> -->
+        <Tooltip content="Coin Adjustment" placement="bottom" v-if="type === 'coin'">
+            <Button
+                type="button"
+                class="justify-center p-1 w-8 h-8 relative focus:outline-none dark:bg-[#ffffff32]"
+                variant="opacity"
+                @click="openMemberModal('coin_adjustment')"
+                pill
+            >
+                <CreditEditIcon aria-hidden="true" class="w-5 h-5 absolute" />
+                <span class="sr-only">Coin Adjustment</span>
+            </Button>
+        </Tooltip>
     </div>
 
     <Modal :show="memberDetailModal" :title="modalComponent" @close="closeModal" max-width="xl">
@@ -137,6 +155,14 @@ const openInNewTab = (url) => {
                 <InternalTransfer
                     :member_details="member_details"
                     :wallet="wallet"
+                    @update:memberDetailModal="memberDetailModal = $event"
+                />
+            </template>
+            <template v-if="modalComponent==='Coin Adjustment'">
+                <CoinAdjustment
+                    :member_details="member_details"
+                    :coin="coin"
+                    :setting_coin="setting_coin"
                     @update:memberDetailModal="memberDetailModal = $event"
                 />
             </template>
