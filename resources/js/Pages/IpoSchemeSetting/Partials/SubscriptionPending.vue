@@ -211,7 +211,14 @@ const closeModal = () => {
             >
                 <td class="px-3 py-2.5 inline-flex items-center gap-2">
                     <img :src="subscription.user.profile_photo_url ? subscription.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                    {{ subscription.user.name }}
+                    <div class="flex flex-col">
+                        <div>
+                             {{ subscription.user.name }}
+                        </div>
+                        <div class="dark:text-gray-400">
+                            {{ subscription.user.email }}
+                        </div>
+                    </div>
                 </td>
                 <td class="px-3 py-2.5">
                     {{ formatDateTime(subscription.created_at, false) }}

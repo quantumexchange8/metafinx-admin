@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import {ref} from "vue";
+import Button from "@/Components/Button.vue";
 import {
     ChevronRight,
     UnverifiedIcon,
@@ -17,7 +18,8 @@ import {
     ProofIcon,
     Wallet,
     InternalMUSDWalletIcon,
-    XLCoinLogo
+    XLCoinLogo,
+    DuplicateIcon,
 } from "@/Components/Icons/outline.jsx";
 import {RefreshIcon} from "@heroicons/vue/outline";
 import Modal from "@/Components/Modal.vue";
@@ -26,6 +28,7 @@ import Action from "@/Pages/Member/MemberDetails/Partials/Action.vue";
 import AccountInformation from "@/Pages/Member/MemberDetails/Partials/AccountInformation.vue";
 import EarningInformation from "@/Pages/Member/MemberDetails/Partials/EarningInformation.vue";
 import {transactionFormat} from "@/Composables/index.js";
+import Tooltip from "@/Components/Tooltip.vue";
 
 const props = defineProps({
     wallets: Object,
@@ -46,6 +49,7 @@ const refresh = ref(false);
 const frontIdentityModal = ref(false);
 const backIdentityModal = ref(false);
 const { formatAmount } = transactionFormat();
+const tooltipContent = ref('Copy');
 
 function refreshTable() {
     isLoading.value = !isLoading.value;
@@ -79,6 +83,31 @@ const openBackIdentityModal = () => {
 const backButton = () => {
     frontIdentityModal.value = false
     backIdentityModal.value = false
+}
+
+function copyTestingCode () {
+    let walletAddressCopy = document.querySelector('#XLCoinAddress')
+    walletAddressCopy.setAttribute('type', 'text');
+    walletAddressCopy.select();
+
+    try {
+        var successful = document.execCommand('copy');
+        if (successful) {
+            tooltipContent.value = 'Copied!';
+            setTimeout(() => {
+                tooltipContent.value = 'Copy'; // Reset tooltip content to 'Copy' after 2 seconds
+            }, 1000);
+        } else {
+            tooltipContent.value = 'Try Again Later!';
+        }
+
+    } catch (err) {
+        alert('Oops, unable to copy');
+    }
+
+    /* unselect the range */
+    walletAddressCopy.setAttribute('type', 'hidden')
+    window.getSelection().removeAllRanges()
 }
 </script>
 
@@ -257,14 +286,18 @@ const backButton = () => {
                                     {{ formatAmount(coin.unit) }} XLC 
                                 </div>
                             </div>
-                            <div class="pt-4 h-6 flex items-center gap-2">
+                            <div class="pt-4 h-6 inline-flex items-center gap-2">
                                 <Action
                                     type="coin"
                                     :member_details="member_details"
                                     :coin="coin"
                                     :setting_coin="setting_coin"
                                 />
-                                <span class="text-xs dark:text-white">{{ coin.address }}</span>
+                                <span class="mb-1 text-xs dark:text-white">{{ coin.address }}</span>
+                                <input type="hidden" id="XLCoinAddress" :value="coin.address">
+                                <Tooltip :content="tooltipContent" placement="top">
+                                    <DuplicateIcon aria-hidden="true" :class="['w-4 h-4 dark:text-white']" @click.stop.prevent="copyTestingCode" style="cursor: pointer" />
+                                </Tooltip>
                             </div>
                         </div>
                         <XLCoinLogo class="w-32 h-32" />

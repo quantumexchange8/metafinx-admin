@@ -155,13 +155,27 @@ const closeModal = () => {
                 <td class="py-2">
                     <div class="inline-flex items-center gap-2">
                         <img :src="transfer.user.profile_photo_url ? transfer.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        {{ transfer.user.name }}
+                        <div class="flex flex-col">
+                            <div>
+                                {{ transfer.user.name }}
+                            </div>
+                            <div class="dark:text-gray-400">
+                                {{ transfer.user.email }}
+                            </div>
+                        </div>
                     </div>
                 </td>
                 <td class="py-2">
                     <div class="inline-flex items-center gap-2">
                         <img :src="transfer.to_user.profile_photo_url ? transfer.to_user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        {{ transfer.to_user.name }}
+                        <div class="flex flex-col">
+                            <div>
+                                {{ transfer.to_user.name }}
+                            </div>
+                            <div class="dark:text-gray-400">
+                                {{ transfer.to_user.email }}
+                            </div>
+                        </div>
                     </div>
                 </td>
                 <td class="py-2">

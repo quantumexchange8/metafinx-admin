@@ -99,7 +99,7 @@ const exportTransaction = () => {
                 </button>
                 <RefreshIcon
                     :class="{ 'animate-spin': isLoading }"
-                    class="flex-shrink-0 w-5 h-5 cursor-pointer dark:text-white ml-5"
+                    class="flex-shrink-0 w-5 h-5 cursor-pointer dark:text-white ml-5 mr-5"
                     aria-hidden="true"
                     @click="refreshTable"
                 />

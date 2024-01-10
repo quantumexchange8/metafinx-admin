@@ -131,13 +131,13 @@ const closeModal = () => {
             <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
             <tr>
                 <th scope="col" class="pl-5 py-2">
+                    Date
+                </th>
+                <th scope="col" class="py-2">
                     Name
                 </th>
                 <th scope="col" class="py-2">
-                    Asset
-                </th>
-                <th scope="col" class="py-2">
-                    Date
+                    Type
                 </th>
                 <th scope="col" class="py-2">
                     Transaction ID
@@ -163,23 +163,32 @@ const closeModal = () => {
             >
                 <td class="pl-5 py-2">
                     <div class="inline-flex items-center gap-2">
-                        <img :src="deposit.user.profile_photo_url ? deposit.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        {{ deposit.user.name }}
+                        {{ formatDateTime(deposit.created_at) }}
                     </div>
                 </td>
                 <td class="py-2">
                     <div class="inline-flex items-center gap-2">
-                        <div v-if="deposit.wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
-                            <InternalWalletIcon class="mt-0.5 ml-0.5"/>
+                        <img :src="deposit.user.profile_photo_url ? deposit.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                        <div class="flex flex-col">
+                            <div>
+                                {{ deposit.user.name }}
+                            </div>
+                            <div class="dark:text-gray-400">
+                                {{ deposit.user.email }}
+                            </div>
                         </div>
-                        <div v-else-if="deposit.wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
-                            <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
-                        </div>
-                        {{ deposit.wallet.name }}
                     </div>
                 </td>
                 <td class="py-2">
-                    {{ formatDateTime(deposit.created_at) }}
+                    <div class="inline-flex items-center gap-2">
+                    <div v-if="deposit.wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                        <InternalWalletIcon class="mt-0.5 ml-0.5"/>
+                    </div>
+                    <div v-else-if="deposit.wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                        <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
+                    </div>
+                    {{ deposit.wallet.name }}
+                    </div>
                 </td>
                 <td class="py-2">
                     {{ deposit.transaction_id }}

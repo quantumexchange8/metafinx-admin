@@ -2,7 +2,7 @@
 import debounce from "lodash/debounce.js";
 import {ref, watch} from "vue";
 import {ArrowLeftIcon, ArrowRightIcon} from "@heroicons/vue/outline";
-import {InternalWalletIcon} from "@/Components/Icons/outline.jsx";
+import {InternalWalletIcon, InternalMUSDWalletIcon, InternalXLCIcon} from "@/Components/Icons/outline.jsx";
 import Loading from "@/Components/Loading.vue";
 import {transactionFormat} from "@/Composables/index.js";
 import {TailwindPagination} from "laravel-vue-pagination";
@@ -16,14 +16,14 @@ const props = defineProps({
     exportStatus: Boolean,
 })
 
-const wallets = ref({data: []});
+const walletsAndAssets = ref({data: []});
 const currentPage = ref(1);
-const refreshWallet = ref(props.refresh);
-const walletLoading = ref(props.isLoading);
+const refreshWalletsAndAssets = ref(props.refresh);
+const walletsAndAssetsLoading = ref(props.isLoading);
 const emit = defineEmits(['update:loading', 'update:refresh', 'update:export']);
 const { formatDateTime, formatAmount } = transactionFormat();
-const walletHistoryModal = ref(false);
-const walletDetail = ref();
+const walletsAndAssetsHistoryModal = ref(false);
+const walletsAndAssetsDetail = ref();
 
 watch(
     [() => props.search, () => props.date],
@@ -33,7 +33,7 @@ watch(
 );
 
 const getResults = async (page = 1, search = '', date = '') => {
-    walletLoading.value = true
+    walletsAndAssetsLoading.value = true;
     try {
         let url = `/transaction/getBalanceHistory/WalletAdjustment?page=${page}`;
 
@@ -46,11 +46,11 @@ const getResults = async (page = 1, search = '', date = '') => {
         }
         
         const response = await axios.get(url);
-        wallets.value = response.data.WalletAdjustment;
+        walletsAndAssets.value = response.data.WalletAdjustment;
     } catch (error) {
         console.error(error);
     } finally {
-        walletLoading.value = false
+        walletsAndAssetsLoading.value = false
         emit('update:loading', false);
     }
 }
@@ -66,7 +66,7 @@ const handlePageChange = (newPage) => {
 };
 
 watch(() => props.refresh, (newVal) => {
-    refreshWallet.value = newVal;
+    refreshWalletsAndAssets.value = newVal;
     if (newVal) {
         // Call the getResults function when refresh is true
         getResults();
@@ -75,7 +75,7 @@ watch(() => props.refresh, (newVal) => {
 });
 
 watch(() => props.exportStatus, (newVal) => {
-    refreshWallet.value = newVal;
+    refreshWalletsAndAssets.value = newVal;
     if (newVal) {
         let url = `/transaction/getBalanceHistory/WalletAdjustment?exportStatus=yes`;
 
@@ -100,19 +100,19 @@ const paginationActiveClass = [
     'border dark:border-gray-600 dark:bg-gray-600 rounded-full text-[#FF9E23] dark:text-white'
 ];
 
-const openWalletHistoryModal = (wallet) => {
-    walletHistoryModal.value = true
-    walletDetail.value = wallet
+const openWalletsAndAssetsHistoryModal = (wallet) => {
+    walletsAndAssetsHistoryModal.value = true
+    walletsAndAssetsDetail.value = wallet
 }
 
 const closeModal = () => {
-    walletHistoryModal.value = false
+    walletsAndAssetsHistoryModal.value = false
 }
 </script>
 
 <template>
     <div class="relative overflow-x-auto sm:rounded-lg">
-        <div v-if="walletLoading" class="w-full flex justify-center my-8">
+        <div v-if="walletsAndAssetsLoading" class="w-full flex justify-center my-8">
             <Loading />
         </div>
         <table v-else class="w-[650px] table-fixed md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
@@ -125,53 +125,79 @@ const closeModal = () => {
                     Name
                 </th>
                 <th scope="col" class="py-2">
+                    Type
+                </th>
+                <th scope="col" class="py-2">
                     After Adjustment
                 </th>
                 <th scope="col" class="py-2">
                     Remark
                 </th>
-                <th scope="col" class="py-2">
-                    Wallet Type
-                </th>
             </tr>
             </thead>
             <tbody>
-            <tr v-if="wallets.data.length === 0">
+            <tr v-if="walletsAndAssets.data.length === 0">
                 <th colspan="4" class="py-4 text-lg text-center">
                     No History
                 </th>
             </tr>
             <tr
-                v-for="wallet in wallets.data"
+                v-for="walletAndAsset in walletsAndAssets.data"
                 class="bg-white dark:bg-transparent text-xs text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
-                @click="openWalletHistoryModal(wallet)"
+                @click="openWalletsAndAssetsHistoryModal(walletAndAsset)"
             >
                 <td class="pl-5 py-2">
-                    {{ formatDateTime(wallet.created_at) }}
+                    {{ formatDateTime(walletAndAsset.created_at) }}
                 </td>
                 <td class="py-2">
                     <div class="inline-flex items-center gap-2">
-                        <img :src="wallet.user.profile_photo_url ? wallet.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        {{ wallet.user.name }}
+                        <img :src="walletAndAsset.user.profile_photo_url ? walletAndAsset.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                        <div class="flex flex-col">
+                            <div>
+                                {{ walletAndAsset.user.name }}
+                            </div>
+                            <div class="dark:text-gray-400">
+                                {{ walletAndAsset.user.email }}
+                            </div>
+                        </div>                    
                     </div>
                 </td>
                 <td class="py-2">
-                    $ {{ formatAmount(wallet.new_balance) }}
+                    <div v-if="walletAndAsset.type === 'WalletAdjustment'" class="inline-flex items-center gap-2">
+                        <div v-if="walletAndAsset.wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                            <InternalWalletIcon class="mt-0.5 ml-0.5"/>
+                        </div>
+                        <div v-else-if="walletAndAsset.wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                            <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
+                        </div>
+                        <span>{{ walletAndAsset.wallet.name }}</span>
+                    </div>
+                    <div v-if="walletAndAsset.type === 'AssetAdjustment'" class="inline-flex items-center gap-2">
+                        <div v-if="walletAndAsset.setting_coin.id === 1">
+                            <InternalXLCIcon />
+                        </div>
+                        <span>{{ walletAndAsset.setting_coin.name }}</span>
+                    </div>
                 </td>
                 <td class="py-2">
-                    {{ wallet.description }}
+                    <div v-if="walletAndAsset.type === 'WalletAdjustment'">
+                        $ {{ formatAmount(walletAndAsset.new_amount) }}
+                    </div>
+                    <div v-if="walletAndAsset.type === 'AssetAdjustment'">
+                        {{ formatAmount(walletAndAsset.new_amount) }} XLC Unit
+                    </div>
                 </td>
                 <td class="py-2">
-                    {{ wallet.type }}
+                    {{ walletAndAsset.description }}
                 </td>
             </tr>
             </tbody>
         </table>
-        <div class="flex justify-center mt-4" v-if="!walletLoading">
+        <div class="flex justify-center mt-4" v-if="!walletsAndAssetsLoading">
             <TailwindPagination
                 :item-classes=paginationClass
                 :active-classes=paginationActiveClass
-                :data="wallets"
+                :data="walletsAndAssets"
                 :limit=2
                 @pagination-change-page="handlePageChange"
             >
@@ -185,34 +211,49 @@ const closeModal = () => {
         </div>
     </div>
 
-    <Modal :show="walletHistoryModal" title="Wallet Adjustment Details" @close="closeModal">
+    <Modal :show="walletsAndAssetsHistoryModal" title="Wallet Adjustment Details" @close="closeModal">
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Name</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ walletDetail.user.name }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ walletsAndAssetsDetail.user.name }}</span>
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Email</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ walletDetail.user.email }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ walletsAndAssetsDetail.user.email }}</span>
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Date & Time</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ formatDateTime(walletDetail.created_at) }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ formatDateTime(walletsAndAssetsDetail.created_at) }}</span>
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Before Adjustment</span>
-            <span class="col-span-2 text-black dark:text-white py-2">$ {{ formatAmount(walletDetail.old_balance) }}</span>
+            <div v-if="walletsAndAssetsDetail.type === 'WalletAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                <span>$ </span>{{ formatAmount(walletsAndAssetsDetail.old_amount) }}
+            </div>
+            <div v-if="walletsAndAssetsDetail.type === 'AssetAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                {{ formatAmount(walletsAndAssetsDetail.old_amount) }}<span> XLC Unit</span>
+            </div>
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Adjust Amount</span>
-            <span class="col-span-2 text-black dark:text-white py-2">$ {{ formatAmount(walletDetail.amount) }}</span>
+            <div v-if="walletsAndAssetsDetail.type === 'WalletAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                <span>$ </span>{{ formatAmount(walletsAndAssetsDetail.amount) }}
+            </div>
+            <div v-if="walletsAndAssetsDetail.type === 'AssetAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                {{ formatAmount(walletsAndAssetsDetail.amount) }}<span> XLC Unit</span>
+            </div>        
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">After Adjustment</span>
-            <span class="col-span-2 text-black dark:text-white py-2">$ {{ formatAmount(walletDetail.new_balance) }}</span>
+            <div v-if="walletsAndAssetsDetail.type === 'WalletAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                <span>$ </span>{{ formatAmount(walletsAndAssetsDetail.new_amount) }}
+            </div>
+            <div v-if="walletsAndAssetsDetail.type === 'AssetAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                {{ formatAmount(walletsAndAssetsDetail.new_amount) }}<span> XLC Unit</span>
+            </div>        
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Remark</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ walletDetail.description }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ walletsAndAssetsDetail.description }}</span>
         </div>
     </Modal>
 </template>

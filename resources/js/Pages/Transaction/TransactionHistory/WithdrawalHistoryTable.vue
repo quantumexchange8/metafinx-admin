@@ -131,13 +131,13 @@ const closeModal = () => {
             <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
             <tr>
                 <th scope="col" class="pl-5 py-2">
+                    Date
+                </th>
+                <th scope="col" class="py-2">
                     Name
                 </th>
                 <th scope="col" class="py-2">
-                    Asset
-                </th>
-                <th scope="col" class="py-2">
-                    Date
+                    Type
                 </th>
                 <th scope="col" class="py-2">
                     Transaction ID
@@ -163,8 +163,20 @@ const closeModal = () => {
             >
                 <td class="pl-5 py-2">
                     <div class="inline-flex items-center gap-2">
+                        {{ formatDateTime(withdrawal.created_at) }}
+                    </div>
+                </td>
+                <td class="py-2">
+                    <div class="inline-flex items-center gap-2">
                         <img :src="withdrawal.user.profile_photo_url ? withdrawal.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        {{ withdrawal.user.name }}
+                        <div class="flex flex-col">
+                            <div>
+                                {{ withdrawal.user.name }}
+                            </div>
+                            <div class="dark:text-gray-400">
+                                {{ withdrawal.user.email }}
+                            </div>
+                        </div>
                     </div>
                 </td>
                 <td class="py-2">
@@ -177,9 +189,6 @@ const closeModal = () => {
                         </div>
                         {{ withdrawal.wallet.name }}
                     </div>
-                </td>
-                <td class="py-2">
-                    {{ formatDateTime(withdrawal.created_at) }}
                 </td>
                 <td class="py-2">
                     {{ withdrawal.transaction_id }}

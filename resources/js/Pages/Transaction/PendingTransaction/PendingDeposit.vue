@@ -286,7 +286,14 @@ const rejectTransaction = async () => {
                 <td class="py-3">
                     <div class="inline-flex items-center gap-2">
                         <img :src="deposit.user.profile_photo_url ? deposit.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        {{ deposit.user.name }}
+                        <div class="flex flex-col">
+                            <div>
+                                {{ deposit.user.name }}
+                            </div>
+                            <div class="dark:text-gray-400">
+                                {{ deposit.user.email }}
+                            </div>
+                        </div>
                     </div>
                 </td>
                 <td class="py-3">

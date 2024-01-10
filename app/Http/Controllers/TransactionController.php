@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\DepositExport;
-use App\Exports\WithdrawalExport;
-use App\Exports\BalanceAdjustmentExport;
-use App\Models\Payment;
-use App\Models\Wallet;
-use App\Models\BalanceAdjustment;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
+use App\Models\Wallet;
+use App\Models\Payment;
+use Illuminate\Http\Request;
+use App\Exports\DepositExport;
+use App\Models\CoinAdjustment;
+use App\Models\AssetAdjustment;
+use App\Exports\WithdrawalExport;
+use App\Models\BalanceAdjustment;
+use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AdjustmentExport;
 
 class TransactionController extends Controller
 {
@@ -208,54 +210,44 @@ class TransactionController extends Controller
 
     public function getBalanceHistory(Request $request, $type)
     {
-        $query = BalanceAdjustment::query()->with('user', 'to_user')
-            ->where('type', $type);
+        $search = $request->filled('search') ? '%' . $request->input('search') . '%' : null;
+        $dateRange = $request->filled('date') ? explode(' - ', $request->input('date')) : null;
 
-        if ($request->filled('search')) {
-            $search = '%' . $request->input('search') . '%';
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('user', function ($user_query) use ($search) {
-                    $user_query->where('name', 'like', $search);
-                })
-                ->orWhereHas('to_user', function ($to_user_query) use ($search) {
-                    $to_user_query->where('name', 'like', $search);
-                })
-                ->orWhere('new_balance', 'like', $search)
-                ->orWhere('amount', 'like', $search)
-                ->orWhere('description', 'like', $search);
+        $query = AssetAdjustment::query()->with('user:id,name,email', 'wallet:id,name,type', 'setting_coin:id,name');
+
+        if ($search) {
+            $query->where(function ($query) use ($search) {
+                $query->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', $search);
+                })->orWhere('new_amount', 'like', $search)
+                    ->orWhere('amount', 'like', $search)
+                    ->orWhere('description', 'like', $search);
             });
         }
 
-        if ($request->filled('date')) {
-            $date = $request->input('date');
-            $dateRange = explode(' - ', $date);
-            $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
-            $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
-
-            $query->whereBetween('created_at', [$start_date, $end_date]);
+        if ($dateRange) {
+            $query->whereBetween('created_at', [
+                Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay(),
+                Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay()
+            ]);
         }
 
         if ($request->has('exportStatus')) {
-            if ($type == 'WalletAdjustment') {
-                return Excel::download(new BalanceAdjustmentExport($query, $type), Carbon::now() . '-' . $type . '_History-report.xlsx');
-            } elseif ($type == 'InternalTransfer') {
-                return Excel::download(new BalanceAdjustmentExport($query, $type), Carbon::now() . '-' . $type . '_History-report.xlsx');
-            }
+            if ($type == 'WalletAdjustment' || 'AssettAdjustment') {
+                return Excel::download(new AdjustmentExport($query,$type), Carbon::now() . '-' . 'Asset_and_Balance_History-report.xlsx');
+            } 
         }
 
         $results = $query->latest()->paginate(10);
 
         $results->each(function ($user_deposit) use ($type) {
             $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
-
-            if ($type != 'WalletAdjustment') {
-                $user_deposit->to_user->profile_photo_url = $user_deposit->to_user->getFirstMediaUrl('profile_photo');
-            }
         });
 
         return response()->json([$type => $results]);
     }
 
+    
     private function updateTransaction($rec)
     {
         $hashedToken = md5($rec->transaction_id . $rec->to_wallet_address);

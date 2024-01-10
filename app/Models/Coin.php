@@ -22,4 +22,15 @@ class Coin extends Model
     {
         return $this->belongsTo(SettingCoin::class, 'setting_coin_id', 'id');
     }
+
+    public function assetAdjustments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AssetAdjustment::class, 'coin_id', 'id')->whereNotNull('setting_coin_id');
+    }
+
+    public function settingCoinAdjustments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AssetAdjustment::class, 'setting_coin_id', 'id');
+    }
+
 }

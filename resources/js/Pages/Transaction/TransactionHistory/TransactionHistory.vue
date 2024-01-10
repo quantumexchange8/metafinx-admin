@@ -3,10 +3,10 @@ import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
 import {ref} from "vue";
 import DepositHistoryTable from "@/Pages/Transaction/TransactionHistory/DepositHistoryTable.vue";
 import WithdrawalHistoryTable from "@/Pages/Transaction/TransactionHistory/WithdrawalHistoryTable.vue";
-import WalletAdjustmentHistory from "@/Pages/Transaction/TransactionHistory/WalletAdjustmentHistory.vue";
 import InternalTransferHistory from "@/Pages/Transaction/TransactionHistory/InternalTransferHistory.vue";
 import PendingWithdrawal from "@/Pages/Transaction/PendingTransaction/PendingWithdrawal.vue";
 import PendingDeposit from "@/Pages/Transaction/PendingTransaction/PendingDeposit.vue";
+import WalletAdjustmentHistory from "./WalletAdjustmentHistory.vue";
 
 const props = defineProps({
     refresh: Boolean,
@@ -81,10 +81,10 @@ const updateTransactionType = (transaction_type) => {
                                 : 'border-b border-gray-400',
                            ]"
                 >
-                    Wallet Adjustment
+                    Adjustment
                 </button>
             </Tab>
-            <Tab
+            <!-- <Tab
                 as="template"
                 v-slot="{ selected }"
             >
@@ -100,7 +100,7 @@ const updateTransactionType = (transaction_type) => {
                 >
                     Internal Transfer
                 </button>
-            </Tab>
+            </Tab> -->
         </TabList>
         <TabPanels>
             <TabPanel>
@@ -141,7 +141,7 @@ const updateTransactionType = (transaction_type) => {
                     @update:export="$emit('update:export', $event)"
                 />
             </TabPanel>
-            <TabPanel>
+            <!-- <TabPanel>
                 <InternalTransferHistory
                     :refresh="refresh"
                     :isLoading="isLoading"
@@ -152,7 +152,7 @@ const updateTransactionType = (transaction_type) => {
                     @update:refresh="$emit('update:refresh', $event)"
                     @update:export="$emit('update:export', $event)"
                 />
-            </TabPanel>
+            </TabPanel> -->
         </TabPanels>
     </TabGroup>
 </template>
