@@ -393,7 +393,7 @@ class MemberController extends Controller
             'to_user_id' => $to_user_id,
             'to_wallet_id' => $to_wallet->id,
             'type' => 'InternalTransfer',
-            'old_balance' => $wallet->balance,
+            'old_amount' => $wallet->balance,
             'amount' => $amount,
             'description' => $request->description,
             'handle_by' => Auth::id(),
@@ -408,7 +408,7 @@ class MemberController extends Controller
         ]);
 
         $wallet_balance->update([
-            'new_balance' => $from_user_after_balance
+            'new_amount' => $from_user_after_balance
         ]);
 
         return redirect()->back()->with('title', 'Balance Transferred!')->with('success', 'The amount is transferred successfully to ' . $to_user->name . '.');
