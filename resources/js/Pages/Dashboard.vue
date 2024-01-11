@@ -7,10 +7,13 @@ import PendingKYC from "@/Pages/Dashboard/PendingKYC.vue";
 import PendingTransaction from "@/Pages/Dashboard/PendingTransaction.vue";
 import TotalTransaction from "@/Pages/Dashboard/TotalTransaction/TotalTransaction.vue";
 import TotalInvestment from "@/Pages/Dashboard/TotalInvestment/TotalInvestment.vue";
+import TotalWalletBalance from "@/Pages/Dashboard/TotalWalletBalance/TotalWalletBalance.vue";
 
 const props = defineProps({
     totalDeposit: Number,
     totalWithdrawal: Number,
+    totalTransaction: Number,
+    totalWalletBalance: Number,
     totalInvestment: Number,
     totalMembers: Number,
     pendingMembers: Object,
@@ -20,7 +23,7 @@ const props = defineProps({
     pendingTransactions: Object,
     pendingTransactionCount: Number,
     currentTotalInvestment: String,
-})
+});
 
 const { formatAmount } = transactionFormat();
 const currentYear = new Date().getFullYear();
@@ -33,15 +36,25 @@ const statistics = [
         value: props.totalMembers,
     },
     {
-        key: 'totalDepositStats',
-        label: 'Total Deposit',
-        value: '$ ' + formatAmount(props.totalDeposit),
+        key: 'totalTransactionStats',
+        label: 'Total Transaction',
+        value: '$ ' + formatAmount(props.totalTransaction),
     },
     {
-        key: 'totalWithdrawalStats',
-        label: 'Total Withdrawal',
-        value: '$ ' + formatAmount(props.totalWithdrawal),
+        key: 'totalWalletBalanceStats',
+        label: 'Total Wallet Balance',
+        value: '$ ' + formatAmount(props.totalWalletBalance),
     },
+    // {
+    //     key: 'totalDepositStats',
+    //     label: 'Total Deposit',
+    //     value: '$ ' + formatAmount(props.totalDeposit),
+    // },
+    // {
+    //     key: 'totalWithdrawalStats',
+    //     label: 'Total Withdrawal',
+    //     value: '$ ' + formatAmount(props.totalWithdrawal),
+    // },
     {
         key: 'totalInvestmentStats',
         label: 'Total Investment',
@@ -89,13 +102,21 @@ const isActiveStatistic = (key) => {
 
         <MemberChart
             v-if="activeStats==='totalMemberStats'"
-            :totalMem="currentYear"
+            :currentYear="currentYear"
             :totalMembers="totalMembers"
         />
         <TotalTransaction
-            v-if="activeStats==='totalDepositStats' || activeStats==='totalWithdrawalStats'"
+            v-if="activeStats==='totalTransactionStats'"
             :currentYear="currentYear"
         />
+        <TotalWalletBalance
+            v-if="activeStats==='totalWalletBalanceStats'"
+            :currentYear="currentYear"
+        />
+        <!-- <TotalTransaction
+            v-if="activeStats==='totalDepositStats' || activeStats==='totalWithdrawalStats'"
+            :currentYear="currentYear"
+        /> -->
         <TotalInvestment
             v-if="activeStats==='totalInvestmentStats'"
             :currentYear="currentYear"

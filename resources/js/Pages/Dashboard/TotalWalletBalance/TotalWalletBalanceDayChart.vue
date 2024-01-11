@@ -3,6 +3,7 @@ import Loading from "@/Components/Loading.vue";
 import {onMounted, ref, watch} from "vue";
 import Chart from 'chart.js/auto'
 
+
 const props = defineProps({
     selectedMonth: Number,
     selectedYear: Number,
@@ -24,11 +25,11 @@ const fetchData = async () => {
             chartInstance.destroy();
         }
 
-        const ctx = document.getElementById('dailyTotalMembers');
+        const ctx = document.getElementById('dailyTotalWalletBalances');
 
         isLoading.value = true;
 
-        const response = await axios.get('/getTotalTransactionByDays', { params: { month: month.value, year: year.value } });
+        const response = await axios.get('/getTotalWalletBalanceByDays', { params: { month: month.value, year: year.value } });
         const { labels, datasets } = response.data;
         chartData.value.labels = labels;
         chartData.value.datasets = datasets;
@@ -37,8 +38,8 @@ const fetchData = async () => {
             if(datasets[0]) {
                 datasets[0].backgroundColor = (context) => {
                     const bgColor = [
-                        'rgba(253, 176, 34, 0.40)',
-                        'rgba(253, 176, 34, 0.00)'
+                        'rgba(253, 176, 34, 0.00)',
+                        'rgba(255, 45, 85, 0.40)'
                     ];
 
                     if (!context.chart.chartArea) {
@@ -55,8 +56,8 @@ const fetchData = async () => {
             if(datasets[1]) {
                 datasets[1].backgroundColor = (context) => {
                     const bgColor = [
-                        'rgba(255, 45, 85, 0.40)',
-                        'rgba(255, 45, 85, 0.00)'
+                        'rgba(253, 176, 34, 0.00)',
+                        'rgba(255, 45, 85, 0.40)'
                     ];
 
                     if (!context.chart.chartArea) {
@@ -142,7 +143,7 @@ const fetchData = async () => {
             }
         });
     } catch (error) {
-        const ctx = document.getElementById('dailyTotalMembers');
+        const ctx = document.getElementById('dailyTotalWalletBalances');
 
         isLoading.value = false
         console.error('Error fetching chart data:', error);
@@ -172,6 +173,6 @@ onMounted(async () => {
         <Loading />
     </div>
     <div>
-        <canvas id="dailyTotalMembers" height="350"></canvas>
+        <canvas id="dailyTotalWalletBalances" height="350"></canvas>
     </div>
 </template>

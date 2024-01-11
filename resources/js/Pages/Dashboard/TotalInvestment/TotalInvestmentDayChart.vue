@@ -4,7 +4,8 @@ import {onMounted, ref, watch} from "vue";
 import Chart from 'chart.js/auto'
 
 const props = defineProps({
-    selectedMonth: Number
+    selectedMonth: Number,
+    selectedYear: Number,
 })
 
 const chartData = ref({
@@ -13,6 +14,8 @@ const chartData = ref({
 });
 const isLoading = ref(false)
 const month = ref(props.selectedMonth)
+const year = ref(props.selectedYear)
+
 let chartInstance = null;
 
 const fetchData = async () => {
@@ -25,7 +28,7 @@ const fetchData = async () => {
 
         isLoading.value = true;
 
-        const response = await axios.get('/getTotalInvestmentByDays', { params: { month: month.value } });
+        const response = await axios.get('/getTotalInvestmentByDays', { params: { month: month.value, year: year.value } });
         const { labels, datasets } = response.data;
         chartData.value.labels = labels;
         chartData.value.datasets = datasets;
@@ -161,10 +164,11 @@ onMounted(async () => {
     // Watch for changes in the date and fetch data when it changes
 
     watch(
-        () => props.selectedMonth, // Expression to watch
-        (newMonth) => {
-            // This callback will be called when selectedMonth changes.
+        [() => props.selectedMonth, () => props.selectedYear], // Array of expressions to watch
+        ([newMonth, newYear]) => {
+            // This callback will be called when selectedMonth or selectedYear changes.
             month.value = newMonth;
+            year.value = newYear;
             fetchData();
         }
     );

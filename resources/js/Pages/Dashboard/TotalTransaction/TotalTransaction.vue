@@ -24,6 +24,7 @@ const months = Array.from({ length: 12 }, (_, index) => {
 
 const years = [
     {value: 2023, label: '2023'},
+    {value: 2024, label: '2024'},
 ];
 
 const selectedMonth = ref(new Date().getMonth() + 1); // Initialize with the current month (1-12)
@@ -71,12 +72,19 @@ const selectFilterType = (type) => {
                             </button>
                         </Tab>
                     </TabList>
-                    <div class="w-36">
+                    <div v-if="filterType==='Daily'" class="flex gap-5 w-80">
                         <BaseListbox
-                            v-if="filterType==='Daily'"
                             v-model="selectedMonth"
                             :options="months"
+                            class="w-40"
                         />
+                        <BaseListbox
+                            v-model="selectedYear"
+                            :options="years"
+                            class="w-40"
+                        />
+                    </div>
+                    <div v-else>
                         <BaseListbox
                             v-if="filterType==='Monthly'"
                             v-model="selectedYear"
@@ -93,6 +101,7 @@ const selectFilterType = (type) => {
                     >
                         <TransactionDayChart
                             :selectedMonth="selectedMonth"
+                            :selectedYear="selectedYear"
                         />
                     </TabPanel>
                     <TabPanel

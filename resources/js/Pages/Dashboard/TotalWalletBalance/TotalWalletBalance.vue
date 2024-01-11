@@ -1,14 +1,14 @@
 <script setup>
-import {ref} from "vue";
-import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
-import MemberMonthChart from "@/Pages/Dashboard/TotalMember/MemberMonthChart.vue";
-import MemberDayChart from "@/Pages/Dashboard/TotalMember/MemberDayChart.vue";
+import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
 import BaseListbox from "@/Components/BaseListbox.vue";
+import {ref} from "vue";
+import TotalWalletBalanceDayChart from "@/Pages/Dashboard/TotalWalletBalance/TotalWalletBalanceDayChart.vue";
+import TotalWalletBalanceMonthChart from "@/Pages/Dashboard/TotalWalletBalance/TotalWalletBalanceMonthChart.vue";
 
 const props = defineProps({
-    currentYear: Number,
-    totalMembers: Number
+    currentYear: Number
 })
+
 const categories = ref({
     Daily: [],
     Monthly: [],
@@ -33,18 +33,14 @@ const filterType = ref('Daily');
 const selectFilterType = (type) => {
     filterType.value = type
 }
-
 </script>
 
 <template>
     <div class="p-5 rounded-[10px] dark:bg-gray-700 my-8">
         <div class="flex justify-between">
             <div class="grid">
-                <span class="text-xl font-semibold dark:text-white">Total Members</span>
-                <span class="text-xs font-normal dark:text-gray-400">{{currentYear}} Total Members Data</span>
-            </div>
-            <div>
-                <span class="text-[32px] font-semibold dark:text-white">{{ props.totalMembers }}</span> <span class="text-xl dark:text-gray-400">members</span>
+                <span class="text-xl font-semibold dark:text-white">Total Transaction</span>
+                <span class="text-xs font-normal dark:text-gray-400">{{currentYear}} Total Transaction Data</span>
             </div>
         </div>
         <hr class="h-px my-3 bg-gray-200 border-0 dark:bg-gray-600">
@@ -75,12 +71,12 @@ const selectFilterType = (type) => {
                         </Tab>
                     </TabList>
                     <div v-if="filterType==='Daily'" class="flex gap-5 w-80">
-                            <BaseListbox
-                                v-model="selectedMonth"
-                                :options="months"
-                                class="w-40"
-                            />
-                            <BaseListbox
+                        <BaseListbox
+                            v-model="selectedMonth"
+                            :options="months"
+                            class="w-40"
+                        />
+                        <BaseListbox
                                 v-model="selectedYear"
                                 :options="years"
                                 class="w-40"
@@ -101,7 +97,7 @@ const selectFilterType = (type) => {
                         'rounded-xl dark:bg-transparent p-3',
                         ]"
                     >
-                        <MemberDayChart
+                        <TotalWalletBalanceDayChart
                             :selectedMonth="selectedMonth"
                             :selectedYear="selectedYear"
                         />
@@ -111,7 +107,7 @@ const selectFilterType = (type) => {
                         'rounded-xl dark:bg-transparent p-3',
                         ]"
                     >
-                        <MemberMonthChart
+                        <TotalWalletBalanceMonthChart
                             :selectedYear="selectedYear"
                         />
                     </TabPanel>
