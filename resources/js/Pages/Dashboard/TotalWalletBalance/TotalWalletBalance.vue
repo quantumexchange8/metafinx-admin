@@ -39,8 +39,8 @@ const selectFilterType = (type) => {
     <div class="p-5 rounded-[10px] dark:bg-gray-700 my-8">
         <div class="flex justify-between">
             <div class="grid">
-                <span class="text-xl font-semibold dark:text-white">Total Transaction</span>
-                <span class="text-xs font-normal dark:text-gray-400">{{currentYear}} Total Transaction Data</span>
+                <span class="text-xl font-semibold dark:text-white">Total Wallet Balance</span>
+                <span class="text-xs font-normal dark:text-gray-400">{{currentYear}} Total Wallet Balance Data</span>
             </div>
         </div>
         <hr class="h-px my-3 bg-gray-200 border-0 dark:bg-gray-600">

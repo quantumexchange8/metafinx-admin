@@ -53,10 +53,25 @@ const fetchData = async () => {
                             stepSize: 1
                         },
                         grace: '10%',
-                        beginAtZero: true
+                        beginAtZero: true,
+                        border: {
+                            display: false
+                        },
+                        grid: {
+                            drawTicks: false,
+                            color: (ctx) => {
+                                return '#4D5761'
+                            }
+                        },
                     },
                     x: {
                         stacked: true,
+                        grid: {
+                            drawTicks: false,
+                            color: (ctx) => {
+                                return 'transparent'
+                            }
+                        },
                         ticks: {
                             color: '#9DA4AE',
                             font: {

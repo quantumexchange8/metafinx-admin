@@ -107,7 +107,16 @@ const fetchData = async () => {
                             },
                         },
                         grace: '10%',
-                        beginAtZero: true
+                        beginAtZero: true,
+                        border: {
+                            display: false
+                        },
+                        grid: {
+                            drawTicks: false,
+                            color: (ctx) => {
+                                return '#4D5761'
+                            }
+                        },
                     },
                     x: {
                         ticks: {
@@ -117,6 +126,12 @@ const fetchData = async () => {
                                 size: 14,
                                 weight: 400,
                             },
+                        },
+                        grid: {
+                            drawTicks: false,
+                            color: (ctx) => {
+                                return 'transparent'
+                            }
                         },
                     }
                 },

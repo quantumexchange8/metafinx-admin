@@ -42,7 +42,7 @@ const fetchData = async () => {
             [
                 'rgba(253, 176, 34, 0.40)',
                 'rgba(253, 176, 34, 0.00)',
-                'OngoingPeriod'
+                'Active'
             ],
             [
                 'rgba(0, 199, 190, 0.40)',
@@ -52,7 +52,7 @@ const fetchData = async () => {
             [
                 'rgba(255, 45, 85, 0.40)',
                 'rgba(255, 45, 85, 0.00)',
-                'Terminated'
+                'Total'
             ]
         ];
 
@@ -119,7 +119,16 @@ const fetchData = async () => {
                             },
                         },
                         grace: '10%',
-                        beginAtZero: true
+                        beginAtZero: true,
+                        border: {
+                            display: false
+                        },
+                        grid: {
+                            drawTicks: false,
+                            color: (ctx) => {
+                                return '#4D5761'
+                            }
+                        },
                     },
                     x: {
                         ticks: {
@@ -129,6 +138,12 @@ const fetchData = async () => {
                                 size: 14,
                                 weight: 400,
                             },
+                        },
+                        grid: {
+                            drawTicks: false,
+                            color: (ctx) => {
+                                return 'transparent'
+                            }
                         },
                     }
                 },

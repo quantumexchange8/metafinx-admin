@@ -6,6 +6,7 @@ use App\Models\InvestmentSubscription;
 use App\Models\Payment;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Models\WalletNet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,12 +16,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $payment = Payment::where('status', 'Success')->get();
-        $totalDeposit = $payment->where('type', 'Deposit')->sum('amount');
-        $totalWithdrawal = $payment->where('type', 'Withdrawal')->sum('amount');
+        $payment = Payment::where('status', 'Success');
+        $withdrawal = clone $payment;
 
+        $totalDeposit = $payment->where('type', 'Deposit')->sum('amount');
+        $totalWithdrawal = $withdrawal->where('type', 'Withdrawal')->sum('amount');
         $totalTransaction = $totalDeposit + $totalWithdrawal;
-        $totalWalletBalance = Wallet::where('deleted_at', null)->sum('balance');
+        $totalWalletBalance = Wallet::sum('balance');
 
         $pendingMemberCount  = User::query()
         ->where('kyc_approval', 'pending')
@@ -47,10 +49,10 @@ class DashboardController extends Controller
             ->sum('amount');
 
         return Inertia::render('Dashboard', [
-            'totalDeposit' => $totalDeposit,
-            'totalWithdrawal' => $totalWithdrawal,
+            'totalDeposit' => floatval($totalDeposit),
+            'totalWithdrawal' => floatval($totalWithdrawal),
             'totalTransaction' => $totalTransaction,
-            'totalWalletBalance' => $totalWalletBalance,
+            'totalWalletBalance' => floatval($totalWalletBalance),
             'totalInvestment' => InvestmentSubscription::all()->sum('amount'),
             'currentTotalInvestment' => number_format($currentTotalInvestment, 2),
             'totalMembers' => User::where('status', 1)->count(),
@@ -214,24 +216,26 @@ class DashboardController extends Controller
 
     public function getTotalWalletBalanceByDays(Request $request)
     {
-        $wallet_balances = Wallet::query()
+        $wallet_balances = DB::table('wallet_nets')
+            ->leftJoin('wallets', 'wallet_nets.wallet_id', '=', 'wallets.id')
             ->when($request->filled('month'), function ($query) use ($request) {
                 $month = $request->input('month');
                 $year = $request->input('year');
-                $query->whereYear('created_at', $year)
-                      ->whereMonth('created_at', $month);
+                $query->whereYear('wallet_nets.created_at', $year)
+                    ->whereMonth('wallet_nets.created_at', $month);
             })
-            ->where('deleted_at', null)
+            ->where('wallet_nets.deleted_at', null)
             ->select(
-                DB::raw('DAY(created_at) as day'),
-                'type',
-                DB::raw('SUM(balance) as balance')
+                DB::raw('DAY(wallet_nets.created_at) as day'),
+                'wallets.name as wallet_name',
+                'wallets.type as wallet_type',
+                DB::raw('SUM(wallet_nets.total_balance) as balance')
             )
-            ->groupBy('day', 'type')
+            ->groupBy('day', 'wallet_name', 'wallet_type')
             ->get();
 
         // Get unique type to create datasets
-        $uniqueTransactionType = $wallet_balances->pluck('type')->unique();
+        $uniqueWalletType = $wallet_balances->pluck('wallet_type')->unique();
 
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month;
@@ -240,19 +244,19 @@ class DashboardController extends Controller
             'labels' => range(1, cal_days_in_month(CAL_GREGORIAN, $month, $year)), // Generate an array of days
             'datasets' => [],
         ];
-        
+
         $backgroundColors = ['internal_wallet' => '#FF2D55', 'musd_wallet' => '#fdb022'];
 
         // Loop through each unique type and create a dataset
-        foreach ($uniqueTransactionType as $transactionType) {
-            $transactionData = $wallet_balances->where('type', $transactionType);
+        foreach ($uniqueWalletType as $walletType) {
+            $wallet = $wallet_balances->where('wallet_type', $walletType);
 
             $dataset = [
-                'label' => $transactionData->first()->type,
-                'data' => array_map(function ($day) use ($transactionData) {
-                    return $transactionData->firstWhere('day', $day)->balance ?? 0;
+                'label' => $wallet->first()->wallet_name,
+                'data' => array_map(function ($day) use ($wallet) {
+                    return $wallet->firstWhere('day', $day)->balance ?? 0;
                 }, $chartData['labels']),
-                'borderColor' => $backgroundColors[$transactionType],
+                'borderColor' => $backgroundColors[$walletType],
                 'borderWidth' => 2,
                 'pointStyle' => false,
                 'fill' => true
@@ -260,27 +264,29 @@ class DashboardController extends Controller
 
             $chartData['datasets'][] = $dataset;
         }
-        
+
         return response()->json($chartData);
     }
 
     public function getTotalWalletBalanceByMonths(Request $request)
     {
-        $wallet_balances = Wallet::query()
+        $wallet_balances = DB::table('wallet_nets')
+            ->leftJoin('wallets', 'wallet_nets.wallet_id', '=', 'wallets.id')
             ->when($request->filled('year'), function ($query) use ($request) {
                 $year = $request->input('year');
-                $query->whereYear('created_at', $year);
+                $query->whereYear('wallet_nets.created_at', $year);
             })
-            ->where('deleted_at', null)
+            ->where('wallet_nets.deleted_at', null)
             ->select(
-                DB::raw('MONTH(created_at) as month'), // Change DAY to MONTH
-                'type',
-                DB::raw('SUM(balance) as balance')
+                DB::raw('MONTH(wallet_nets.created_at) as month'),
+                'wallets.name as wallet_name',
+                'wallets.type as wallet_type',
+                DB::raw('SUM(wallet_nets.total_balance) as total_balance')
             )
-            ->groupBy('month', 'type') // Change 'day' to 'month'
+            ->groupBy('month', 'wallet_name', 'wallet_type')
             ->get();
 
-        $uniqueTransactionType = $wallet_balances->pluck('type')->unique();
+        $uniqueWalletType = $wallet_balances->pluck('wallet_type')->unique();
 
         // Initialize the chart data structure with short month names as labels
         $shortMonthNames = [];
@@ -295,15 +301,15 @@ class DashboardController extends Controller
 
         $backgroundColors = ['internal_wallet' => '#FF2D55', 'musd_wallet' => '#fdb022'];
 
-        foreach ($uniqueTransactionType as $transactionType) {
-            $transactionData = $wallet_balances->where('type', $transactionType);
+        foreach ($uniqueWalletType as $walletType) {
+            $wallet = $wallet_balances->where('wallet_type', $walletType);
 
             $dataset = [
-                'label' => $transactionData->first()->type,
-                'data' => array_map(function ($month) use ($transactionData) {
-                    return $transactionData->firstWhere('month', $month)->balance ?? 0;
+                'label' => $wallet->first()->wallet_name,
+                'data' => array_map(function ($month) use ($wallet) {
+                    return $wallet->firstWhere('month', $month)->total_balance ?? 0;
                 }, range(1, 12)), // Use month numbers 1-12
-                'borderColor' => $backgroundColors[$transactionType],
+                'borderColor' => $backgroundColors[$walletType],
                 'borderWidth' => 2,
                 'pointStyle' => false,
                 'fill' => true
@@ -412,7 +418,7 @@ class DashboardController extends Controller
             'label' => 'Total',
             'data' => array_map(function ($month) use ($totalSubscriptionData) {
                 $totalDataForMonth = $totalSubscriptionData->where('month', $month);
-                
+
                 // Check if there is data for the month
                 if ($totalDataForMonth->isNotEmpty()) {
                     return $totalDataForMonth->sum('amount');
@@ -432,7 +438,7 @@ class DashboardController extends Controller
             'label' => 'Active',
             'data' => array_map(function ($month) use ($activeSubscriptionData) {
                 $ActiveDataForMonth = $activeSubscriptionData->where('month', $month);
-                
+
                 // Check if there is data for the month
                 if ($ActiveDataForMonth->isNotEmpty()) {
                     return $ActiveDataForMonth->sum('amount');
