@@ -72,8 +72,8 @@ const exportTransaction = () => {
         </div>
     </div>
 
-    <TabGroup>
-        <TabPanels>
+    <!-- <TabGroup>
+        <TabPanels> -->
                 <CoinTransactionHistory
                     :refresh="refresh"
                     :isLoading="isLoading"
@@ -84,6 +84,6 @@ const exportTransaction = () => {
                     @update:refresh="refresh = $event"
                     @update:export="exportStatus = $event"
                 />
-        </TabPanels>
-    </TabGroup>
+        <!-- </TabPanels>
+    </TabGroup> -->
 </template>

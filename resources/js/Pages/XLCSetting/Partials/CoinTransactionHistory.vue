@@ -45,7 +45,7 @@ watch(
 const getResults = async (page = 1, search = '', date = '') => {
     historyLoading.value = true
     try {
-        let url = `/ipo_scheme/getSubscriptionDetails?page=${page}`;
+        let url = `/xlc_setting/getCoinPaymentDetails?page=${page}`;
 
         if (search) {
             url += `&search=${search}`;
@@ -86,7 +86,7 @@ watch(() => props.refresh, (newVal) => {
 watch(() => props.exportStatus, (newVal) => {
     historyLoading.value = newVal;
     if (newVal) {
-        let url = `/ipo_scheme/getSubscriptionDetails?exportStatus=yes`;
+        let url = `/xlc_setting/getCoinPaymentDetails?exportStatus=yes`;
 
         if (props.date) {
             url += `&date=${props.date}`;
@@ -160,22 +160,27 @@ const closeModal = () => {
             >
                 <td class="px-3 py-2.5 inline-flex items-center gap-2">
                     <img :src="subscription.user.profile_photo_url ? subscription.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                    <!-- data -->
+                    <div>
+                        {{ subscription.user.name }}
+                    </div>
+                </td>
+                <td class="px-3 py-2.5">
+                    <div>
+                        {{ subscription.wallet.name }}
+                    </div>
                 </td>
                 <td class="px-3 py-2.5">
                     <!-- data -->
+                    {{ subscription.transaction_id }}
                 </td>
                 <td class="px-3 py-2.5">
-                    <!-- data -->
+                    {{ formatDateTime(subscription.created_at) }}
                 </td>
                 <td class="px-3 py-2.5">
-                    <!-- data -->
-                </td>
-                <td class="px-3 py-2.5">
-                    <!-- data -->
+                    {{ formatAmount(subscription.amount) }}
                 </td>
                 <td class="px-3 py-2.5 uppercase">
-                    <!-- data -->
+                    {{ formatAmount(subscription.unit) }}
                 </td>
             </tr>
             </tbody>
@@ -197,5 +202,44 @@ const closeModal = () => {
             </TailwindPagination>
         </div>
     </div>
+
+    <Modal :show="subscriptionDetailModal" title="Transaction Details" @close="closeModal">
+        <div class="grid grid-cols-3 items-center">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction type</span>
+            <span class="text-black dark:text-white py-2" v-if="subscriptionDetail.type === 'BuyCoin'">{{ formatType(subscriptionDetail.type) }}</span>
+        </div>
+        <div class="grid grid-cols-3 items-center">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction ID</span>
+            <span class="text-black dark:text-white py-2">{{ subscriptionDetail.transaction_id }}</span>
+        </div>
+        <div class="grid grid-cols-3 items-center">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Date & time</span>
+            <span class="text-black dark:text-white py-2">{{ formatDateTime(subscriptionDetail.created_at, true) }}</span>
+        </div>
+        <div class="grid grid-cols-3 items-center">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">From</span>
+            <span class="text-black dark:text-white py-2">{{ subscriptionDetail.wallet.name }}</span>
+        </div>
+        <div class="grid grid-cols-3 items-center">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Paid</span>
+            <span class="text-black dark:text-white py-2">{{ formatAmount(subscriptionDetail.amount) }}</span>
+        </div>
+        <div class="grid grid-cols-3 items-center">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Amount (unit)</span>
+            <span class="text-black dark:text-white py-2">{{ formatAmount(subscriptionDetail.unit) }}</span>
+        </div>
+        <div class="grid grid-cols-3 items-center">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Price per Unit</span>
+            <span class="text-black dark:text-white py-2">{{ formatAmount(subscriptionDetail.unit) }}</span>
+        </div>
+        <div class="grid grid-cols-3 items-center">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Conversion Rate</span>
+            <span class="text-black dark:text-white py-2">1 USDT = {{ subscriptionDetail.conversion_rate }} MYR</span>
+        </div>
+        <div class="grid grid-cols-3 items-center">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction Status</span>
+            <span class="text-black dark:text-white py-2">{{ subscriptionDetail.status }}</span>
+        </div>
+    </Modal>
 
 </template>

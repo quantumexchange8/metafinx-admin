@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import XLCCoinChart from "@/Pages/XLCSetting/Partials/XLCCoinChart.vue";
+import XLCCoinChart from "@/Pages/XLCSetting/TotalXlcoinSupply/XLCCoinChart.vue";
 import CoinTransactionHistoryTable from "@/Pages/XLCSetting/Partials/CoinTransactionHistoryTable.vue";
 import {computed, ref} from 'vue'
 import { Switch } from '@headlessui/vue'
@@ -13,7 +13,10 @@ const props = defineProps({
     totalInvestmentCount: String,
     totalEarningCount: String,
     onGoingAmountCount: String,
+    coinTransactions: Object,
 })
+
+const currentYear = new Date().getFullYear();
 
 const enabled = ref(false);
 
@@ -41,11 +44,11 @@ const updateStatus = async (planId, newStatus) => {
         <template #header>
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <h2 class="text-2xl font-semibold leading-tight">
-                    XLC Setting
+                    XL Coin Setting
                 </h2>
             </div>
             <p class="text-base font-normal dark:text-gray-400">
-                View and modify ongoing XLC schemes provided to your members.
+                View and modify ongoing XL Coin schemes provided to your members.
             </p>
         </template>
 
@@ -54,7 +57,7 @@ const updateStatus = async (planId, newStatus) => {
                 <div class="px-5 py-2.5 flex items-center rounded-[10px] dark:bg-gray-700">
                     <div class="grid gap-2">
                         <div class="text-xs font-medium dark:text-gray-400">
-                            Current XLC Coin Price (today)
+                            Current XL Coin Price (today)
                         </div>
                         <div class="text-xl font-semibold">
                             MYR 
@@ -93,7 +96,9 @@ const updateStatus = async (planId, newStatus) => {
                 </div>
             </div>
             <div class="pt-5 md:pt-0 col-span-3">
-                <XLCCoinChart />
+                <XLCCoinChart 
+                    :currentYear="currentYear"
+                />
             </div>
         </div>
 

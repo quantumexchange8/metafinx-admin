@@ -7,6 +7,7 @@ use App\Http\Controllers\IpoSchemeController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\XlcController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -28,9 +29,9 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/xlc_setting', function () {
-        return Inertia::render('XLCSetting/XLCSetting');
-    });
+    // Route::get('/xlc_setting', function () {
+    //     return Inertia::render('XLCSetting/XLCSetting');
+    // });
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/getTotalMembers', [DashboardController::class, 'getTotalMembers'])->name('getTotalMembers');
@@ -88,6 +89,19 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/addInvestmentPlan', [IpoSchemeController::class, 'addInvestmentPlan'])->name('ipo_scheme_setting.addInvestmentPlan');
         Route::post('/editInvestmentPlan', [IpoSchemeController::class, 'editInvestmentPlan'])->name('ipo_scheme_setting.editInvestmentPlan');
     });
+
+    /**
+     * ==============================
+     *       XLC Setting
+     * ==============================
+     */
+     Route::prefix('xlc_setting')->group(function () {
+        Route::get('/xlc_setting', [XlcController::class, 'xlc_setting'])->name('xlc.setting');
+        Route::get('/getCoinPaymentDetails', [XlcController::class, 'getCoinPaymentDetails'])->name('xlc.getCoinPaymentDetails');
+        Route::get('/getTotalXlCoinByDays', [XlcController::class, 'getTotalXlCoinByDays'])->name('xlc.getTotalXlCoinByDays');
+        Route::get('/getTotalXlCoinByMonth', [XlcController::class, 'getTotalXlCoinByMonth'])->name('xlc.getTotalXlCoinByMonth');
+
+     });
 
     /**
      * ==============================
