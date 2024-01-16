@@ -175,6 +175,7 @@ class IpoSchemeController extends Controller
             'investment_min_amount' => $request->investment_min_amount,
             'roi_per_annum' => $request->roi_per_annum,
             'investment_period' => $request->investment_period,
+            'type' => $request->plan_type,
         ]);
 
         $descriptionItems = $request->descriptions;

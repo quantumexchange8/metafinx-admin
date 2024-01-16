@@ -4,7 +4,16 @@ import {AddIcon, DeleteIcon, checkIcon} from "@/Components/Icons/outline.jsx"
 import {PlusIcon} from "@heroicons/vue/outline"
 import {ref, watch} from "vue";
 import Modal from "@/Components/Modal.vue";
-import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
+import {Tab, 
+        TabGroup, 
+        TabList, 
+        TabPanel, 
+        TabPanels, 
+        RadioGroup, 
+        RadioGroupLabel, 
+        RadioGroupDescription, 
+        RadioGroupOption, 
+} from "@headlessui/vue";
 import InputError from "@/Components/InputError.vue";
 import {useForm} from "@inertiajs/vue3";
 import Label from "@/Components/Label.vue";
@@ -32,11 +41,24 @@ const planNameCn = ref('');
 const planNameTw = ref('');
 const roiPercentage = ref('0');
 
+
+const plans = [
+  {
+    name: 'Standard'
+  },
+  {
+    name: 'EBMI'
+  }
+]
+
+const plan_type = ref(plans[0])
+
 const form = useForm({
     plan_name: {},
     investment_min_amount: '',
     roi_per_annum: '',
     investment_period: '',
+    plan_type: '',
     descriptions: [
         {'en': '', 'cn': '', 'tw': ''}
     ],
@@ -400,6 +422,67 @@ const removeDescription = (index) => {
                         <InputError :message="form.errors.investment_period" class="mt-2" />
                     </div>
                 </div>
+                <RadioGroup v-model="form.plan_type" class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                    <RadioGroupLabel class="text-sm dark:text-white md:w-1/4">Plan Type</RadioGroupLabel>
+                    <div class="flex flex-row w-full gap-4">
+                        <RadioGroupOption
+                            as="template"
+                            v-for="plan in plans"
+                            :key="plan.name"
+                            :value="plan"
+                            v-slot="{ active, checked }"
+                            class="w-full h-10"
+                        >
+                            <div
+                            :class="[
+                                active
+                                ? 'focus:border-pink-700 focus:ring focus:ring-pink-500'
+                                : '',
+                                checked ? 'bg-gray-600 dark:text-white ' : 'bg-gray-700',
+                            ]"
+                            class="relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none"
+                            >
+                            <div class="flex w-full items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="text-sm">
+                                        <RadioGroupLabel
+                                        as="p"
+                                        :class="checked ? 'text-white' : 'dark:text-white'"
+                                        class="font-medium"
+                                        >
+                                            {{ plan.name }}
+                                        </RadioGroupLabel>
+                                        <RadioGroupDescription
+                                        as="span"
+                                        :class="checked ? 'dark:text-white' : 'dark:text-white'"
+                                        class="inline"
+                                        >
+                                        </RadioGroupDescription>
+                                    </div>
+                                </div>
+                                <div v-show="checked" class="shrink-0 text-white ">
+                                    <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none">
+                                        <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="12"
+                                        fill=""
+                                        fill-opacity="0.2"
+                                        />
+                                        <path
+                                        d="M7 13l3 3 7-7"
+                                        stroke="#039855"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+                            </div>
+                        </RadioGroupOption>
+                    </div>
+                </RadioGroup>
             </div>
 
             <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">

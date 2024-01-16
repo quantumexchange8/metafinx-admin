@@ -21,6 +21,7 @@ class InvestmentPlan extends Model
         'investment_period',
         'roi_per_annum',
         'status',
+        'type',
     ];
 
     public function getActivitylogOptions(): LogOptions
