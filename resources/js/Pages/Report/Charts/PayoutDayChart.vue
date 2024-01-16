@@ -38,7 +38,7 @@ const fetchData = async () => {
             [
                 'rgba(50, 173, 230, 0.40)',
                 'rgba(50, 173, 230, 0.00)',
-                'Monthly_Return',
+                'monthly_return',
                 'Monthly Return'
             ],
             [

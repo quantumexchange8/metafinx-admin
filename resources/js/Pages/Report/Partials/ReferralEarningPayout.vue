@@ -26,6 +26,7 @@ const formatter = ref({
     month: 'MM'
 });
 const referrals = ref({data: []});
+const totalAmount = ref(0);
 const currentPage = ref(1);
 const refreshReferral = ref(props.refresh);
 const isLoading = ref(props.isLoading);
@@ -58,6 +59,7 @@ const getResults = async (page = 1, search = '', type= '', date = '') => {
 
         const response = await axios.get(url);
         referrals.value = response.data.results;
+        totalAmount.value = response.data.totalAmount;
         // console.log(response.data.referralEarning);
     } catch (error) {
         console.error(error);
@@ -189,6 +191,11 @@ const paginationActiveClass = [
                 <span class="flex gap-2">Next <ArrowRightIcon class="w-5 h-5" /></span>
             </template>
         </TailwindPagination>
+    </div>
+    <div class="flex items-center">
+        <div class="text-xl font-semibold">
+            Total Amount: ${{ formatAmount(totalAmount) }}
+        </div>
     </div>
     
 </template>

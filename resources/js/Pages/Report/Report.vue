@@ -10,7 +10,8 @@ import {CloudDownloadIcon} from "@/Components/Icons/outline.jsx";
 
 const props = defineProps({
     report: Object,
-    
+    totatMonthlyReturn: String,
+    totalReferralEarning: String,
 })
 
 const { formatAmount, formatDateTime } = transactionFormat();
@@ -38,7 +39,7 @@ const payoutStats = ref([
     {
         key: 'Monthly_Return',
         label: 'Total Monthly Return Payout',
-        value: '$ ' + formatAmount(monthlyPayout.value),
+        value: '$ ' + formatAmount(props.totatMonthlyReturn),
     },
     // {
     //     key: 'Quarterly_Dividend',
@@ -48,7 +49,7 @@ const payoutStats = ref([
     {
         key: 'referral_earnings',
         label: 'Total Referral Earning Payout',
-        value: '$ ' + formatAmount(referralEarning.value),
+        value: '$ ' + formatAmount(props.totalReferralEarning),
     },
     {
         key: 'Affiliate_Earning',
@@ -60,6 +61,11 @@ const payoutStats = ref([
         label: 'Total Dividend Earning Payout',
         value: '$ ' + formatAmount(dividendEarning.value),
     },
+    // {
+    //     key: 'Pairing Bonus',
+    //     label: 'Total Pairing Bonus',
+    //     value: '$ ' + formatAmount(dividendEarning.value),
+    // },
     // {
     //     key: 'Ticket_Bonus',
     //     label: 'Total Ticket Bonus Payout',
@@ -161,15 +167,17 @@ const activePayoutLabel = computed(() => {
                 <div
                     v-for="payoutStat in payoutStats"
                     :key="payoutStat.key"
-                    class="px-5 py-3 rounded-xl flex flex-col overflow-hidden bg-white shadow-md dark:hover:bg-gray-600 cursor-pointer"
+                    class="px-5 py-3 rounded-xl flex flex-col justify-center overflow-hidden bg-white shadow-md dark:hover:bg-gray-600 cursor-pointer"
                     :class="isActivePayout(payoutStat.key)"
                     @click="selectPayout(payoutStat.key)"
                 >
-                    <div class="text-xs dark:text-gray-400">
-                        {{ payoutStat.label }}
-                    </div>
-                    <div class="text-xl font-semibold">
-                        {{ payoutStat.value }}
+                    <div class="grid">
+                        <div class="text-xs dark:text-gray-400">
+                            {{ payoutStat.label }}
+                        </div>
+                        <div class="text-xl font-semibold">
+                            {{ payoutStat.value }}
+                        </div>
                     </div>
                 </div>
             </div>

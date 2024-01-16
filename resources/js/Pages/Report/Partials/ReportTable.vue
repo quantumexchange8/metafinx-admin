@@ -91,7 +91,7 @@ watch(
             @update:refresh="refresh = $event"
             @update:export="$emit('update:export', $event)"
         />
-        <QuarterlyDividendPayout
+        <!-- <QuarterlyDividendPayout
             v-if="activePayout==='Quarterly_Dividend'"
             :refresh="refresh"
             :isLoading="isLoading"
@@ -102,7 +102,7 @@ watch(
             @update:loading="isLoading = $event"
             @update:refresh="refresh = $event"
             @update:export="$emit('update:export', $event)"
-        />
+        /> -->
         <ReferralEarningPayout
             v-if="activePayout==='referral_earnings'"
             :refresh="refresh"
@@ -139,7 +139,7 @@ watch(
             @update:refresh="refresh = $event"
             @update:export="$emit('update:export', $event)"
         />
-        <TicketBonusPayout
+        <!-- <TicketBonusPayout
             v-if="activePayout==='Ticket_Bonus'"
             :refresh="refresh"
             :isLoading="isLoading"
@@ -150,7 +150,7 @@ watch(
             @update:loading="isLoading = $event"
             @update:refresh="refresh = $event"
             @update:export="$emit('update:export', $event)"
-        />
+        /> -->
     </div>
 
 </template>
