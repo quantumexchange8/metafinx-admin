@@ -90,7 +90,7 @@ class DashboardController extends Controller
             'datasets' => [],
         ];
 
-        $backgroundColors = [1 => '#FFB2AB', 2 => '#FF2D55', 3 => '#FEC84B', 4 => '#F79009'];
+        $backgroundColors = [1 => '#FFB2AB', 2 => '#FF2D55', 3 => '#FEC84B', 4 => '#F79009', 5 => '#FFB2AB'];
 
         // Loop through each unique setting_rank_id and create a dataset
         foreach ($uniqueSettingRankIds as $settingRankId) {

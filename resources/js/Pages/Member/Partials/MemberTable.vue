@@ -16,6 +16,7 @@ const props = defineProps({
     refresh: Boolean,
     isLoading: Boolean,
     kycStatus: String,
+    exportStatus: Boolean,
 })
 const formatter = ref({
     date: 'YYYY-MM-DD',
@@ -35,7 +36,7 @@ watch(
     }, 300)
 );
 
-const getResults = async (page = 1, search = '', rank = '', date = '', type = props.kycStatus) => {
+const getResults = async (page = 1, search = props.search , rank = props.rank, date = props.date, type = props.kycStatus) => {
     isLoading.value = true
     try {
         let url = `/member/getMemberDetails?page=${page}`;
@@ -84,6 +85,29 @@ watch(() => props.refresh, (newVal) => {
         emit('update:refresh', false);
     }
 });
+
+// watch(() => props.exportStatus, (newVal) => {
+//     refreshDeposit.value = newVal;
+//     if(newVal) {
+
+//         let url = `/member/getMemberDetails?exportStatus=yes`;
+
+//             if (props.date) {
+//                 url += `&date=${props.date}`;
+//             }
+
+//             if (props.search) {
+//                 url += `&search=${props.search}`;
+//             }
+
+//             if (props.filter) {
+//                 url += `&filter=${props.filter}`;
+//             }
+
+//             window.location.href = url;
+//             emit('update:export', false);
+//     }
+// })
 
 watchEffect(() => {
     if (usePage().props.title !== null) {

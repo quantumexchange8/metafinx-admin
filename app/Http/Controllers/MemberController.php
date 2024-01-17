@@ -31,6 +31,9 @@ use App\Http\Requests\WalletAdjustmentRequest;
 use App\Models\AssetAdjustment;
 use App\Notifications\KycApprovalNotification;
 use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\MemberListingExport;
+use App\Exports\MemberListingTypeExport;
 
 class MemberController extends Controller
 {
@@ -99,6 +102,14 @@ class MemberController extends Controller
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
+        
+        // if ($request->has('exportStatus')) {
+        //     if($request->type != null){
+        //         return Excel::download(new MemberListingTypeExport($members), Carbon::now() . '-' . $request->type . '-report.xlsx');
+        //     } else {
+        //         return Excel::download(new MemberListingExport($members), Carbon::now() . '-' . '-report.xlsx');
+        //     }
+        // }
 
         $members->each(function ($user) {
             $user->profile_photo_url = $user->getFirstMediaUrl('profile_photo');
@@ -107,6 +118,8 @@ class MemberController extends Controller
             $user->kyc_upload_date = $user->getMedia('back_identity')->first()->created_at ?? null;
             $user->active_investment_amount = $this->getActiveSubscriptionAmount($user);
         });
+        
+        
 
         return response()->json($members);
     }
@@ -224,6 +237,7 @@ class MemberController extends Controller
     public function viewMemberDetails($id)
     {
         $user = User::with('media')->find($id);
+        
 
         $upline = User::with('media')
         ->where('id', $user->upline_id)

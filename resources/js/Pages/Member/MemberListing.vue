@@ -26,15 +26,13 @@ const type = ref('');
 const rank = ref('');
 const isLoading = ref(false);
 const refresh = ref(false);
+const exportStatus = ref(false)
 const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
 });
 
 function refreshTable() {
-    search.value = '';
-    date.value = '';
-    rank.value = '';
     isLoading.value = !isLoading.value;
     refresh.value = true;
 }
@@ -70,6 +68,18 @@ onMounted(() => {
         selectedTab.value = 1;
     }
 });
+
+const clearFilters = () => {
+    search.value = '';
+    date.value = '';
+    rank.value = '';
+    isLoading.value = true;
+    refresh.value = true;
+};
+
+const exportMember = () => {
+    exportStatus.value = true;
+}
 </script>
 
 <template>
@@ -84,11 +94,34 @@ onMounted(() => {
                         Track and manage all your members accounts here
                     </p>
                 </div>
-                <Action
-                    type="add_member"
-                    :settingRanks="settingRanks"
-                    :countries="countries"
-                />
+                <div class="flex flex-row gap-3">
+                    <div>
+                        <Action
+                            type="add_member"
+                            :settingRanks="settingRanks"
+                            :countries="countries"
+                        />
+                    </div>
+                    <div>
+                        <Button
+                            type="button"
+                            class="justify-center w-full gap-2 border border-gray-600 text-white text-sm dark:hover:bg-gray-600"
+                            variant="transparent"
+                            v-slot="{ iconSizeClasses }"
+                            @click="exportMember"
+                        >
+                        <!-- @click="exportTransaction" -->
+                            <div class="inline-flex items-center">
+                                <CloudDownloadIcon
+                                    aria-hidden="true"
+                                    class="mr-2 w-5 h-5"
+                                />
+                                <span>Export as Excel</span>
+                            </div>
+                        </Button>
+                    </div>
+                </div>
+                
             </div>
         </template>
 
@@ -103,35 +136,47 @@ onMounted(() => {
                 />
             </div>
 
-            <div class="mt-5 grid grid-cols-5 md:grid-cols-7 gap-3">
-                <div class="w-full col-span-5 md:col-span-2">
-                    <InputIconWrapper class="md:col-span-2">
-                        <template #icon>
-                            <SearchIcon aria-hidden="true" class="w-5 h-5" />
-                        </template>
-                        <Input withIcon id="search" type="text" class="block w-full border border-transparent" placeholder="Search" v-model="search" />
-                    </InputIconWrapper>
+            <div class="mt-5 flex flex-row items-center justify-between gap-3">
+                <div class="flex flex-row items-center gap-3">
+                    <div class="w-full lg:w-[280px]">
+                        <InputIconWrapper class="md:col-span-2">
+                            <template #icon>
+                                <SearchIcon aria-hidden="true" class="w-5 h-5" />
+                            </template>
+                            <Input withIcon id="search" type="text" class="block w-full border border-transparent" placeholder="Search" v-model="search" />
+                        </InputIconWrapper>
+                    </div>
+                    <div class="w-full md:w-[240px]">
+                        <vue-tailwind-datepicker
+                            placeholder="Select dates"
+                            :formatter="formatter"
+                            separator=" - "
+                            v-model="date"
+                            input-classes="py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+                        />
+                    </div>
+                    <div class="w-full md:w-[240px]">
+                        <BaseListbox
+                            id="rankID"
+                            class="w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600"
+                            v-model="rank"
+                            :options="rankList"
+                            placeholder="Filter rank"
+                        />
+                    </div>
                 </div>
-                <div class="w-full col-span-3 md:col-span-1">
-                    <vue-tailwind-datepicker
-                        placeholder="Select dates"
-                        :formatter="formatter"
-                        separator=" - "
-                        v-model="date"
-                        input-classes="py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-                    />
-                </div>
-                <div class="w-full col-span-2 md:col-span-1">
-                    <BaseListbox
-                        id="rankID"
-                        class="w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600"
-                        v-model="rank"
-                        :options="rankList"
-                        placeholder="Filter rank"
-                    />
+                <div>
+                    <Button
+                        type="button"
+                        class="w-full md:w-auto flex items-center justify-center px-3 py-2 border border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+                        variant="transparent"
+                        @click="clearFilters"
+                    >
+                        Clear
+                    </Button>
                 </div>
 
-<!--                <div class="flex justify-end">-->
+               <!-- <div class="flex justify-end">-->
 <!--                    <Button-->
 <!--                        type="button"-->
 <!--                        class="justify-center w-full md:w-1/2 gap-2 border border-gray-600 text-white text-sm dark:hover:bg-gray-600"-->
@@ -140,7 +185,7 @@ onMounted(() => {
 <!--                        <CloudDownloadIcon aria-hidden="true" class="w-5 h-5" />-->
 <!--                        <span>Export as Excel</span>-->
 <!--                    </Button>-->
-<!--                </div>-->
+<!--                </div> -->
             </div>
 
             <div class="flex gap-4 mt-5">
@@ -181,8 +226,10 @@ onMounted(() => {
                                 :date="date"
                                 :rank="rank"
                                 :kycStatus=kycStatus.value
+                                :exportStatus="exportStatus"
                                 @update:loading="isLoading = $event"
                                 @update:refresh="refresh = $event"
+                                @update:export="$emit('update:export', $event)"
                             />
                         </TabPanel>
                     </TabPanels>
