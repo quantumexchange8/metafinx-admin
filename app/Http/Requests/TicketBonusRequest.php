@@ -9,7 +9,7 @@ class TicketBonusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'numeric', 'min:0'],
+            'value' => ['required', 'numeric', 'min:0'],
         ];
     }
 
@@ -20,8 +20,16 @@ class TicketBonusRequest extends FormRequest
 
     public function attributes(): array
     {
+        $value = '';
+
+        if ($this->slug === 'withdrawal-fee') {
+            $value = 'Withdrawal Fee';
+        } elseif ($this->slug === 'gas-fee') {
+            $value = 'Gas Fee';
+        }
+
         return [
-            'amount' => 'Withdrawal Fee',
+            'value' => $value,
         ];
     }
 }

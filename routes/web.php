@@ -134,9 +134,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         //Dividend Bonus
         Route::post('/addDividendBonus', [ConfigurationController::class, 'addDividendBonus'])->name('configuration.addDividendBonus');
         Route::get('/getDividendBonus', [ConfigurationController::class, 'getDividendBonus'])->name('configuration.getDividendBonus');
-        //Withdrawal Fee
-        Route::post('/editWithdrawalFee', [ConfigurationController::class, 'editWithdrawalFee'])->name('configuration.editWithdrawalFee');
-        Route::get('/getWithdrawalFee', [ConfigurationController::class, 'getWithdrawalFee'])->name('configuration.getWithdrawalFee');
+        //Master Setting
+        Route::post('/editMasterSetting', [ConfigurationController::class, 'editMasterSetting'])->name('configuration.editMasterSetting');
+        Route::get('/getMasterSetting', [ConfigurationController::class, 'getMasterSetting'])->name('configuration.getMasterSetting');
         //Affiliate Setting
         Route::get('/getSettingRank', [ConfigurationController::class, 'getSettingRank'])->name('configuration.getSettingRank');
         Route::post('/affiliateSetting', [ConfigurationController::class, 'affiliateSetting'])->name('configuration.affiliateSetting');

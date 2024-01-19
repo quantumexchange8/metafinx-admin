@@ -7,18 +7,19 @@ import DividendBonus from "@/Pages/Configuration/DividendBonus/DividendBonus.vue
 import WithdrawalFee from "@/Pages/Configuration/WithdrawalFee/WithdrawalFee.vue";
 import AffiliateForm from "@/Pages/Configuration/AffiliateSetting/AffliateForm.vue";
 import CoinSetting from "@/Pages/Configuration/CoinSetting/CoinSetting.vue";
+import MasterSetting from "@/Pages/Configuration/MasterSetting/MasterSetting.vue";
 
 const props = defineProps({
     users: Array,
     settingRanks: Object,
-    withdrawalFee: Object,
     settingCoin: Object,
     totalCoinSupply: Number,
     conversionRate: Object,
     coinMarketTime: Object,
+    masterSetting: Object,
 })
 
-const content = ref('CoinSetting');
+const content = ref('Announcement');
 
 const updateContent = (newContent) => {
     content.value = newContent;
@@ -87,9 +88,9 @@ const updateContent = (newContent) => {
                 v-if="content==='AffiliateSetting'"
                 :settingRanks="settingRanks"
             />
-            <WithdrawalFee
-                v-if="content==='WithdrawalFee'"
-                :withdrawalFee="withdrawalFee"
+            <MasterSetting
+                v-if="content==='MasterSetting'"
+                :masterSetting="masterSetting"
             />
             <CoinSetting
                 v-if="content==='CoinSetting'"

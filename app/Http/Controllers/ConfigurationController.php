@@ -2,35 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AnnouncementRequest;
+use App\Models\Coin;
+use App\Models\User;
+use Inertia\Inertia;
+use App\Models\Setting;
+use App\Models\CoinPrice;
+use App\Models\SettingCoin;
+use App\Models\SettingRank;
+use App\Models\Announcement;
+use App\Models\SettingBonus;
+use Illuminate\Http\Request;
+use App\Models\CoinMarketTime;
+use App\Models\ConversionRate;
+use App\Models\SettingEarning;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Models\SettingWithdrawalFee;
 use App\Http\Requests\CoinPriceRequest;
-use App\Http\Requests\DividendBonusRequest;
+use App\Models\SettingAffiliateEarning;
 use App\Http\Requests\MarketTimeRequest;
 use App\Http\Requests\TicketBonusRequest;
-use App\Models\Announcement;
-use App\Models\Coin;
-use App\Models\CoinMarketTime;
-use App\Models\CoinPrice;
-use App\Models\ConversionRate;
-use App\Models\SettingAffiliateEarning;
-use App\Models\SettingCoin;
-use App\Models\SettingEarning;
-use App\Models\SettingRank;
-use App\Models\SettingWithdrawalFee;
-use App\Models\User;
-use App\Models\SettingBonus;
-use App\Notifications\AnnouncementNotification;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use App\Http\Requests\AnnouncementRequest;
+use App\Http\Requests\DividendBonusRequest;
 use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
+use App\Notifications\AnnouncementNotification;
 
 class ConfigurationController extends Controller
 {
     public function index()
     {
         $coin_market_time = CoinMarketTime::latest()->first();
-
+        $masterSettings = Setting::select('name', 'value', 'slug')
+        ->whereIn('id', function ($query) {
+            $query->select(DB::raw('MAX(id)'))
+                ->from('settings')
+                ->groupBy('name', 'slug');
+        })
+        ->get(); 
+                            
         // Check if $coin_market_time is not null to avoid errors
         if ($coin_market_time) {
             $openTime = Carbon::parse($coin_market_time->open_time);
@@ -49,11 +58,11 @@ class ConfigurationController extends Controller
 
         return Inertia::render('Configuration/Configuration', [
             'settingRanks' => SettingRank::select('id', 'name')->get(),
-            'withdrawalFee' => SettingWithdrawalFee::latest()->first(),
             'settingCoin' => SettingCoin::latest()->first(),
             'totalCoinSupply' => Coin::sum('unit'),
             'conversionRate' => ConversionRate::latest()->first(),
             'coinMarketTime' => $coin_market_time,
+            'masterSetting' => $masterSettings,
         ]);
     }
 
@@ -166,16 +175,29 @@ class ConfigurationController extends Controller
         return redirect()->back()->with('title', 'Dividend Bonus')->with('success', 'A dividend bonus of $ ' . $request->amount . ' will be released on ' . $request->date . '.');
     }
 
-    public function editWithdrawalFee(TicketBonusRequest $request)
+    public function editMasterSetting(TicketBonusRequest $request)
     {
-        SettingWithdrawalFee::create([
-            'amount' => $request->amount,
+        $symbol = '';
+    
+        if ($request->slug == 'withdrawal-fee') {
+            $symbol = '$ ';
+        } elseif ($request->slug == 'gas-fee') {
+            $symbol = '% ';
+        }
+
+        Setting::create([
+            'name' => $request->name,
+            'slug' => $request->slug,
+            'value' => $request->value,
             'updated_by' => \Auth::id(),
         ]);
-
-        return redirect()->back()->with('title', 'Withdrawal Fee')->with('success', 'Withdrawal fee of $ ' . $request->amount . ' has been updated successfully.');
+    
+        return redirect()
+            ->back()
+            ->with('title', $request->name)
+            ->with('success', $request->name . $symbol . $request->value . ' has been updated successfully.');
     }
-
+    
     public function getDividendBonus(Request $request)
     {
         $dividends = SettingBonus::query()
@@ -202,17 +224,15 @@ class ConfigurationController extends Controller
         return response()->json($dividends);
     }
 
-    public function getWithdrawalFee(Request $request)
+    public function getMasterSetting(Request $request)
     {
-        $tickets = SettingWithdrawalFee::query()
+        $settings = Setting::query()
             ->with('user:id,name')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->input('search');
-                $query->where(function ($subQuery) use ($search) {
-                    $subQuery->whereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('name', 'like', '%' . $search . '%');
-                    });
-                });
+                $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('slug', 'like', '%' . $search . '%')
+                ->orWhere('value', 'like', '%' . $search . '%');
             })
             ->when($request->filled('date'), function ($query) use ($request) {
                 $date = $request->input('date');
@@ -224,8 +244,9 @@ class ConfigurationController extends Controller
             ->latest()
             ->paginate(10);
 
-        return response()->json($tickets);
+        return response()->json($settings);
     }
+
 
     public function getSettingRank(Request $request)
     {

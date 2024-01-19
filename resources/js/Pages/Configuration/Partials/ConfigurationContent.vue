@@ -64,9 +64,9 @@ const updateContent = (newContent) => {
 
         <ConfigurationLink
             class="flex-col md:flex-row"
-            title="Withdrawal Fee"
-            @click="updateContent('WithdrawalFee')"
-            :active="props.content==='WithdrawalFee'"
+            title="Master Setting"
+            @click="updateContent('MasterSetting')"
+            :active="props.content==='MasterSetting'"
         >
             <template #icon>
                 <TicketBonusIcon
