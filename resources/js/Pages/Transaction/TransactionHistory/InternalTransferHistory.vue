@@ -35,7 +35,7 @@ watch(
 const getResults = async (page = 1, search = '', date = '') => {
     transferLoading.value = true
     try {
-        let url = `/transaction/getBalanceHistory/InternalTransfer?page=${page}`;
+        let url = `/transaction/getTransactionHistory/InternalTransfer?page=${page}`;
 
         if (search) {
             url += `&search=${search}`;
@@ -125,16 +125,22 @@ const closeModal = () => {
                     Name
                 </th>
                 <th scope="col" class="py-2">
+                    Transfer From
+                </th>
+                 <th scope="col" class="py-2">
                     Transfer To
                 </th>
                 <th scope="col" class="py-2">
                     Transfer Amount
                 </th>
-                <th scope="col" class="py-2">
-                    Current Balance
-                </th>
-                <th scope="col" class="py-2">
+                <!-- <th scope="col" class="py-2">
+                    Balance
+                </th> -->
+                <!-- <th scope="col" class="py-2">
                     Remark
+                </th> -->
+                <th scope="col" class="py-2 text-center">
+                    Status
                 </th>
             </tr>
             </thead>
@@ -166,26 +172,20 @@ const closeModal = () => {
                     </div>
                 </td>
                 <td class="py-2">
-                    <div class="inline-flex items-center gap-2">
-                        <img :src="transfer.to_user.profile_photo_url ? transfer.to_user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        <div class="flex flex-col">
-                            <div>
-                                {{ transfer.to_user.name }}
-                            </div>
-                            <div class="dark:text-gray-400">
-                                {{ transfer.to_user.email }}
-                            </div>
-                        </div>
-                    </div>
+                    {{ transfer.from_wallet.name }}
                 </td>
                 <td class="py-2">
-                    $ {{ formatAmount(transfer.amount) }}
+                    {{ transfer.to_wallet.name }}
                 </td>
                 <td class="py-2">
-                    $ {{ formatAmount(transfer.new_balance) }}
+                   $ {{ formatAmount(transfer.transaction_amount) }}
                 </td>
-                <td class="py-2">
-                    {{ transfer.description }}
+                <!-- <td class="py-2">
+                    {{ transfer.remarks }}
+                </td> -->
+                <td v-if="transfer.status == 'Success'" class="py-2 text-center">
+                    <span v-if="transfer.status === 'Success'" class="flex w-2 h-2 bg-green-500 dark:bg-green-500 mx-auto rounded-full"></span>
+                    <span v-else class="flex w-2 h-2 bg-green-500 dark:bg-error-500 mx-auto rounded-full"></span>
                 </td>
             </tr>
             </tbody>
@@ -222,20 +222,28 @@ const closeModal = () => {
             <span class="col-span-2 text-black dark:text-white py-2">{{ formatDateTime(transferDetail.created_at) }}</span>
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction ID</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ transferDetail.transaction_number }}</span>
+        </div>
+        <div class="grid grid-cols-3 items-center gap-2">
+            <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transfer From</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ transferDetail.from_wallet.name }}</span>
+        </div>
+        <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transfer To</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ transferDetail.to_user.name }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ transferDetail.to_wallet.name }}</span>
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transfer Amount</span>
             <span class="col-span-2 text-black dark:text-white py-2">$ {{ formatAmount(transferDetail.amount) }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center gap-2">
+        <!-- <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Current Balance</span>
             <span class="col-span-2 text-black dark:text-white py-2">$ {{ formatAmount(transferDetail.new_balance) }}</span>
-        </div>
-        <div class="grid grid-cols-3 items-center gap-2">
+        </div> -->
+        <!-- <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Remark</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ transferDetail.description }}</span>
-        </div>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ transferDetail.remarks }}</span>
+        </div> -->
     </Modal>
 </template>

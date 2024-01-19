@@ -11,10 +11,13 @@ use App\Exports\DepositExport;
 use App\Models\CoinAdjustment;
 use App\Models\AssetAdjustment;
 use App\Exports\WithdrawalExport;
+use App\Exports\InternalTransferExport;
 use App\Models\BalanceAdjustment;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AdjustmentExport;
+use Illuminate\Support\Facades\App;
 
 class TransactionController extends Controller
 {
@@ -25,17 +28,21 @@ class TransactionController extends Controller
 
     public function getPendingTransaction(Request $request, $type)
     {
-        $query = Payment::query()->with(['user', 'wallet'])
-            ->where('type', $type)
+        $query = Transaction::query()->with(['user:id,name,email', 'from_wallet:id,name,type', 'to_wallet:id,name,type'])
+            ->where('transaction_type', $type)
             ->where('status', 'Processing');
 
         if ($request->filled('search')) {
             $search = '%' . $request->input('search') . '%';
             $query->where(function ($q) use ($search) {
-                $q->whereHas('wallet', function ($wallet_query) use ($search) {
-                    $wallet_query->where('name', 'like', $search);
+                // $q->whereHas('wallet', function ($wallet_query) use ($search) {
+                //     $wallet_query->where('name', 'like', $search);
+                // })
+                $q->whereHas('user', function ($user) use ($search) {
+                    $user->where('name', 'like', $search)
+                         ->orWhere('email', 'like', $search);
                 })
-                    ->orWhere('transaction_id', 'like', $search)
+                    ->orWhere('transaction_number', 'like', $search)
                     ->orWhere('amount', 'like', $search);
             });
         }
@@ -72,33 +79,37 @@ class TransactionController extends Controller
         $type = $request->type;
 
         if ($type == 'approve_selected') {
-            $payments = Payment::whereIn('id', $request->id)->get();
+            $transactions = Transaction::whereIn('id', $request->id)->get();
 
-            foreach ($payments as $payment) {
-                $payment->update([
+            foreach ($transactions as $transaction) {
+                $transaction->update([
                     'status' => 'Success'
                 ]);
 
-                $this->updateTransaction($payment);
+                if (App::environment('production')) {
+                    $this->updateTransaction($transaction);
+                }
 
-                if ($payment->type == 'Deposit') {
-                    $wallet = Wallet::find($payment->wallet_id);
-                    $wallet->balance += $payment->amount;
+                $this->updateTransaction($transaction);
+
+                if ($transaction->type == 'Deposit') {
+                    $wallet = Wallet::find($transaction->from_wallet_id);
+                    $wallet->balance += $transaction->amount;
                     $wallet->save();
                 }
             }
         } else {
-            $payment = Payment::find($request->id);
+            $transaction = Transaction::find($request->id);
 
-            $payment->update([
+            $transaction->update([
                 'status' => 'Success'
             ]);
 
-            $this->updateTransaction($payment);
+            $this->updateTransaction($transaction);
 
-            if ($payment->type == 'Deposit') {
-                $wallet = Wallet::find($payment->wallet_id);
-                $wallet->balance += $payment->amount;
+            if ($transaction->type == 'Deposit') {
+                $wallet = Wallet::find($transaction->from_wallet_id);
+                $wallet->balance += $transaction->amount;
                 $wallet->save();
             }
         }
@@ -111,40 +122,44 @@ class TransactionController extends Controller
         $type = $request->type;
 
         if ($type == 'reject_selected') {
-            $payments = Payment::whereIn('id', $request->id)->get();
+            $transactions = Transaction::whereIn('id', $request->id)->get();
 
-            foreach ($payments as $payment) {
+            foreach ($transactions as $transaction) {
 
-                if ($payment->status == 'Processing') {
-                    $payment->update([
+                if ($transaction->status == 'Processing') {
+                    $transaction->update([
                         'status' => 'Rejected',
-                        'remarks' => 'MULTIPLE Reject - ID ' . $payment->transaction_id
+                        'remarks' => 'MULTIPLE Reject by admin - ID ' . $transaction->transaction_number
                     ]);
 
-                    $this->updateTransaction($payment);
+                    if (App::environment('production')) {
+                        $this->updateTransaction($transaction);
+                    }
 
-                    if ($payment->type == 'Withdrawal') {
-                        $wallet = Wallet::find($payment->wallet_id);
+                    if ($transaction->type == 'Withdrawal') {
+                        $wallet = Wallet::find($transaction->from_wallet_id);
 
-                        $wallet->balance += $payment->amount;
+                        $wallet->balance += $transaction->amount;
                         $wallet->save();
                     }
                 }
             }
         } else {
-            $payment = Payment::find($request->id);
+            $transaction = Transaction::find($request->id);
 
-            $payment->update([
+            $transaction->update([
                 'status' => 'Rejected',
                 'remarks'=> $request->remark
             ]);
 
-            $this->updateTransaction($payment);
+            if (App::environment('production')) {
+                $this->updateTransaction($transaction);
+            }
 
-            if ($payment->type == 'Withdrawal') {
-                $wallet = Wallet::find($payment->wallet_id);
+            if ($transaction->type == 'Withdrawal') {
+                $wallet = Wallet::find($transaction->from_wallet_id);
 
-                $wallet->balance += $payment->amount;
+                $wallet->balance += $transaction->amount;
                 $wallet->save();
             }
         }
@@ -154,17 +169,25 @@ class TransactionController extends Controller
 
     public function getTransactionHistory(Request $request, $type)
     {
-        $query = Payment::query()->with(['user', 'wallet'])
-            ->where('type', $type)
+        $query = Transaction::query()->with(['user:id,name,email', 'from_wallet:id,name,type', 'to_wallet:id,name,type'])
+            ->where('transaction_type', $type)
             ->whereNotIn('status', ['Processing', 'Pending']);
 
         if ($request->filled('search')) {
             $search = '%' . $request->input('search') . '%';
             $query->where(function ($q) use ($search) {
-                $q->whereHas('wallet', function ($wallet_query) use ($search) {
-                    $wallet_query->where('name', 'like', $search);
+                // $q->whereHas('from_wallet', function ($wallet_query) use ($search) {
+                //     $wallet_query->where('name', 'like', $search);
+                    
+                // })
+                // ->orWhereHas('to_wallet', function ($wallet_query) use ($search) {
+                //     $wallet_query->where('name', 'like', $search);
+                // })
+                $q->WhereHas('user', function ($user) use ($search) {
+                    $user->where('name', 'like', $search)
+                         ->orWhere('email', 'like', $search);
                 })
-                    ->orWhere('transaction_id', 'like', $search)
+                    ->orWhere('transaction_number', 'like', $search)
                     ->orWhere('amount', 'like', $search);
             });
         }
@@ -210,32 +233,47 @@ class TransactionController extends Controller
 
     public function getBalanceHistory(Request $request, $type)
     {
-        $search = $request->filled('search') ? '%' . $request->input('search') . '%' : null;
-        $dateRange = $request->filled('date') ? explode(' - ', $request->input('date')) : null;
+        // $search = $request->filled('search') ? '%' . $request->input('search') . '%' : null;
+        // $dateRange = $request->filled('date') ? explode(' - ', $request->input('date')) : null;
 
-        $query = AssetAdjustment::query()->with('user:id,name,email', 'wallet:id,name,type', 'setting_coin:id,name');
+        $query = Transaction::query()->with(
+            'user:id,name,email', 
+            'from_wallet:id,name,type', 'to_wallet:id,name,type',
+            'from_coin:id,setting_coin_id', 'to_coin:id,setting_coin_id'
+            )
+                ->whereIn('transaction_type', [$type, 'AssetAdjustment']);
+                // ->orWhere('transaction_type', 'AssetAdjustment');
 
-        if ($search) {
+        if ($request->filled('search')) {
+            $search = '%' . $request->input('search') . '%';
             $query->where(function ($query) use ($search) {
                 $query->whereHas('user', function ($userQuery) use ($search) {
-                    $userQuery->where('name', 'like', $search);
-                })->orWhere('new_amount', 'like', $search)
-                    ->orWhere('amount', 'like', $search)
-                    ->orWhere('description', 'like', $search);
+                    $userQuery->where('name', 'like', $search)
+                            ->orWhere('email', 'like', $search);
+                })
+                // ->orWhere('new_amount', 'like', $search)
+                //     ->orWhere('amount', 'like', $search)
+                //     ->orWhere('description', 'like', $search);
+                ->orWhere('transaction_number', 'like', $search)
+                ->orWhere('transaction_amount', 'like', $search);
             });
         }
 
-        if ($dateRange) {
-            $query->whereBetween('created_at', [
-                Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay(),
-                Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay()
-            ]);
+        if ($request->filled('date')) {
+            $date = $request->input('date');
+            $dateRange = explode(' - ', $date);
+            $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+            $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+
+            $query->whereBetween('created_at', [$start_date, $end_date]);
         }
 
         if ($request->has('exportStatus')) {
-            if ($type == 'WalletAdjustment' || 'AssettAdjustment') {
+            if ($type === 'WalletAdjustment' || $type === 'AssettAdjustment') {
                 return Excel::download(new AdjustmentExport($query,$type), Carbon::now() . '-' . 'Asset_and_Balance_History-report.xlsx');
-            } 
+            } elseif ($type == 'InternalTransfer') {
+                return Excel::download(new InternalTransferExport($query), Carbon::now() . '-' . $type . '_History-report.xlsx');
+            }
         }
 
         $results = $query->latest()->paginate(10);
@@ -250,7 +288,7 @@ class TransactionController extends Controller
     
     private function updateTransaction($rec)
     {
-        $hashedToken = md5($rec->transaction_id . $rec->to_wallet_address);
+        $hashedToken = md5($rec->transaction_number . $rec->to_wallet_address);
         $params = [
             "token" => $hashedToken,
             "transactionID" => $rec->transaction_id,

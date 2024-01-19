@@ -84,7 +84,7 @@ const updateTransactionType = (transaction_type) => {
                     Adjustment
                 </button>
             </Tab>
-            <!-- <Tab
+            <Tab
                 as="template"
                 v-slot="{ selected }"
             >
@@ -100,7 +100,7 @@ const updateTransactionType = (transaction_type) => {
                 >
                     Internal Transfer
                 </button>
-            </Tab> -->
+            </Tab>
         </TabList>
         <TabPanels>
             <TabPanel>
@@ -141,7 +141,7 @@ const updateTransactionType = (transaction_type) => {
                     @update:export="$emit('update:export', $event)"
                 />
             </TabPanel>
-            <!-- <TabPanel>
+            <TabPanel>
                 <InternalTransferHistory
                     :refresh="refresh"
                     :isLoading="isLoading"
@@ -152,7 +152,7 @@ const updateTransactionType = (transaction_type) => {
                     @update:refresh="$emit('update:refresh', $event)"
                     @update:export="$emit('update:export', $event)"
                 />
-            </TabPanel> -->
+            </TabPanel>
         </TabPanels>
     </TabGroup>
 </template>

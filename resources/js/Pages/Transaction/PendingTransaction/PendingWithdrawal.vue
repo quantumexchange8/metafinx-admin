@@ -298,20 +298,20 @@ const rejectTransaction = async () => {
                 </td>
                 <td class="py-3">
                     <div class="inline-flex items-center gap-2">
-                        <div v-if="deposit.wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                        <div v-if="deposit.from_wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
                             <InternalWalletIcon class="mt-0.5 ml-0.5"/>
                         </div>
-                        <div v-else-if="deposit.wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                        <div v-else-if="deposit.from_wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
                             <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
                         </div>
-                        {{ deposit.wallet.name }}
+                        {{ deposit.from_wallet.name }}
                     </div>
                 </td>
                 <td class="py-3">
                     {{ formatDateTime(deposit.created_at) }}
                 </td>
                 <td class="py-3">
-                    {{ deposit.transaction_id }}
+                    {{ deposit.transaction_number }}
                 </td>
                 <td class="py-3">
                     ${{ deposit.amount }}

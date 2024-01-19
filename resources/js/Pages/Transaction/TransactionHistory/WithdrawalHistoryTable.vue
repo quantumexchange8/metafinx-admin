@@ -181,17 +181,17 @@ const closeModal = () => {
                 </td>
                 <td class="py-2">
                     <div class="inline-flex items-center gap-2">
-                        <div v-if="withdrawal.wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                        <div v-if="withdrawal.from_wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
                             <InternalWalletIcon class="mt-0.5 ml-0.5"/>
                         </div>
-                        <div v-else-if="withdrawal.wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                        <div v-else-if="withdrawal.from_wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
                             <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
                         </div>
-                        {{ withdrawal.wallet.name }}
+                        {{ withdrawal.from_wallet.name }}
                     </div>
                 </td>
                 <td class="py-2">
-                    {{ withdrawal.transaction_id }}
+                    {{ withdrawal.transaction_number }}
                 </td>
                 <td class="py-2">
                     $ {{ withdrawal.amount }}
@@ -237,11 +237,11 @@ const closeModal = () => {
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction Type</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ withdrawalDetail.type }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ withdrawalDetail.transaction_type }}</span>
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction ID</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ withdrawalDetail.transaction_id }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ withdrawalDetail.transaction_number }}</span>
         </div>
         <div class="grid grid-cols-3 items-cente gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Date & Time</span>

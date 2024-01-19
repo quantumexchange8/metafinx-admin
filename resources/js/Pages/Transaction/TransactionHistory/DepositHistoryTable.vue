@@ -55,6 +55,7 @@ const getResults = async (page = 1, search = '', date = '', filter = '') => {
         const response = await axios.get(url);
         deposits.value = response.data.Deposit;
         totalAmount.value = response.data.totalAmount;
+
     } catch (error) {
         console.error(error.response.data);
     } finally {
@@ -181,17 +182,17 @@ const closeModal = () => {
                 </td>
                 <td class="py-2">
                     <div class="inline-flex items-center gap-2">
-                    <div v-if="deposit.wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                    <div v-if="deposit.to_wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
                         <InternalWalletIcon class="mt-0.5 ml-0.5"/>
                     </div>
-                    <div v-else-if="deposit.wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                    <div v-else-if="deposit.to_wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
                         <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
                     </div>
-                    {{ deposit.wallet.name }}
+                    {{ deposit.to_wallet.name }}
                     </div>
                 </td>
                 <td class="py-2">
-                    {{ deposit.transaction_id }}
+                    {{ deposit.transaction_number }}
                 </td>
                 <td class="py-2">
                     $ {{ deposit.amount }}
@@ -237,11 +238,11 @@ const closeModal = () => {
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction Type</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ depositDetail.type }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ depositDetail.transaction_type }}</span>
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction ID</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ depositDetail.transaction_id }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ depositDetail.transaction_number }}</span>
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Date & Time</span>

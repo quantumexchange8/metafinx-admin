@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class DepositExport implements FromCollection, WithHeadings
+class InternalTransferExport implements FromCollection, WithHeadings
 {
     private $query;
 
@@ -21,18 +21,19 @@ class DepositExport implements FromCollection, WithHeadings
      */
     public function collection(): \Illuminate\Support\Collection
     {
-        $records = $this->query->get();
+        $records = $this->query->where('transaction_type', 'InternalTransfer')->get();
         $result = array();
         foreach($records as $deposits){
+            
             $result[] = array(
                 'name' => $deposits->user->name,
                 'email' => $deposits->user->email,
-                'asset' => $deposits->to_wallet->name,
+                'from_wallet' => $deposits->from_wallet->name,
+                'to_wallet' => $deposits->to_wallet->name,
                 'transaction_id' => $deposits->transaction_number,
-                'txn_hash' => $deposits->txn_hash,
-                'to_wallet_address' => $deposits->to_wallet_address,
                 'date' => Carbon::parse($deposits->created_at)->format('Y-m-d'),
                 'amount' =>  number_format((float)$deposits->amount, 2, '.', ''),
+                'transaction_amount' =>  number_format((float)$deposits->transaction_amount, 2, '.', ''),
                 'status' => $deposits->status,
             );
         }
@@ -45,12 +46,12 @@ class DepositExport implements FromCollection, WithHeadings
         return [
             'Name',
             'Email',
-            'Asset',
+            'Transfer From',
+            'Transfer To',
             'Transaction ID',
-            'Transaction Hash',
-            'To Wallet Address',
             'Date',
             'Amount',
+            'Transfer Amount',
             'Status',
         ];
     }

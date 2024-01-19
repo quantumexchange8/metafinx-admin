@@ -27,8 +27,8 @@ class WithdrawalExport implements FromCollection, WithHeadings
             $result[] = array(
                 'name' => $withdrawal->user->name,
                 'email' => $withdrawal->user->email,
-                'asset' => $withdrawal->wallet->name,
-                'transaction_id' => $withdrawal->transaction_id,
+                'asset' => $withdrawal->from_wallet->name,
+                'transaction_id' => $withdrawal->transaction_number,
                 'date' => Carbon::parse($withdrawal->created_at)->format('Y-m-d'),
                 'to_wallet_address' =>  $withdrawal->to_wallet_address,
                 'amount' =>  number_format((float)$withdrawal->amount, 2, '.', ''),

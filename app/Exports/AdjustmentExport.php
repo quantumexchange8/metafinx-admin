@@ -27,14 +27,16 @@ class AdjustmentExport implements FromCollection, WithHeadings
 
         if ($this->type == 'WalletAdjustment' || 'AssetAdjustment') {
             foreach($records as $record){
+                
                 $result[] = array(
                     'name' => $record->user->name,
                     'email' => $record->user->email,
                     'date' => Carbon::parse($record->created_at)->format('Y-m-d'),
-                    'type' => $record->type,
-                    'before_amount' => number_format((float)$record->old_amount, 2, '.', ''),
-                    'amount' => number_format((float)$record->amount, 2, '.', ''),
-                    'after_amount' => number_format((float)$record->new_amount, 2, '.', ''),
+                    'type' => $record->transaction_type,
+                    // 'before_amount' => number_format((float)$record->old_amount, 2, '.', ''),
+                    'amount' => number_format((float)$record->transaction_amount, 2, '.', ''),
+                    'wallet_amount' => number_format((float)$record->new_wallet_amount, 2, '.', ''),
+                    'coin_amount' => number_format((float)$record->new_coin_amount, 2, '.', ''),
                     'Remark' => $record->description,
                     );
             }
@@ -51,9 +53,9 @@ class AdjustmentExport implements FromCollection, WithHeadings
                 'Email',
                 'Date',
                 'Type',
-                'Before Adjustment',
                 'Adjust Amount',
-                'After Adjustment',
+                'Wallet Amount',
+                'Coin Adjustment',
                 'Remark',
             ];
         }

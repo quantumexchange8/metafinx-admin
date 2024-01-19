@@ -175,7 +175,7 @@ const submitForm = () => {
             </div>
             <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">ID Number</span>
-                <span class="col-span-2 text-black dark:text-white py-2">{{ transaction.transaction_id }}</span>
+                <span class="col-span-2 text-black dark:text-white py-2">{{ transaction.transaction_number }}</span>
             </div>
             <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">Date & time</span>

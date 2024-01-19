@@ -128,10 +128,16 @@ const closeModal = () => {
                     Type
                 </th>
                 <th scope="col" class="py-2">
+                    Transaction ID
+                </th>
+                <th scope="col" class="py-2">
                     After Adjustment
                 </th>
                 <th scope="col" class="py-2">
                     Remark
+                </th>
+                <th scope="col" class="py-2 text-center">
+                    Status
                 </th>
             </tr>
             </thead>
@@ -163,32 +169,40 @@ const closeModal = () => {
                     </div>
                 </td>
                 <td class="py-2">
-                    <div v-if="walletAndAsset.type === 'WalletAdjustment'" class="inline-flex items-center gap-2">
-                        <div v-if="walletAndAsset.wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                    <div v-if="walletAndAsset.transaction_type === 'WalletAdjustment'" class="inline-flex items-center gap-2">
+                        <div v-if="walletAndAsset.from_wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
                             <InternalWalletIcon class="mt-0.5 ml-0.5"/>
                         </div>
-                        <div v-else-if="walletAndAsset.wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                        <div v-else-if="walletAndAsset.from_wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
                             <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
                         </div>
-                        <span>{{ walletAndAsset.wallet.name }}</span>
+                        <span>{{ walletAndAsset.from_wallet.name }}</span>
                     </div>
-                    <div v-if="walletAndAsset.type === 'AssetAdjustment'" class="inline-flex items-center gap-2">
-                        <div v-if="walletAndAsset.setting_coin.id === 1">
+                    <div v-if="walletAndAsset.transaction_type === 'AssetAdjustment'" class="inline-flex items-center gap-2">
+                        <div v-if="walletAndAsset.from_coin.setting_coin_id === 1">
                             <InternalXLCIcon />
                         </div>
-                        <span>{{ walletAndAsset.setting_coin.name }}</span>
+                        <!-- <span>{{ walletAndAsset.from_coin.setting_coin_id }}</span> -->
+                        <span>MXT</span>
                     </div>
                 </td>
                 <td class="py-2">
-                    <div v-if="walletAndAsset.type === 'WalletAdjustment'">
-                        $ {{ formatAmount(walletAndAsset.new_amount) }}
+                    <span>{{ walletAndAsset.transaction_number }}</span>
+                </td>
+                <td class="py-2">
+                    <div v-if="walletAndAsset.transaction_type === 'WalletAdjustment'">
+                        $ {{ formatAmount(walletAndAsset.new_wallet_amount) }}
                     </div>
-                    <div v-if="walletAndAsset.type === 'AssetAdjustment'">
-                        {{ formatAmount(walletAndAsset.new_amount) }} XLC Unit
+                    <div v-if="walletAndAsset.transaction_type === 'AssetAdjustment'">
+                        {{ formatAmount(walletAndAsset.new_coin_amount) }} XLC Unit
                     </div>
                 </td>
                 <td class="py-2">
-                    {{ walletAndAsset.description }}
+                    {{ walletAndAsset.remarks }}
+                </td>
+                <td v-if="walletAndAsset.status == 'Success'" class="py-2 text-center">
+                    <span v-if="walletAndAsset.status === 'Success'" class="flex w-2 h-2 bg-green-500 dark:bg-green-500 mx-auto rounded-full"></span>
+                    <span v-else class="flex w-2 h-2 bg-green-500 dark:bg-error-500 mx-auto rounded-full"></span>
                 </td>
             </tr>
             </tbody>
@@ -224,36 +238,36 @@ const closeModal = () => {
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Date & Time</span>
             <span class="col-span-2 text-black dark:text-white py-2">{{ formatDateTime(walletsAndAssetsDetail.created_at) }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center gap-2">
+        <!-- <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Before Adjustment</span>
-            <div v-if="walletsAndAssetsDetail.type === 'WalletAdjustment'" class="col-span-2 text-black dark:text-white py-2">
-                <span>$ </span>{{ formatAmount(walletsAndAssetsDetail.old_amount) }}
+            <div v-if="walletsAndAssetsDetail.transaction_type === 'WalletAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                <span>$ </span>{{ formatAmount(walletsAndAssetsDetail.new_amount) }}
             </div>
-            <div v-if="walletsAndAssetsDetail.type === 'AssetAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+            <div v-if="walletsAndAssetsDetail.transaction_type === 'AssetAdjustment'" class="col-span-2 text-black dark:text-white py-2">
                 {{ formatAmount(walletsAndAssetsDetail.old_amount) }}<span> XLC Unit</span>
             </div>
-        </div>
+        </div> -->
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Adjust Amount</span>
-            <div v-if="walletsAndAssetsDetail.type === 'WalletAdjustment'" class="col-span-2 text-black dark:text-white py-2">
-                <span>$ </span>{{ formatAmount(walletsAndAssetsDetail.amount) }}
+            <div v-if="walletsAndAssetsDetail.transaction_type === 'WalletAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                <span>$ </span>{{ formatAmount(walletsAndAssetsDetail.transaction_amount) }}
             </div>
-            <div v-if="walletsAndAssetsDetail.type === 'AssetAdjustment'" class="col-span-2 text-black dark:text-white py-2">
-                {{ formatAmount(walletsAndAssetsDetail.amount) }}<span> XLC Unit</span>
+            <div v-if="walletsAndAssetsDetail.transaction_type === 'AssetAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                {{ formatAmount(walletsAndAssetsDetail.transaction_amount) }}<span> XLC Unit</span>
             </div>        
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">After Adjustment</span>
-            <div v-if="walletsAndAssetsDetail.type === 'WalletAdjustment'" class="col-span-2 text-black dark:text-white py-2">
-                <span>$ </span>{{ formatAmount(walletsAndAssetsDetail.new_amount) }}
+            <div v-if="walletsAndAssetsDetail.transaction_type === 'WalletAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                <span>$ </span>{{ formatAmount(walletsAndAssetsDetail.new_wallet_amount) }}
             </div>
-            <div v-if="walletsAndAssetsDetail.type === 'AssetAdjustment'" class="col-span-2 text-black dark:text-white py-2">
-                {{ formatAmount(walletsAndAssetsDetail.new_amount) }}<span> XLC Unit</span>
+            <div v-if="walletsAndAssetsDetail.transaction_type === 'AssetAdjustment'" class="col-span-2 text-black dark:text-white py-2">
+                {{ formatAmount(walletsAndAssetsDetail.new_coin_amount) }}<span> XLC Unit</span>
             </div>        
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Remark</span>
-            <span class="col-span-2 text-black dark:text-white py-2">{{ walletsAndAssetsDetail.description }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">{{ walletsAndAssetsDetail.remarks }}</span>
         </div>
     </Modal>
 </template>

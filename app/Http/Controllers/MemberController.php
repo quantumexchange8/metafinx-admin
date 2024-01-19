@@ -29,11 +29,13 @@ use App\Http\Requests\CoinAdjustmentRequest;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Requests\WalletAdjustmentRequest;
 use App\Models\AssetAdjustment;
+use App\Models\Transaction;
 use App\Notifications\KycApprovalNotification;
 use Illuminate\Validation\ValidationException;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MemberListingExport;
 use App\Exports\MemberListingTypeExport;
+use App\Services\RunningNumberService;
 
 class MemberController extends Controller
 {
@@ -351,19 +353,25 @@ class MemberController extends Controller
 
         $wallet = Wallet::find($request->wallet_id);
         $new_balance = $wallet->balance + $amount;
-
+        
         if ($new_balance < 0 || $amount == 0) {
             throw ValidationException::withMessages(['amount' => 'Insufficient balance']);
         }
 
-        $wallet_balance = AssetAdjustment::create([
+        $adjustment_id = RunningNumberService::getID('adjustment');
+        
+        $wallet_balance = Transaction::create([
             'user_id' => $request->user_id,
-            'wallet_id' => $request->wallet_id,
-            'type' => 'WalletAdjustment',
-            'old_amount' => $wallet->balance,
-            'amount' => $amount,
-            'description' => $request->description,
+            'from_wallet_id' => $request->wallet_id,
+            'transaction_type' => 'WalletAdjustment',
+            'category' => 'wallet',
+            // 'old_amount' => $wallet->balance,
+            'amount' => '0',
+            'transaction_number' => $adjustment_id,
+            'transaction_amount' => $amount,
+            'remarks' => $request->description,
             'handle_by' => Auth::id(),
+            'status' => 'Success',
         ]);
 
         $wallet->update([
@@ -371,7 +379,7 @@ class MemberController extends Controller
         ]);
 
         $wallet_balance->update([
-            'new_amount' => $new_balance
+            'new_wallet_amount' => $new_balance
         ]);
 
         return redirect()->back()->with('title', 'Wallet Adjusted!')->with('success', 'This wallet has been adjusted successfully.');
@@ -439,15 +447,19 @@ class MemberController extends Controller
             throw ValidationException::withMessages(['unit' => 'Insufficient unit']);
         }
 
-        $coin_balance = AssetAdjustment::create([
+        $adjustment_id = RunningNumberService::getID('adjustment');
+
+        $coin_balance = Transaction::create([
             'user_id' => $request->user_id,
-            'coin_id' => $request->coin_id,
-            'setting_coin_id' => $request->setting_coin_id,
-            'type' => 'AssetAdjustment',
-            'old_amount' => $coin->unit,
-            'amount' => $unit,
-            'description' => $request->description,
+            'from_coin_id' => $request->coin_id,
+            // 'setting_coin_id' => $request->setting_coin_id,
+            'category' => 'asset',
+            'transaction_type' => 'AssetAdjustment',
+            'transaction_number' => $adjustment_id,
+            'transaction_amount' => $unit,
+            'remarks' => $request->description,
             'handle_by' => Auth::id(),
+            'status' => 'Success',
         ]);
 
         $coin->update([
@@ -455,7 +467,7 @@ class MemberController extends Controller
         ]);
 
         $coin_balance->update([
-            'new_amount' => $new_unit
+            'new_coin_amount' => $new_unit
         ]);
 
         return redirect()->back()->with('title', 'Coin Adjusted!')->with('success', 'This coin has been adjusted successfully.');
