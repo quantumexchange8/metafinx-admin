@@ -17,7 +17,9 @@ class IpoSchemeController extends Controller
 {
     public function setting()
     {
-        $investmentPlans = InvestmentPlan::with('descriptions:id,investment_plan_id,description')->get();
+        $investmentPlans = InvestmentPlan::with('descriptions:id,investment_plan_id,description')
+                            ->where('type', 'standard')
+                            ->get();
         $totalInvestmentCount = InvestmentSubscription::sum('amount');
         $totalEarningCount = InvestmentSubscription::sum('total_earning');
         $onGoingAmountCount = InvestmentSubscription::where('status', 'OnGoingPeriod')->sum('amount');

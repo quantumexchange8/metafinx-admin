@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\CoinPrice;
 use App\Models\CoinPayment;
+use App\Models\InvestmentPlan;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CoinTransactionExport;
 use Carbon\Carbon;
@@ -20,8 +21,13 @@ class XlcController extends Controller
 
         $coinTransactions = CoinPayment::all();
 
+        $investmentPlans = InvestmentPlan::with('descriptions:id,investment_plan_id,description')
+                            ->where('type', 'stacking')
+                            ->get();
+        
         return Inertia::render('XLCSetting/XLCSetting', [
             'coinTransactions' => $coinTransactions,
+            'investmentPlans' => $investmentPlans,
         ]);
     }
 

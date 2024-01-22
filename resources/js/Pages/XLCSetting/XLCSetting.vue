@@ -106,5 +106,47 @@ const updateStatus = async (planId, newStatus) => {
         <div class="p-5 my-5 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700">
             <CoinTransactionHistoryTable />
         </div>
+
+        <template #asideRight>
+            <div class="inset-y-0 p-6 flex flex-col space-y-6 bg-white shadow-lg dark:bg-gray-800 border-l dark:border-gray-700 lg:w-96 fixed right-0">
+                <h3 class="text-xl font-semibold leading-tight">
+                    Ongoing Stacking Plan
+                </h3>
+                <!-- <AddInvestmentPlan /> -->
+                <div v-for="investmentPlan in props.investmentPlans" class="p-5 dark:bg-gray-700 rounded-[20px] flex flex-col gap-2">
+                    <div class="flex justify-between">
+                        <div class="inline-flex items-center justify-center gap-3">
+                            <img class="w-12 h-12 rounded-lg bg-white" src="/assets/icon.png" alt="Medium avatar">
+                            <div class="grid">
+                                <div class="font-semibold">
+                                    {{ investmentPlan.name['en'] }}
+                                </div>
+                                <div class="font-normal dark:text-gray-400">
+                                    {{ investmentPlan.roi_per_annum }}% p.a.
+                                </div>
+                            </div>
+                        </div>
+                        <Switch
+                            :modelValue="enabled.value && investmentPlan.status === 'active'"
+                            :class="investmentPlan.status === 'active' ? 'bg-success-500' : 'bg-gray-500'"
+                            class="relative inline-flex h-[24px] w-[48px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+                            @click="toggleStatus(investmentPlan)"
+                        >
+                            <span class="sr-only">Toggle Active</span>
+                            <span
+                                aria-hidden="true"
+                                :class="investmentPlan.status === 'active' ? 'translate-x-6' : 'translate-x-0'"
+                                class="pointer-events-none inline-block h-[20px] w-[20px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out"
+                            />
+                        </Switch>
+                    </div>
+                    <div class="pt-5">
+                        <EditInvestmentPlan
+                            :investmentPlan="investmentPlan"
+                        />
+                    </div>
+                </div>
+            </div>
+        </template>
     </AuthenticatedLayout>
 </template>
