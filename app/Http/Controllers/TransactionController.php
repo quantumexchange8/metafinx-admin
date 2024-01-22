@@ -14,6 +14,7 @@ use App\Exports\WithdrawalExport;
 use App\Exports\InternalTransferExport;
 use App\Models\BalanceAdjustment;
 use App\Models\Transaction;
+use App\Models\InvestmentSubscription;
 use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AdjustmentExport;
@@ -28,7 +29,7 @@ class TransactionController extends Controller
 
     public function getPendingTransaction(Request $request, $type)
     {
-        $query = Transaction::query()->with(['user:id,name,email', 'from_wallet:id,name,type', 'to_wallet:id,name,type'])
+        $query = Transaction::query()->with(['user', 'from_wallet:id,name,type', 'to_wallet:id,name,type'])
             ->where('transaction_type', $type)
             ->whereIn('status', ['Pending', 'Processing']);
 
@@ -68,10 +69,22 @@ class TransactionController extends Controller
 
         $results->each(function ($user_deposit) {
             $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
+            $user_deposit->user->front_identity = $user_deposit->user->getFirstMediaUrl('front_identity');
+            $user_deposit->user->back_identity = $user_deposit->user->getFirstMediaUrl('back_identity');
+            $user_deposit->user->kyc_upload_date = $user_deposit->user->getMedia('back_identity')->first()->created_at ?? null;
+            $user_deposit->user->active_investment_amount = $this->getActiveSubscriptionAmount($user_deposit);
         });
 
 
         return response()->json([$type => $results]);
+    }
+
+    protected function getActiveSubscriptionAmount($user)
+    {
+        return InvestmentSubscription::query()
+            ->where('user_id', $user->id)
+            ->whereDate('expired_date', '>', now())
+            ->sum('amount');
     }
 
     public function approveTransaction(Request $request)
