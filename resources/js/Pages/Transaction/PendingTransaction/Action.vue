@@ -201,39 +201,41 @@ const submitForm = () => {
             </div>
 
             <!-- KYC Details -->
-            <h2 class="py-3 text-xl font-semibold dark:text-white border-b dark:border-gray-700">KYC Details</h2>
+            <div v-if="transaction.transaction_type === 'Withdrawal'">
+                <h2 class="py-3 text-xl font-semibold dark:text-white border-b dark:border-gray-700">KYC Details</h2>
+                <div class="p-5 mt-3 bg-white overflow-hidden md:overflow-visible rounded-xl dark:bg-gray-700">
+                    <div class="flex flex-col justify-center items-center">
+                        <img :src="transaction.user.profile_photo_url ? transaction.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-16 h-16 rounded-full" alt="">
+                        <div class="text-xl font-semibold dark:text-white mt-3">
+                            {{ transaction.user.name }}
+                        </div>
+                        <div class="text-sm font-normal dark:text-gray-400">
+                            {{ transaction.user.identity_number }}
+                        </div>
+                    </div>
+                </div>
+                <div class="py-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="flex flex-col gap-2">
+                            <div class="text-sm text-left w-full dark:text-white">
+                                Proof of Identity (FRONT)
+                            </div>
+                            <div class="dark:bg-white rounded-lg w-full flex justify-center border-2 dark:border-white">
+                                <img :src="transaction.user.front_identity" class="max-h-64 rounded-lg" alt="">
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <div class="text-sm text-left w-full dark:text-white">
+                                Proof of Identity (BACK)
+                            </div>
+                            <div class="dark:bg-white rounded-lg w-full flex justify-center border-2 dark:border-white">
+                                <img :src="transaction.user.back_identity" class="max-h-64 rounded-lg" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
-            <div class="p-5 mt-3 bg-white overflow-hidden md:overflow-visible rounded-xl dark:bg-gray-700">
-                <div class="flex flex-col justify-center items-center">
-                    <img :src="transaction.user.profile_photo_url ? transaction.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-16 h-16 rounded-full" alt="">
-                    <div class="text-xl font-semibold dark:text-white mt-3">
-                        {{ transaction.user.name }}
-                    </div>
-                    <div class="text-sm font-normal dark:text-gray-400">
-                        {{ transaction.user.identity_number }}
-                    </div>
-                </div>
-            </div>
-            <div class="py-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="flex flex-col gap-2">
-                        <div class="text-sm text-left w-full dark:text-white">
-                            Proof of Identity (FRONT)
-                        </div>
-                        <div class="dark:bg-white rounded-lg w-full flex justify-center border-2 dark:border-white">
-                            <img :src="transaction.user.front_identity" class="max-h-64 rounded-lg" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <div class="text-sm text-left w-full dark:text-white">
-                            Proof of Identity (BACK)
-                        </div>
-                        <div class="dark:bg-white rounded-lg w-full flex justify-center border-2 dark:border-white">
-                            <img :src="transaction.user.back_identity" class="max-h-64 rounded-lg" alt="">
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </Modal>
