@@ -40,15 +40,15 @@ const updateStatus = async (planId, newStatus) => {
 </script>
 
 <template>
-    <AuthenticatedLayout title="XLC Setting">
+    <AuthenticatedLayout title="MXT Setting">
         <template #header>
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <h2 class="text-2xl font-semibold leading-tight">
-                    XL Coin Setting
+                    MXT Setting
                 </h2>
             </div>
             <p class="text-base font-normal dark:text-gray-400">
-                View and modify ongoing XL Coin schemes provided to your members.
+                View and modify ongoing MXT schemes provided to your members.
             </p>
         </template>
 
@@ -57,7 +57,7 @@ const updateStatus = async (planId, newStatus) => {
                 <div class="px-5 py-2.5 flex items-center rounded-[10px] dark:bg-gray-700">
                     <div class="grid gap-2">
                         <div class="text-xs font-medium dark:text-gray-400">
-                            Current XL Coin Price (today)
+                            Current MXT Coin Price (today)
                         </div>
                         <div class="text-xl font-semibold">
                             MYR 

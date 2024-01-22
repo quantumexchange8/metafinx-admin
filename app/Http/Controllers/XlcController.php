@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\CoinPrice;
 use App\Models\CoinPayment;
 use App\Models\InvestmentPlan;
+use App\Models\Transaction;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CoinTransactionExport;
 use Carbon\Carbon;
@@ -20,7 +21,6 @@ class XlcController extends Controller
     {
 
         $coinTransactions = CoinPayment::all();
-
         $investmentPlans = InvestmentPlan::with('descriptions:id,investment_plan_id,description')
                             ->where('type', 'stacking')
                             ->get();
@@ -33,15 +33,16 @@ class XlcController extends Controller
 
     public function getCoinPaymentDetails(Request $request)
     {
-        $coinTransactions = CoinPayment::with(['user:id,name', 'wallet:id,name']);
+        $coinTransactions = Transaction::with(['user:id,name', 'from_wallet:id,name,type', 'to_wallet:id,name,type', 'from_coin:id,address'])
+                            ->whereIn('transaction_type', ['BuyCoin', 'Stacking']);
+                            
         if ($request->filled('search')) {
             $search = $request->input('search');
             $coinTransactions->where(function ($subQuery) use ($search) {
                 $subQuery->whereHas('user', function ($userQuery) use ($search) {
-                    $userQuery->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('email', 'like', '%' . $search . '%');
+                    $userQuery->where('name', 'like', '%' . $search . '%');
                 })
-                    ->orWhere('transaction_id', 'like', '%' . $search . '%');
+                    ->orWhere('transaction_number', 'like', '%' . $search . '%');
             });
         }
 
@@ -64,7 +65,7 @@ class XlcController extends Controller
 
     public function getTotalXlCoinByDays(Request $request)
     {
-        $UnitData = CoinPayment::query()
+        $UnitData = Transaction::query()
                     ->when($request->filled('month'), function ($query) use ($request) {
                         $month = $request->input('month');
                         $year = $request->input('year');
@@ -72,12 +73,14 @@ class XlcController extends Controller
                             ->whereMonth('created_at', $month);
                     })
                     ->where('status', '=', 'Success')
+                    ->where('category', '=', 'asset')
+                    ->where('transaction_type', '=', 'BuyCoin')
                     ->select(
                         DB::raw('DAY(created_at) as day'),
-                        'type',
+                        'from_wallet_id',
                         DB::raw('SUM(unit) as unit')
                     )
-                    ->groupBy('day', 'type')
+                    ->groupBy('day', 'from_wallet_id')
                     ->get();
 
         // Get unique type to create datasets
@@ -127,20 +130,22 @@ class XlcController extends Controller
     public function getTotalXlCoinByMonth(Request $request)
     {
 
-        $UnitData = CoinPayment::query()
+        $UnitData = Transaction::query()
             ->when($request->filled('year'), function ($query) use ($request) {
                 $year = $request->input('year');
                 $query->whereYear('created_at', $year);
             })
             ->where('status', '=', 'Success')
+            // ->where('category', '=', 'asset')
+            ->where('transaction_type', '=', 'BuyCoin')
             ->select(
                 DB::raw('MONTH(created_at) as month'), // Change DAY to MONTH
-                'type',
+                'transaction_type',
                 DB::raw('SUM(unit) as unit')
             )
-            ->groupBy('month', 'type') // Change 'day' to 'month'
+            ->groupBy('month', 'transaction_type') // Change 'day' to 'month'
             ->get();
-
+            
         $uniqueDataType = $UnitData->pluck('type')->unique();
 
         // Initialize the chart data structure with short month names as labels

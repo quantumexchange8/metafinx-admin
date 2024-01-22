@@ -25,8 +25,8 @@ class CoinTransactionExport implements FromCollection
         foreach($records as $record){
             $result[] = array(
                 'name' => $record->user->name,
-                'wallet' => $record->wallet->name,
-                'transaction_id' => $record->transaction_id,
+                'wallet' => $record->from_wallet->name ?? $record->from_coin->address,
+                'transaction_id' => $record->transaction_number,
                 'date' => Carbon::parse($record->created_at)->format('Y-m-d'),
                 'amount' => number_format((float)$record->amount, 2, '.', ''),
                 'unit' =>  number_format((float)$record->unit, 2, '.', ''),

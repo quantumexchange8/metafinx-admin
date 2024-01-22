@@ -166,18 +166,18 @@ const closeModal = () => {
                 </td>
                 <td class="px-3 py-2.5">
                     <div>
-                        {{ subscription.wallet.name }}
+                        {{ subscription.transaction_type === 'BuyCoin' ? subscription.from_wallet.name : (subscription.transaction_type === 'Stacking' ? subscription.from_coin.address : '') }}
                     </div>
                 </td>
                 <td class="px-3 py-2.5">
                     <!-- data -->
-                    {{ subscription.transaction_id }}
+                    {{ subscription.transaction_number }}
                 </td>
                 <td class="px-3 py-2.5">
                     {{ formatDateTime(subscription.created_at) }}
                 </td>
                 <td class="px-3 py-2.5">
-                    {{ formatAmount(subscription.amount) }}
+                    {{ subscription.transaction_type === 'BuyCoin' ? formatAmount(subscription.amount) : (subscription.transaction_type === 'Stacking' ? formatAmount(subscription.transaction_charges) : '') }}
                 </td>
                 <td class="px-3 py-2.5 uppercase">
                     {{ formatAmount(subscription.unit) }}
@@ -206,11 +206,11 @@ const closeModal = () => {
     <Modal :show="subscriptionDetailModal" title="Transaction Details" @close="closeModal">
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction type</span>
-            <span class="text-black dark:text-white py-2" v-if="subscriptionDetail.type === 'BuyCoin'">{{ formatType(subscriptionDetail.type) }}</span>
+            <span class="text-black dark:text-white py-2" >{{ formatType(subscriptionDetail.transaction_type) }}</span>
         </div>
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction ID</span>
-            <span class="text-black dark:text-white py-2">{{ subscriptionDetail.transaction_id }}</span>
+            <span class="text-black dark:text-white py-2">{{ subscriptionDetail.transaction_number }}</span>
         </div>
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Date & time</span>
@@ -218,11 +218,13 @@ const closeModal = () => {
         </div>
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">From</span>
-            <span class="text-black dark:text-white py-2">{{ subscriptionDetail.wallet.name }}</span>
+            <span v-if="subscriptionDetail.transaction_type === 'BuyCoin'" class="text-black dark:text-white py-2">{{ subscriptionDetail.from_wallet.name }}</span>
+            <span v-else class="text-black dark:text-white py-2">{{ subscriptionDetail.from_coin.address }}</span>
         </div>
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Paid</span>
-            <span class="text-black dark:text-white py-2">{{ formatAmount(subscriptionDetail.amount) }}</span>
+            <span v-if="subscriptionDetail.transaction_type === 'BuyCoin'" class="text-black dark:text-white py-2">$ {{ formatAmount(subscriptionDetail.amount) }}</span>
+            <span v-else class="text-black dark:text-white py-2">$ {{ formatAmount(subscriptionDetail.transaction_charges) }}</span>
         </div>
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Amount (unit)</span>
@@ -230,12 +232,13 @@ const closeModal = () => {
         </div>
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Price per Unit</span>
-            <span class="text-black dark:text-white py-2">{{ formatAmount(subscriptionDetail.unit) }}</span>
+            <span v-if="subscriptionDetail.transaction_type === 'BuyCoin'" class="text-black dark:text-white py-2">{{ formatAmount(subscriptionDetail.price_per_unit) }}</span>
+            <span v-else class="text-black dark:text-white py-2">{{ subscriptionDetail.price_per_unit ? formatAmount(subscriptionDetail.price_per_unit) : '0.00' }}</span>
         </div>
-        <div class="grid grid-cols-3 items-center">
+        <!-- <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Conversion Rate</span>
             <span class="text-black dark:text-white py-2">1 USDT = {{ subscriptionDetail.conversion_rate }} MYR</span>
-        </div>
+        </div> -->
         <div class="grid grid-cols-3 items-center">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction Status</span>
             <span class="text-black dark:text-white py-2">{{ subscriptionDetail.status }}</span>

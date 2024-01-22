@@ -30,7 +30,7 @@ class TransactionController extends Controller
     {
         $query = Transaction::query()->with(['user:id,name,email', 'from_wallet:id,name,type', 'to_wallet:id,name,type'])
             ->where('transaction_type', $type)
-            ->where('status', 'Processing');
+            ->whereIn('status', ['Pending', 'Processing']);
 
         if ($request->filled('search')) {
             $search = '%' . $request->input('search') . '%';

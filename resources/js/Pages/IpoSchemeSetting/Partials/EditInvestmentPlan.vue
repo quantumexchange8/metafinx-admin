@@ -1,6 +1,6 @@
 <script setup>
 import Button from "@/Components/Button.vue";
-import {EditIcon, DeleteIcon, checkIcon} from "@/Components/Icons/outline.jsx"
+import {EditIcon, DeleteIcon, checkIcon, XIcon, CloudUploadIcon} from "@/Components/Icons/outline.jsx"
 import {PlusIcon} from "@heroicons/vue/outline"
 import {ref, watch} from "vue";
 import Modal from "@/Components/Modal.vue";
@@ -36,6 +36,9 @@ const planNameCn = ref(props.investmentPlan.name.cn);
 const planNameTw = ref(props.investmentPlan.name.tw);
 const roiPercentage = ref(props.investmentPlan.roi_per_annum);
 
+const selectedLogo = ref(null);
+const selectedLogoName = ref(null);
+
 const form = useForm({
     id: props.investmentPlan.id,
     plan_name: {},
@@ -43,7 +46,30 @@ const form = useForm({
     roi_per_annum: props.investmentPlan.roi_per_annum,
     investment_period: String(props.investmentPlan.investment_period),
     descriptions: props.investmentPlan.descriptions.map((description) => description.description),
+    plan_logo: null,
 })
+
+const onPlanLogoChanges = (event) => {
+    const planLogoInput = event.target;
+    const file = planLogoInput.files[0];
+
+    if(file) {
+        //Display the selected image
+        const reader = new FileReader();
+        reader.onload = () => {
+            selectedLogo.value = reader.result;
+        };
+        reader.readAsDataURL(file);
+        selectedLogoName.value = file.name;
+        form.plan_logo = file;
+    } else {
+        selectedLogo.value = null;
+    }
+}
+
+const removePlanLogo = () => {
+    selectedLogo.value = null;
+}
 
 const submit = () => {
     form.plan_name.en = planNameEn.value;
@@ -403,6 +429,51 @@ const removeDescription = (index) => {
                         <InputError :message="form.errors.investment_period" class="mt-2" />
                     </div>
                 </div>
+
+                <!-- <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                    <Label for="plan_logo" class="text-sm dark:text-white md:w-1/4" value="Upload logo"/>
+                    <div v-if="selectedLogo == null" class="flex gap-3 w-full">
+                        <input
+                            ref="planLogoInput"
+                            id="plan_logo"
+                            type="file"
+                            class="hidden"
+                            accept="image/*"
+                            @change="onPlanLogoChanges"
+                        />
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            @click="$refs.planLogoInput.click()"
+                            class="justify-center gap-2"
+                        >
+                            <CloudUploadIcon aria-hidden="true"/>
+                            <span>Browse</span>
+                        </Button>
+                        <div>
+                        </div>
+                    </div>
+                    <div
+                        v-if="selectedLogo"
+                        class="relative w-full py-2 pl-4 flex justify-between rounded-lg border focus:ring-1 focus:outline-none"
+                        
+                    >
+                        <div class="inline-flex items-center gap-3">
+                            <img :src="selectedLogo" alt="Selected Image" class="max-w-full h-9 object-contain rounded" />
+                            <div class="text-gray-light-900 dark:text-white">
+                                {{ selectedLogoName }}
+                            </div>
+                        </div>
+                        <Button
+                            type="button"
+                            variant="transparent"
+                            pill
+                            @click="removePlanLogo"
+                        >
+                            <XIcon />
+                        </Button>
+                    </div>
+                </div> -->
             </div>
 
             <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">

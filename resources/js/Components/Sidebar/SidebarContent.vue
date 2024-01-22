@@ -52,7 +52,7 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
         </SidebarLink>
 
         <SidebarLink
-            title="XLC Setting"
+            title="MXT Setting"
             :href="route('xlc.setting')"
         >
             <template #icon>

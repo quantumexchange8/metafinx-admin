@@ -56,10 +56,10 @@ function refreshTable() {
         <div class="flex justify-between pb-3 border-b dark:border-gray-600">
             <div class="grid">
                 <div class="text-xl font-semibold dark:text-white">
-                    Total XL Coin Supply
+                    Total MXT Supply
                 </div>
                 <div class="text-xs font-normal dark:text-gray-400">
-                    Overview data since 01 January 2023
+                    Overview data since 01 January 2024
                 </div>
             </div>
             <div>

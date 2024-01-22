@@ -140,7 +140,7 @@ class ReportController extends Controller
             'datasets' => [],
         ];
 
-        $backgroundColors = ['referral_earnings' => '#00C7BE', 'monthly_return' => '#FF2D55'];
+        $backgroundColors = ['referral_earnings' => '#00C7BE', 'monthly_return' => '#FF2D55', 'affiliate_earnings' => '#AF52DE', 'dividend_earning' => '#5856D6'];
 
         // $backgroundColors = ['Monthly Return' => '#FF2D55', 'Quarterly Dividend' => '#FDB022', 'referral_earnings' => '#00C7BE', 
         // 'Affiliate Earning' => '#AF52DE', 'Dividend Earning' => '#5856D6', 'Ticket Bonus' => '#32ADE6'];
