@@ -86,7 +86,7 @@ function refreshTable() {
                                 <div v-if="category == 'Daily'">
                                     <button
                                         :class="[
-                                        'w-full rounded-l-xl py-2.5 text-sm font-medium leading-5 text-gray-800 dark:text-gray-400',
+                                        'w-full rounded-l-xl py-1.5 text-sm font-medium leading-5 text-gray-800 dark:text-gray-400',
                                         'border dark:border-gray-600',
                                         'ring-white ring-opacity-60 ring-offset-2 ring-offset-gray-400 focus:outline-none focus:ring-0',
                                         'dark:focus:outline-none',
@@ -102,7 +102,7 @@ function refreshTable() {
                                 <div v-else>
                                     <button
                                         :class="[
-                                        'w-full rounded-r-xl py-2.5 text-sm font-medium leading-5 text-gray-800 dark:text-gray-400',
+                                        'w-full rounded-r-xl py-1.5 text-sm font-medium leading-5 text-gray-800 dark:text-gray-400',
                                         'border dark:border-gray-600',
                                         'ring-white ring-opacity-60 ring-offset-2 ring-offset-gray-400 focus:outline-none focus:ring-0',
                                         'dark:focus:outline-none',

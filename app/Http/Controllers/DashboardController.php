@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\WalletNet;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,11 +17,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $payment = Payment::where('status', 'Success');
+        $payment = Transaction::where('status', 'Success')->where('category', 'wallet');
         $withdrawal = clone $payment;
 
-        $totalDeposit = $payment->where('type', 'Deposit')->sum('amount');
-        $totalWithdrawal = $withdrawal->where('type', 'Withdrawal')->sum('amount');
+        $totalDeposit = $payment->where('transaction_type', 'Deposit')->sum('amount');
+        $totalWithdrawal = $withdrawal->where('transaction_type', 'Withdrawal')->sum('amount');
         $totalTransaction = $totalDeposit + $totalWithdrawal;
         $totalWalletBalance = Wallet::sum('balance');
 
@@ -28,14 +29,16 @@ class DashboardController extends Controller
         ->where('kyc_approval', 'pending')
         ->count();
 
-        $pendingTransactionCount  = Payment::query()
-        ->where('status', 'Processing')
+        $pendingTransactionCount  = Transaction::query()
+        ->whereIn('status', ['Pending', 'Processing'])
+        ->where('category', 'wallet')
+        ->whereIn('transaction_type', ['Deposit', 'Withdrawal'])
         ->count();
 
-        $pendingTransactions  = Payment::query()
-            ->where('status', 'Processing')
+        $pendingTransactions  = Transaction::query()
+            ->whereIn('status', ['Processing', 'Pending'])
             ->with(['user:id,name,email'])
-            ->select('id', 'user_id', 'transaction_id', 'status', 'amount', 'created_at')
+            ->select('id', 'user_id', 'transaction_number', 'status', 'amount', 'created_at')
             ->orderByDesc('created_at')
             ->limit(5)
             ->get();
@@ -114,7 +117,7 @@ class DashboardController extends Controller
 
     public function getTotalTransactionByDays(Request $request)
     {
-        $transactions = Payment::query()
+        $transactions = Transaction::query()
             ->when($request->filled('month'), function ($query) use ($request) {
                 $month = $request->input('month');
                 $year = $request->input('year');
@@ -122,16 +125,18 @@ class DashboardController extends Controller
                       ->whereMonth('created_at', $month);
             })
             ->where('status', '=', 'Success')
+            ->where('category', '=', 'wallet')
+            ->whereIn('transaction_type', ['Deposit', 'Withdrawal'])
             ->select(
                 DB::raw('DAY(created_at) as day'),
-                'type',
+                'transaction_type',
                 DB::raw('SUM(amount) as amount')
             )
-            ->groupBy('day', 'type')
+            ->groupBy('day', 'transaction_type')
             ->get();
 
         // Get unique type to create datasets
-        $uniqueTransactionType = $transactions->pluck('type')->unique();
+        $uniqueTransactionType = $transactions->whereIn('transaction_type', ['Deposit', 'Withdrawal'])->pluck('transaction_type')->unique();
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month;
         // Initialize the chart data structure
@@ -141,13 +146,13 @@ class DashboardController extends Controller
         ];
 
         $backgroundColors = ['Deposit' => '#fdb022', 'Withdrawal' => '#FF2D55'];
-
+        
         // Loop through each unique type and create a dataset
         foreach ($uniqueTransactionType as $transactionType) {
-            $transactionData = $transactions->where('type', $transactionType);
-
+            $transactionData = $transactions->where('transaction_type', $transactionType);
+            
             $dataset = [
-                'label' => $transactionData->first()->type,
+                'label' => $transactionData->first()->transaction_type,
                 'data' => array_map(function ($day) use ($transactionData) {
                     return $transactionData->firstWhere('day', $day)->amount ?? 0;
                 }, $chartData['labels']),
@@ -165,21 +170,23 @@ class DashboardController extends Controller
 
     public function getTotalTransactionByMonths(Request $request)
     {
-        $transactions = Payment::query()
+        $transactions = Transaction::query()
             ->when($request->filled('year'), function ($query) use ($request) {
                 $year = $request->input('year');
                 $query->whereYear('created_at', $year);
             })
             ->where('status', '=', 'Success')
+            ->where('category', '=', 'wallet')
+            ->whereIn('transaction_type', ['Deposit', 'Withdrawal'])
             ->select(
                 DB::raw('MONTH(created_at) as month'), // Change DAY to MONTH
-                'type',
+                'transaction_type',
                 DB::raw('SUM(amount) as amount')
             )
-            ->groupBy('month', 'type') // Change 'day' to 'month'
+            ->groupBy('month', 'transaction_type') // Change 'day' to 'month'
             ->get();
 
-        $uniqueTransactionType = $transactions->pluck('type')->unique();
+        $uniqueTransactionType = $transactions->whereIn('transaction_type', ['Deposit', 'Withdrawal'])->pluck('transaction_type')->unique();
 
         // Initialize the chart data structure with short month names as labels
         $shortMonthNames = [];
@@ -195,10 +202,10 @@ class DashboardController extends Controller
         $backgroundColors = ['Deposit' => '#fdb022', 'Withdrawal' => '#FF2D55'];
 
         foreach ($uniqueTransactionType as $transactionType) {
-            $transactionData = $transactions->where('type', $transactionType);
+            $transactionData = $transactions->where('transaction_type', $transactionType);
 
             $dataset = [
-                'label' => $transactionData->first()->type,
+                'label' => $transactionData->first()->transaction_type,
                 'data' => array_map(function ($month) use ($transactionData) {
                     return $transactionData->firstWhere('month', $month)->amount ?? 0;
                 }, range(1, 12)), // Use month numbers 1-12

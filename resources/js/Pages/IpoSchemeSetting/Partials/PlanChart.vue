@@ -116,7 +116,7 @@ onMounted(() => {
                     input-classes="py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white"
                 />
             </div>
-            <div>
+            <div class="h-60">
                 <canvas id="planChart"></canvas>
             </div>
         </div>

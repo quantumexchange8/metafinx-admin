@@ -151,8 +151,8 @@ onMounted(async () => {
     <div v-if="isLoading" class="flex justify-center">
         <Loading />
     </div>
-    <div>
-        <canvas id="totalUnitMonth" height="276"></canvas>
+    <div class="h-60">
+        <canvas id="totalUnitMonth"></canvas>
     </div>
     
 </template>

@@ -44,10 +44,12 @@ const roiPercentage = ref('0');
 
 const plans = [
   {
-    name: 'Standard'
+    name: 'Standard',
+    value: 'standard'
   },
   {
-    name: 'EBMI'
+    name: 'EBMI',
+    value: 'ebmi'
   }
 ]
 
@@ -93,7 +95,7 @@ const submit = () => {
     form.plan_name.en = planNameEn.value;
     form.plan_name.cn = planNameCn.value;
     form.plan_name.tw = planNameTw.value;
-
+    form.plan_type = plan_type.value.value;
     form.post(route('ipo_scheme_setting.addInvestmentPlan'), {
         onSuccess: () => {
             closeModal();
@@ -450,7 +452,7 @@ const removeDescription = (index) => {
                         <InputError :message="form.errors.investment_period" class="mt-2" />
                     </div>
                 </div>
-                <RadioGroup v-model="form.plan_type" class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                <RadioGroup v-model="plan_type" class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
                     <RadioGroupLabel class="text-sm dark:text-white md:w-1/4">Plan Type</RadioGroupLabel>
                     <div class="flex flex-row w-full gap-4">
                         <RadioGroupOption

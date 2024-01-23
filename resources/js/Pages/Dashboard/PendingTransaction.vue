@@ -65,7 +65,7 @@ const { formatAmount } = transactionFormat();
                         </div>
                     </td>
                     <td colspan="1" class="px-4 py-2">
-                        {{ pendingTransaction.transaction_id }}
+                        {{ pendingTransaction.transaction_number }}
                     </td>
                     <td colspan="1" class="px-4 py-2">
                         $ {{ formatAmount(pendingTransaction.amount) }}

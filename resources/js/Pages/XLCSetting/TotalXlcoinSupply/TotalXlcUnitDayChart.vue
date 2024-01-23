@@ -119,7 +119,7 @@ onMounted(async () => {
     <div v-if="isLoading" class="flex justify-center">
         <Loading />
     </div>
-    <div>
+    <div class="h-60">
         <canvas id="dailyTotalXlCoin" height="276"></canvas>
     </div>
 </template>
