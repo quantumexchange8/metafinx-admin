@@ -12,8 +12,6 @@ const props = defineProps({
     masterSetting: Object
 });
 
-const { formatAmount } = transactionFormat();
-
 const forms = ref({});
 
 function clearField(setting) {
@@ -43,6 +41,9 @@ const getPlaceholder = (slug) => {
     } else if (slug === 'gas-fee') {
         return '0.00 %';
     }
+    else if (slug === 'stacking-fee') {
+        return '0.00 %';
+    }
     return 'Placeholder Text';
 };
 
@@ -56,7 +57,7 @@ const getPlaceholder = (slug) => {
                 <h2>
                     <span v-if="setting.slug === 'withdrawal-fee'">$</span>
                     {{ setting.value }}
-                    <span v-if="setting.slug === 'gas-fee'">%</span>
+                    <span v-if="setting.slug === 'gas-fee' || setting.slug === 'stacking-fee'">%</span>
                 </h2>
             </div>
 

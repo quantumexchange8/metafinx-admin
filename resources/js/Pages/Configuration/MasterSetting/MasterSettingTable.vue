@@ -152,9 +152,9 @@ watch(() => refresh.value, (newVal) => {
                         </td>
                         <td class="px-3 py-4 text-center">
                             <div v-if="fee.slug === 'withdrawal-fee'">
-                                ${{ formatAmount(fee.value) }}
+                                $&nbsp;{{ formatAmount(fee.value) }}
                             </div>
-                            <div v-else-if="fee.slug === 'gas-fee'">
+                            <div v-else-if="fee.slug === 'gas-fee' || 'stacking-fee'">
                                 {{ formatAmount(fee.value) }}%
                             </div>
                         </td>

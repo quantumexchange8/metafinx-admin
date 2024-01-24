@@ -179,9 +179,10 @@ class ConfigurationController extends Controller
     {
         $symbol = '';
     
-        if ($request->slug == 'withdrawal-fee') {
+        if ($request->slug == 'withdrawal-fee') 
+        {
             $symbol = '$ ';
-        } elseif ($request->slug == 'gas-fee') {
+        }if ($request->slug == 'gas-fee' || 'stacking-fee') {
             $symbol = '% ';
         }
 
@@ -192,10 +193,14 @@ class ConfigurationController extends Controller
             'updated_by' => \Auth::id(),
         ]);
     
+        $formattedValue = ($request->slug == 'gas-fee' || $request->slug == 'stacking-fee')
+        ? $request->value . $symbol
+        : $symbol . ' ' . $request->value;
+
         return redirect()
             ->back()
             ->with('title', $request->name)
-            ->with('success', $request->name . $symbol . $request->value . ' has been updated successfully.');
+            ->with('success', $request->name . ' ' . $formattedValue . ' has been updated successfully.');
     }
     
     public function getDividendBonus(Request $request)
