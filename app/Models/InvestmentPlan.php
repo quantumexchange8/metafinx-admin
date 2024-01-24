@@ -8,10 +8,12 @@ use Spatie\Translatable\HasTranslations;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\HasMedia;
 
-class InvestmentPlan extends Model
+class InvestmentPlan extends Model implements HasMedia
 {
-    use SoftDeletes, HasTranslations, LogsActivity;
+    use SoftDeletes, HasTranslations, LogsActivity, InteractsWithMedia;
 
     public $translatable = ['name'];
 

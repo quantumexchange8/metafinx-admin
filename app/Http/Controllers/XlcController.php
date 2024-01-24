@@ -8,8 +8,10 @@ use App\Models\CoinPrice;
 use App\Models\CoinPayment;
 use App\Models\InvestmentPlan;
 use App\Models\Transaction;
+use App\Models\CoinStacking;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CoinTransactionExport;
+use App\Exports\StackingHistoryExport;
 use Carbon\Carbon;
 use DB;
 
@@ -33,14 +35,15 @@ class XlcController extends Controller
 
     public function getCoinPaymentDetails(Request $request)
     {
-        $coinTransactions = Transaction::with(['user:id,name', 'from_wallet:id,name,type', 'to_wallet:id,name,type', 'from_coin:id,address'])
-                            ->whereIn('transaction_type', ['BuyCoin', 'Stacking']);
+        $coinTransactions = Transaction::with(['user:id,name,email', 'from_wallet:id,name,type', 'to_wallet:id,name,type', 'from_coin:id,address'])
+                            ->whereIn('transaction_type', ['BuyCoin', 'Stacking', 'SwapCoin']);
                             
         if ($request->filled('search')) {
             $search = $request->input('search');
             $coinTransactions->where(function ($subQuery) use ($search) {
                 $subQuery->whereHas('user', function ($userQuery) use ($search) {
-                    $userQuery->where('name', 'like', '%' . $search . '%');
+                    $userQuery->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
                 })
                     ->orWhere('transaction_number', 'like', '%' . $search . '%');
             });
@@ -54,11 +57,47 @@ class XlcController extends Controller
             $coinTransactions->whereBetween('created_at', [$start_date, $end_date]);
         }
 
+        if ($request->filled('status')) {
+            $status = $request->input('status');
+            $coinTransactions->where('transaction_type', $status);
+        }
+
         if ($request->has('exportStatus')) {
             return Excel::download(new CoinTransactionExport($coinTransactions), Carbon::now() . '-Coin_Transaction_History-report.xlsx');
         }
 
         $results = $coinTransactions->latest()->paginate(10);
+
+        return response()->json($results);
+    }
+
+    public function getStackingDetails(Request $request)
+    {
+        $stackingHistory = CoinStacking::with(['transaction:id,transaction_number', 'user:id,name,email', 'investment_plan:id,name']);
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $stackingHistory->where(function ($subQuery) use ($search) {
+                    $subQuery->whereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%')
+                            ->orWhere('email', 'like', '%' . $search . '%');
+                    })
+                        ->orWhere('subscription_number', 'like', '%' . $search . '%');
+                });
+        }
+
+        if ($request->filled('date')) {
+            $date = $request->input('date');
+            $dateRange = explode(' - ', $date);
+            $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+            $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+            $stackingHistory->whereBetween('created_at', [$start_date, $end_date]);
+        }
+
+        if ($request->has('exportStatus')) {
+            return Excel::download(new StackingHistoryExport($stackingHistory), Carbon::now() . '-Stacking_History-report.xlsx');
+        }
+
+        $results = $stackingHistory->latest()->paginate(10);
 
         return response()->json($results);
     }

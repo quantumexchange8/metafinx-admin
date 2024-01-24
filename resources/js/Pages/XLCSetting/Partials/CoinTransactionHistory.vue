@@ -17,6 +17,7 @@ const props = defineProps({
     isLoading: Boolean,
     search: String,
     date: String,
+    status: String,
     exportStatus: Boolean,
 })
 
@@ -27,6 +28,7 @@ const formatter = ref({
 const subscriptions = ref({data: []});
 const search = ref('');
 const date = ref('');
+const status = ref('');
 const historyLoading = ref(props.isLoading);
 const historyRefresh = ref(props.refresh);
 const currentPage = ref(1);
@@ -36,13 +38,13 @@ const subscriptionDetail = ref();
 const emit = defineEmits(['update:loading', 'update:refresh', 'update:export']);
 
 watch(
-    [() => props.search, () => props.date],
-    debounce(([searchValue, dateValue]) => {
-        getResults(1, searchValue, dateValue);
+    [() => props.search, () => props.date, () => props.status],
+    debounce(([searchValue, dateValue, statusValue]) => {
+        getResults(1, searchValue, dateValue, statusValue);
     }, 300)
 );
 
-const getResults = async (page = 1, search = '', date = '') => {
+const getResults = async (page = 1, search = '', date = '', status = '') => {
     historyLoading.value = true
     try {
         let url = `/xlc_setting/getCoinPaymentDetails?page=${page}`;
@@ -53,6 +55,10 @@ const getResults = async (page = 1, search = '', date = '') => {
 
         if (date) {
             url += `&date=${date}`;
+        }
+
+        if (status) {
+            url += `&status=${status}`;
         }
 
         const response = await axios.get(url);
@@ -96,6 +102,10 @@ watch(() => props.exportStatus, (newVal) => {
             url += `&search=${props.search}`;
         }
 
+        if (props.status) {
+            url += `&status=${props.status}`;
+        }
+
         window.location.href = url;
         emit('update:export', false);
     }
@@ -131,17 +141,20 @@ const closeModal = () => {
                     Name
                 </th>
                 <th scope="col" class="px-3 py-2.5">
-                    From
+                    Wallet
                 </th>
                 <th scope="col" class="px-3 py-2.5">
                     Transaction id
                 </th>
                 <th scope="col" class="px-3 py-2.5">
-                    Date
+                    Type
                 </th>
                 <th scope="col" class="px-3 py-2.5">
-                    Paid
+                    Date
                 </th>
+                <!-- <th scope="col" class="px-3 py-2.5">
+                    Paid
+                </th> -->
                 <th scope="col" class="px-3 py-2.5">
                     Amount (unit)
                 </th>
@@ -160,13 +173,25 @@ const closeModal = () => {
             >
                 <td class="px-3 py-2.5 inline-flex items-center gap-2">
                     <img :src="subscription.user.profile_photo_url ? subscription.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                    <div>
-                        {{ subscription.user.name }}
+                    <div class="flex flex-col">
+                        <div>
+                            {{ subscription.user.name }}
+                        </div>
+                        <div>
+                            {{ subscription.user.email }}
+                        </div>
                     </div>
                 </td>
                 <td class="px-3 py-2.5">
-                    <div>
-                        {{ subscription.transaction_type === 'BuyCoin' ? subscription.from_wallet.name : (subscription.transaction_type === 'Stacking' ? subscription.from_coin.address : '') }}
+                    <div v-if="subscription.transaction_type == 'BuyCoin'">
+                        <!-- {{ subscription.transaction_type === 'BuyCoin' ? subscription.from_wallet.name : (subscription.transaction_type === 'Stacking' ? subscription.from_coin.address : '') }} -->
+                        {{ subscription.from_wallet.name }}
+                    </div>
+                    <div v-else-if="subscription.transaction_type == 'SwapCoin'">
+                        {{ subscription.to_wallet.name }}
+                    </div>
+                    <div v-else-if="subscription.transaction_type == 'Stacking'">
+                        {{ subscription.from_coin.address }}
                     </div>
                 </td>
                 <td class="px-3 py-2.5">
@@ -174,11 +199,14 @@ const closeModal = () => {
                     {{ subscription.transaction_number }}
                 </td>
                 <td class="px-3 py-2.5">
-                    {{ formatDateTime(subscription.created_at) }}
+                    {{ subscription.transaction_type }}
                 </td>
                 <td class="px-3 py-2.5">
-                    {{ subscription.transaction_type === 'BuyCoin' ? formatAmount(subscription.amount) : (subscription.transaction_type === 'Stacking' ? formatAmount(subscription.transaction_charges) : '') }}
+                    {{ formatDateTime(subscription.created_at) }}
                 </td>
+                <!-- <td class="px-3 py-2.5">
+                    {{ subscription.transaction_type === 'BuyCoin' ? formatAmount(subscription.amount) : (subscription.transaction_type === 'Stacking' ? formatAmount(subscription.transaction_charges) : '') }}
+                </td> -->
                 <td class="px-3 py-2.5 uppercase">
                     {{ formatAmount(subscription.unit) }}
                 </td>

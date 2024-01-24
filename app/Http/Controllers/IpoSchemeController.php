@@ -189,6 +189,16 @@ class IpoSchemeController extends Controller
             ]);
         }
 
+        if ($request->hasfile('plan_logo')){
+            if ($request->plan_type == 'standard') {
+                $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('standard_plan');
+            } elseif ($request->plan_type == 'ebmi') {
+                $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('ebmi_plan');
+            } elseif ($request->plan_type == 'stacking') {
+                $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('stacking_plan');
+            }
+        }
+
         return redirect()->back()->with('title', 'Investment plan added')->with('success', 'This new investment plan has been added successfully.');
     }
 
@@ -215,7 +225,20 @@ class IpoSchemeController extends Controller
                 'description' => $descriptionItem
             ]);
         }
+        
+        if ($request->hasfile('plan_logo')){
+            if ($investmentPlan->type == 'standard') {
+                $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('standard_plan');
+            } elseif ($investmentPlan->type == 'ebmi') {
+                $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('ebmi_plan');
+            } elseif ($investmentPlan->type == 'stacking') {
+                $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('stacking_plan');
+            }
+            
+        }
 
         return redirect()->back()->with('title', 'Investment plan updated')->with('success', 'This investment plan has been updated successfully.');
     }
+
+    
 }

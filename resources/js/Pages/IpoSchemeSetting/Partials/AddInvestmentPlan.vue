@@ -81,7 +81,7 @@ const onPlanLogoChanges = (event) => {
         };
         reader.readAsDataURL(file);
         selectedLogoName.value = file.name;
-        form.plan_logo = file;
+        form.plan_logo = event.target.files[0];
     } else {
         selectedLogo.value = null;
     }

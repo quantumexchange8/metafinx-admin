@@ -430,7 +430,7 @@ const removeDescription = (index) => {
                     </div>
                 </div>
 
-                <!-- <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
                     <Label for="plan_logo" class="text-sm dark:text-white md:w-1/4" value="Upload logo"/>
                     <div v-if="selectedLogo == null" class="flex gap-3 w-full">
                         <input
@@ -473,7 +473,7 @@ const removeDescription = (index) => {
                             <XIcon />
                         </Button>
                     </div>
-                </div> -->
+                </div>
             </div>
 
             <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
