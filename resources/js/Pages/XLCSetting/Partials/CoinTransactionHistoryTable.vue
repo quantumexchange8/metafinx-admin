@@ -125,7 +125,7 @@ const exportTransaction = () => {
                                 : 'border-b border-gray-400',
                         ]"
                 >
-                    Stacking History
+                    Staking History
                 </button>
             </Tab>
         </TabList>

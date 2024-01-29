@@ -110,13 +110,14 @@ const updateStatus = async (planId, newStatus) => {
         <template #asideRight>
             <div class="inset-y-0 p-6 flex flex-col space-y-6 bg-white shadow-lg dark:bg-gray-800 border-l dark:border-gray-700 lg:w-96 fixed right-0">
                 <h3 class="text-xl font-semibold leading-tight">
-                    Ongoing Stacking Plan
+                    Ongoing Staking Plan
                 </h3>
                 <!-- <AddInvestmentPlan /> -->
                 <div v-for="investmentPlan in props.investmentPlans" class="p-5 dark:bg-gray-700 rounded-[20px] flex flex-col gap-2">
                     <div class="flex justify-between">
                         <div class="inline-flex items-center justify-center gap-3">
-                            <img class="w-12 h-12 rounded-lg bg-white" src="/assets/icon.png" alt="Medium avatar">
+                            <!-- <img class="w-12 h-12 rounded-lg bg-white" src="/assets/icon.png" alt="Medium avatar"> -->
+                            <img class="w-12 h-12 rounded-lg bg-white" :src="investmentPlan.plan_logo ? investmentPlan.plan_logo : '/assets/icon.png'" alt="Medium avatar">
                             <div class="grid">
                                 <div class="font-semibold">
                                     {{ investmentPlan.name['en'] }}

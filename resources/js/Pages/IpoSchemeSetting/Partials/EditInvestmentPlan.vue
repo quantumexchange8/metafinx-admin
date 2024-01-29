@@ -36,7 +36,7 @@ const planNameCn = ref(props.investmentPlan.name.cn);
 const planNameTw = ref(props.investmentPlan.name.tw);
 const roiPercentage = ref(props.investmentPlan.roi_per_annum);
 
-const selectedLogo = ref(null);
+const selectedLogo = ref(props.investmentPlan.plan_logo ? props.investmentPlan.plan_logo : null);
 const selectedLogoName = ref(null);
 
 const form = useForm({
@@ -460,8 +460,8 @@ const removeDescription = (index) => {
                     >
                         <div class="inline-flex items-center gap-3">
                             <img :src="selectedLogo" alt="Selected Image" class="max-w-full h-9 object-contain rounded" />
-                            <div class="text-gray-light-900 dark:text-white">
-                                {{ selectedLogoName }}
+                            <div v-for="name in investmentPlan.media" class="text-gray-light-900 dark:text-white">
+                                {{ name.file_name }}
                             </div>
                         </div>
                         <Button

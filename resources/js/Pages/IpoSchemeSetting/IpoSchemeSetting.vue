@@ -10,6 +10,7 @@ import EditInvestmentPlan from "@/Pages/IpoSchemeSetting/Partials/EditInvestment
 
 const props = defineProps({
     investmentPlans: Object,
+    investmentPlansUrl: Object,
     totalInvestmentCount: String,
     totalEarningCount: String,
     onGoingAmountCount: String,
@@ -152,7 +153,8 @@ const updateStatus = async (planId, newStatus) => {
                 <div v-for="investmentPlan in props.investmentPlans" class="p-5 dark:bg-gray-700 rounded-[20px] flex flex-col gap-2">
                     <div class="flex justify-between">
                         <div class="inline-flex items-center justify-center gap-3">
-                            <img class="w-12 h-12 rounded-lg bg-white" src="/assets/icon.png" alt="Medium avatar">
+                            <!-- {{ investmentPlansUrl }} -->
+                            <img class="w-12 h-12 rounded-lg bg-white" :src="investmentPlan.plan_logo ? investmentPlan.plan_logo : '/assets/icon.png'" alt="Medium avatar">
                             <div class="grid">
                                 <div class="font-semibold">
                                     {{ investmentPlan.name['en'] }}

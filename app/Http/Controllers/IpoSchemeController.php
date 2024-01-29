@@ -24,8 +24,37 @@ class IpoSchemeController extends Controller
         $totalEarningCount = InvestmentSubscription::sum('total_earning');
         $onGoingAmountCount = InvestmentSubscription::where('status', 'OnGoingPeriod')->sum('amount');
 
+        $groupedInvestmentPlans = $investmentPlans->groupBy('type');
+
+        $investmentPlansUrl = $groupedInvestmentPlans->map(function ($group, $type) {
+            // Select the fields you want for each group
+            return [
+                'type' => $type,
+                'plans' => $group->map(function ($investmentPlan) {
+                    return [
+                        'id' => $investmentPlan->id,
+                        'name' => $investmentPlan->getTranslation('name', app()->getLocale()),
+                        'roi_per_annum' => $investmentPlan->roi_per_annum,
+                        'commision_multiplier' => $investmentPlan->commision_multiplier,
+                        'descriptions' => $investmentPlan->descriptions->map(function ($description) {
+                            return [
+                                'description' => $description->getTranslation('description', app()->getLocale()),
+                            ];
+                        }),
+                        'type' => $investmentPlan->type,
+                        'plan_logo' => $investmentPlan->getFirstMediaUrl('standard_plan')
+                    ];
+                }),
+            ];
+        });
+
+        $investmentPlans->each(function ($plan) {
+            $plan->plan_logo = $plan->getFirstMediaUrl('standard_plan');
+        });
+        
         return Inertia::render('IpoSchemeSetting/IpoSchemeSetting', [
             'investmentPlans' => $investmentPlans,
+            'investmentPlansUrl' => $investmentPlansUrl,
             'totalInvestmentCount' => $totalInvestmentCount,
             'totalEarningCount' => $totalEarningCount,
             'onGoingAmountCount' => $onGoingAmountCount,
@@ -202,7 +231,7 @@ class IpoSchemeController extends Controller
         return redirect()->back()->with('title', 'Investment plan added')->with('success', 'This new investment plan has been added successfully.');
     }
 
-    public function editInvestmentPlan(InvestmentPlanRequest $request)
+    public function editInvestmentPlan(Request $request)
     {
         $investmentPlan = InvestmentPlan::find($request->id);
 

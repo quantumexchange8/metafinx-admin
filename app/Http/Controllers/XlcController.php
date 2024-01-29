@@ -24,9 +24,13 @@ class XlcController extends Controller
 
         $coinTransactions = CoinPayment::all();
         $investmentPlans = InvestmentPlan::with('descriptions:id,investment_plan_id,description')
-                            ->where('type', 'stacking')
+                            ->where('type', 'staking')
                             ->get();
         
+        $investmentPlans->each(function ($plan) {
+            $plan->plan_logo = $plan->getFirstMediaUrl('stacking_plan');
+        });
+
         return Inertia::render('XLCSetting/XLCSetting', [
             'coinTransactions' => $coinTransactions,
             'investmentPlans' => $investmentPlans,
@@ -36,7 +40,7 @@ class XlcController extends Controller
     public function getCoinPaymentDetails(Request $request)
     {
         $coinTransactions = Transaction::with(['user:id,name,email', 'from_wallet:id,name,type', 'to_wallet:id,name,type', 'from_coin:id,address'])
-                            ->whereIn('transaction_type', ['BuyCoin', 'Stacking', 'SwapCoin']);
+                            ->whereIn('transaction_type', ['BuyCoin', 'Staking', 'SwapCoin']);
                             
         if ($request->filled('search')) {
             $search = $request->input('search');
