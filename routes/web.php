@@ -134,6 +134,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/upload/image-revert', [ConfigurationController::class, 'image_revert']);
         //Dividend Bonus
         Route::post('/addDividendBonus', [ConfigurationController::class, 'addDividendBonus'])->name('configuration.addDividendBonus');
+        Route::put('/editDividendBonus/{id}', [ConfigurationController::class, 'editDividendBonus'])->name('configuration.editDividendBonus');
         Route::get('/getDividendBonus', [ConfigurationController::class, 'getDividendBonus'])->name('configuration.getDividendBonus');
         //Master Setting
         Route::post('/editMasterSetting', [ConfigurationController::class, 'editMasterSetting'])->name('configuration.editMasterSetting');
@@ -171,6 +172,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/view', [ReportController::class, 'index'])->name('report.view');
         Route::get('/getPayoutDetails', [ReportController::class, 'getPayoutDetails'])->name('report.getPayoutDetails');
         Route::get('/getMonthlyReturnPayoutDetails', [ReportController::class, 'getMonthlyReturnPayoutDetails'])->name('report.getMonthlyReturnPayoutDetails');
+        Route::get('/getAffiliateEarningPayoutDetails', [ReportController::class, 'getAffiliateEarningPayoutDetails'])->name('report.getAffiliateEarningPayoutDetails');
+        Route::get('/getDividendEarningPayoutDetails', [ReportController::class, 'getDividendEarningPayoutDetails'])->name('report.getDividendEarningPayoutDetails');
 
         Route::get('/getTotalPayoutByDays', [ReportController::class, 'getTotalPayoutByDays'])->name('report.getTotalPayoutByDays');
         Route::get('/getTotalPayoutByMonths', [ReportController::class, 'getTotalPayoutByMonths'])->name('report.getTotalPayoutByMonths');

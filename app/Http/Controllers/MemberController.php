@@ -309,7 +309,7 @@ class MemberController extends Controller
         $walletSum = Wallet::where('user_id', $user->id)->sum('balance');
         $earningSum = Earning::where('upline_id', $user->id)->sum('after_amount');
 
-        $types = ['monthly_return', 'referral_earnings', 'affiliate_earnings', 'dividend_earnings'];
+        $types = ['MonthlyReturn', 'ReferralEarning', 'AffiliateEarning', 'DividendEarning', 'AffiliateDividendEarning'];
 
         $totalEarnings = [];
         foreach ($types as $type) {

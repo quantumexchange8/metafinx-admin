@@ -35,10 +35,10 @@ const refreshInfo = async () => {
         // Replace fetchData with your actual function for fetching data
         responseData.value = await fetchData();
 
-        totalMonthlyReturn.value = responseData.value.totalEarnings.monthly_return;
-        totalReferralEarning.value = responseData.value.totalEarnings.referral_earnings;
-        totalAffiliateEarning.value = responseData.value.totalEarnings.affiliate_earnings;
-        totalDividendEarning.value = responseData.value.totalEarnings.dividend_earnings;
+        totalMonthlyReturn.value = responseData.value.totalEarnings.MonthlyReturn;
+        totalReferralEarning.value = responseData.value.totalEarnings.ReferralEarning;
+        totalAffiliateEarning.value = responseData.value.totalEarnings.AffiliateEarning;
+        totalDividendEarning.value = responseData.value.totalEarnings.DividendEarning;
     } catch (error) {
         console.error('Error fetching data:', error);
     } finally {

@@ -18,6 +18,7 @@ use App\Models\SettingEarning;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\SettingWithdrawalFee;
+use App\Models\InvestmentSubscription;
 use App\Http\Requests\CoinPriceRequest;
 use App\Models\SettingAffiliateEarning;
 use App\Http\Requests\MarketTimeRequest;
@@ -165,6 +166,12 @@ class ConfigurationController extends Controller
 
     public function addDividendBonus(DividendBonusRequest $request)
     {
+        $existingDate = SettingBonus::where('release_date', $request->date)->first();
+
+        if ($existingDate) {
+            throw ValidationException::withMessages(['date' => ['Release date already exists']]);
+        }
+        
         $settingBonus = SettingBonus::create([
             'name' => 'Dividend Bonus',
             'type' => 'dividend_bonuses',
@@ -175,6 +182,26 @@ class ConfigurationController extends Controller
         return redirect()->back()->with('title', 'Dividend Bonus')->with('success', 'A dividend bonus of $ ' . $request->amount . ' will be released on ' . $request->date . '.');
     }
 
+    public function editDividendBonus(DividendBonusRequest $request, $id)
+    {
+        $existingDividendBonus = SettingBonus::findOrFail($id);
+    
+        $existingDate = SettingBonus::where('release_date', $request->date)
+        ->where('id', '!=', $id)
+        ->first();
+        
+        if ($existingDate) {
+            throw ValidationException::withMessages(['date' => ['Release date already exists']]);
+        }
+    
+        $existingDividendBonus->update([
+            'amount' => $request->amount,
+            'release_date' => $request->date,
+        ]);
+    
+        return redirect()->back()->with('title', 'Dividend Bonus Updated')->with('success', 'The dividend bonus has been updated successfully.');
+    }
+    
     public function editMasterSetting(TicketBonusRequest $request)
     {
         $symbol = '';
@@ -226,6 +253,13 @@ class ConfigurationController extends Controller
             ->latest()
             ->paginate(10);
 
+            $totalMemberCount = InvestmentSubscription::distinct('user_id')->count();
+    
+            $dividends->transform(function ($dividend) use ($totalMemberCount) {
+                $dividend->total_Member = $totalMemberCount;
+                return $dividend;
+            });
+    
         return response()->json($dividends);
     }
 
@@ -259,8 +293,8 @@ class ConfigurationController extends Controller
 
         $settingRank = SettingRank::find($rank_id);
 
-        $referralEarning = SettingEarning::where('setting_rank_id', $rank_id)->where('type', 'referral_earnings')->first();
-        $dividendEarning = SettingEarning::where('setting_rank_id', $rank_id)->where('type', 'dividend_earnings')->get();
+        $referralEarning = SettingEarning::where('setting_rank_id', $rank_id)->where('type', 'ReferralEarning')->first();
+        $dividendEarning = SettingEarning::where('setting_rank_id', $rank_id)->where('type', 'DividendEarning')->get();
         $affiliateSettings = SettingAffiliateEarning::where('setting_rank_id', $rank_id)->get();
 
         return response()->json([
@@ -284,13 +318,13 @@ class ConfigurationController extends Controller
 
         $settingEarnings = SettingEarning::where('setting_rank_id', $request->id)->get();
 
-        $dividendEarnings = $request->dividend_earnings;
+        $dividendEarnings = $request->DividendEarning;
         foreach ($settingEarnings as $earning) {
-            if ($earning->type == 'dividend_earnings' && !empty($dividendEarnings)) {
+            if ($earning->type == 'DividendEarning' && !empty($dividendEarnings)) {
                 $earning->delete();
-            } elseif ($earning->type == 'referral_earnings') {
+            } elseif ($earning->type == 'ReferralEarning') {
                 $earning->update([
-                    'value' => $request->referral_earnings
+                    'value' => $request->ReferralEarning
                 ]);
             }
         }
@@ -299,7 +333,7 @@ class ConfigurationController extends Controller
             SettingEarning::create([
                 'setting_rank_id' => $request->id,
                 'name' => 'Dividend Earnings',
-                'type' => 'dividend_earnings',
+                'type' => 'DividendEarning',
                 'value' => $dividendEarning
             ]);
         }

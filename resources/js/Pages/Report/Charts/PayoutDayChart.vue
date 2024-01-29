@@ -36,9 +36,9 @@ const fetchData = async () => {
 
         const gradientColors = [
             [
-                'rgba(50, 173, 230, 0.40)',
-                'rgba(50, 173, 230, 0.00)',
-                'monthly_return',
+                'rgba(255, 45, 85, 0.40)',
+                'rgba(255, 45, 85, 0.00)',
+                'MonthlyReturn',
                 'Monthly Return'
             ],
             [
@@ -50,19 +50,19 @@ const fetchData = async () => {
             [
                 'rgba(0, 199, 190, 0.4)',
                 'rgba(0, 199, 190, 0)',
-                'referral_earnings',
+                'ReferralEarning',
                 'Referral Earning'
             ],
             [
-                'rgba(253, 176, 34, 0.40)',
-                'rgba(253, 176, 34, 0.00)',
-                'Affiliate_Earning',
+                'rgba(175,82,222, 0.40)',
+                'rgba(175,82,222, 0.00)',
+                'AffiliateEarning',
                 'Affiliate Earning'
             ],
             [
-                'rgba(0, 199, 190, 0.40)',
-                'rgba(0, 199, 190, 0.00)',
-                'Dividend_Earning',
+                'rgba(88,86,214, 0.40)',
+                'rgba(88,86,214, 0.00)',
+                'DividendEarning',
                 'Dividend Earning'
             ],
             [

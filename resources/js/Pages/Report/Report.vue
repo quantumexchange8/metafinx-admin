@@ -12,6 +12,7 @@ const props = defineProps({
     report: Object,
     totatMonthlyReturn: String,
     totalReferralEarning: String,
+    totatAffiliateEarning: String,
 })
 
 const { formatAmount, formatDateTime } = transactionFormat();
@@ -20,7 +21,7 @@ const isLoading = ref(false);
 const search = ref('');
 const date = ref('');
 const currentYear = new Date().getFullYear();
-const activePayout = ref('Monthly_Return');
+const activePayout = ref('MonthlyReturn');
 const monthlyPayout = ref(0);
 const referralEarning = ref(0);
 const affiliateEarning = ref(0);
@@ -37,7 +38,7 @@ const tableDate = (dateValue) => {
 
 const payoutStats = ref([
     {
-        key: 'Monthly_Return',
+        key: 'MonthlyReturn',
         label: 'Total Monthly Return Payout',
         value: '$ ' + formatAmount(props.totatMonthlyReturn),
     },
@@ -47,17 +48,17 @@ const payoutStats = ref([
     //     value: '$ ' + formatAmount(quarterlyDividend.value),
     // },
     {
-        key: 'referral_earnings',
+        key: 'ReferralEarning',
         label: 'Total Referral Earning Payout',
         value: '$ ' + formatAmount(props.totalReferralEarning),
     },
     {
-        key: 'Affiliate_Earning',
+        key: 'AffiliateEarning',
         label: 'Total Affiliate Earning Payout',
-        value: '$ ' + formatAmount(affiliateEarning.value),
+        value: '$ ' + formatAmount(props.totatAffiliateEarning),
     },
     {
-        key: 'Dividend_Earning',
+        key: 'DividendEarning',
         label: 'Total Dividend Earning Payout',
         value: '$ ' + formatAmount(dividendEarning.value),
     },
@@ -73,7 +74,7 @@ const payoutStats = ref([
     // },
 ]);
 
-const totalReferralEarningStat = payoutStats.value.find(stat => stat.key === 'referral_earnings');
+const totalReferralEarningStat = payoutStats.value.find(stat => stat.key === 'ReferralEarning');
 
 const getResults = async (page = 1, search = '', date = '') => {
     isLoading.value = true

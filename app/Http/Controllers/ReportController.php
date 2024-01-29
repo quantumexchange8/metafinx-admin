@@ -21,19 +21,21 @@ class ReportController extends Controller
     public function index()
     {
 
-        $totatMonthlyReturn = Earning::where('type', 'monthly_return')->sum('after_amount');
-        $totalReferralEarning = Earning::where('type', 'referral_earnings')->sum('after_amount');
+        $totatMonthlyReturn = Earning::where('type', 'MonthlyReturn')->sum('after_amount');
+        $totalReferralEarning = Earning::where('type', 'ReferralEarning')->sum('after_amount');
+        $totatAffiliateEarning = Earning::where('type', 'AffiliateEarning')->sum('after_amount');
         
         return Inertia::render('Report/Report', [
             'totatMonthlyReturn' => $totatMonthlyReturn,
             'totalReferralEarning' => $totalReferralEarning,
+            'totatAffiliateEarning' => $totatAffiliateEarning,
         ]);
     }
 
     public function getPayoutDetails(Request $request)
     {
         $query = Earning::query()
-            ->with(['downline:id,name,email', 'user:id,name']);
+            ->with(['downline:id,name,email', 'user:id,name,email']);
 
         if ($request->filled('search')) {
             $search = '%' . $request->input('search') . '%';
@@ -57,10 +59,10 @@ class ReportController extends Controller
             $query->whereBetween('created_at', [$start_date, $end_date]);
         }
 
-        // $monthlyReturn = $query->where('type', 'monthly_return')->sum('after_amount');
+        // $monthlyReturn = $query->where('type', 'MonthlyReturn')->sum('after_amount');
         // $quarterlyDividend = $query->where('type', 'Quarterly Divdend'))->sum('after_amount');
-        $referralEarning = $query->where('type', 'referral_earnings')->sum('after_amount');
-        // $affiliateEarning = $query->where('type', 'Affiliate Earning')->sum('after_amount');
+        $referralEarning = $query->where('type', 'ReferralEarning')->sum('after_amount');
+        // $affiliateEarning = $query->where('type', 'AffiliateEarning')->sum('after_amount');
         // $dividendEarning = $query->where('type', 'Dividend Earning')->sum('after_amount');
         // $ticketBonus = $query->where('type', 'Ticket Bonus')->sum('after_amount');
 
@@ -79,6 +81,7 @@ class ReportController extends Controller
 
         $results->each(function ($user_deposit) {
             $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
+            $user_deposit->downline->profile_photo_url = $user_deposit->downline->getFirstMediaUrl('profile_photo');
         });
 
         return response()->json([
@@ -140,10 +143,10 @@ class ReportController extends Controller
             'datasets' => [],
         ];
 
-        $backgroundColors = ['referral_earnings' => '#00C7BE', 'monthly_return' => '#FF2D55', 'affiliate_earnings' => '#AF52DE', 'dividend_earning' => '#5856D6'];
+        $backgroundColors = ['ReferralEarning' => '#00C7BE', 'MonthlyReturn' => '#FF2D55', 'AffiliateEarning' => '#AF52DE', 'DividendEarning' => '#5856D6'];
 
-        // $backgroundColors = ['Monthly Return' => '#FF2D55', 'Quarterly Dividend' => '#FDB022', 'referral_earnings' => '#00C7BE', 
-        // 'Affiliate Earning' => '#AF52DE', 'Dividend Earning' => '#5856D6', 'Ticket Bonus' => '#32ADE6'];
+        // $backgroundColors = ['Monthly Return' => '#FF2D55', 'Quarterly Dividend' => '#FDB022', 'ReferralEarning' => '#00C7BE', 
+        // 'AffiliateEarning' => '#AF52DE', 'Dividend Earning' => '#5856D6', 'Ticket Bonus' => '#32ADE6'];
 
         // Loop through each unique type and create a dataset
         foreach ($uniquePayoutType as $payoutType) {
@@ -214,10 +217,10 @@ class ReportController extends Controller
             'datasets' => [],
         ];
 
-        $backgroundColors = ['referral_earnings' => '#00C7BE', 'monthly_return' => '#FF2D55', 'affiliate_earnings' => '#AF52DE', 'dividend_earnings' => '#5856D6'];
+        $backgroundColors = ['ReferralEarning' => '#00C7BE', 'MonthlyReturn' => '#FF2D55', 'AffiliateEarning' => '#AF52DE', 'DividendEarnings' => '#5856D6'];
 
-        // $backgroundColors = ['Monthly Return' => '#FF2D55', 'Quarterly Dividend' => '#FDB022', 'referral_earnings' => '#00C7BE', 
-        // 'Affiliate Earning' => '#AF52DE', 'Dividend Earning' => '#5856D6', 'Ticket Bonus' => '#32ADE6'];
+        // $backgroundColors = ['Monthly Return' => '#FF2D55', 'Quarterly Dividend' => '#FDB022', 'ReferralEarning' => '#00C7BE', 
+        // 'AffiliateEarning' => '#AF52DE', 'Dividend Earning' => '#5856D6', 'Ticket Bonus' => '#32ADE6'];
 
         foreach ($uniquePayoutType as $payoutType) {
             $payoutData = $payouts->where('type', $payoutType);
@@ -242,7 +245,7 @@ class ReportController extends Controller
     public function getMonthlyReturnPayoutDetails(Request $request)
     {
         $query = Earning::query()
-            ->with(['downline:id,name,email', 'user:id,name']);
+            ->with(['downline:id,name,email', 'user:id,name,email']);
 
         if ($request->filled('search')) {
             $search = '%' . $request->input('search') . '%';
@@ -266,10 +269,10 @@ class ReportController extends Controller
             $query->whereBetween('created_at', [$start_date, $end_date]);
         }
 
-        $monthlyReturn = $query->where('type', 'monthly_return')->sum('after_amount');
+        $monthlyReturn = $query->where('type', 'MonthlyReturn')->sum('after_amount');
         // $quarterlyDividend = $query->where('type', 'Quarterly Divdend'))->sum('after_amount');
-        // $referralEarning = $query->where('type', 'referral_earnings')->sum('after_amount');
-        // $affiliateEarning = $query->where('type', 'Affiliate Earning')->sum('after_amount');
+        // $referralEarning = $query->where('type', 'ReferralEarning')->sum('after_amount');
+        // $affiliateEarning = $query->where('type', 'AffiliateEarning')->sum('after_amount');
         // $dividendEarning = $query->where('type', 'Dividend Earning')->sum('after_amount');
         // $ticketBonus = $query->where('type', 'Ticket Bonus')->sum('after_amount');
 
@@ -298,6 +301,134 @@ class ReportController extends Controller
             // 'referralEarning' => $referralEarning,
             // 'affiliateEarning' => $affiliateEarning,
             // 'dividendEarning' => $dividendEarning,
+            // 'ticketBonus' => $ticketBonus,
+            // 'selectedPayout' => $selectedPayout,
+        ]);
+    }
+
+    public function getAffiliateEarningPayoutDetails(Request $request)
+    {
+        $query = Earning::query()
+            ->with(['downline:id,name,email', 'user:id,name,email']);
+
+        if ($request->filled('search')) {
+            $search = '%' . $request->input('search') . '%';
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('downline', function ($downline) use ($search) {
+                    $downline->where('name', 'like', $search)
+                        ->orWhere('email', 'like', $search);
+                })
+                ->orWhereHas('user', function ($upline) use ($search){
+                    $upline->where('name', 'like', $search);
+                });
+            });
+        }
+
+        if ($request->filled('date')) {
+            $date = $request->input('date');
+            $dateRange = explode(' - ', $date);
+            $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+            $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+
+            $query->whereBetween('created_at', [$start_date, $end_date]);
+        }
+
+        // $monthlyReturn = $query->where('type', 'MonthlyReturn')->sum('after_amount');
+        // $quarterlyDividend = $query->where('type', 'Quarterly Divdend'))->sum('after_amount');
+        // $referralEarning = $query->where('type', 'ReferralEarning')->sum('after_amount');
+        $affiliateEarning = $query->where('type', 'AffiliateEarning')->sum('after_amount');
+        // $dividendEarning = $query->where('type', 'Dividend Earning')->sum('after_amount');
+        // $ticketBonus = $query->where('type', 'Ticket Bonus')->sum('after_amount');
+
+        if ($request->filled('type')) {
+            $type = $request->input('type');
+            $query->where('type', $type);
+        }
+
+        if ($request->has('exportStatus')) {
+            return Excel::download(new EarningReportExport($query), Carbon::now() . '-' . $type . '-report.xlsx');
+        }
+
+        $results = $query->latest()->paginate(10);
+
+        $totalAmount = $query->sum('after_amount');
+
+        $results->each(function ($user_deposit) {
+            $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
+        });
+
+        return response()->json([
+            'results' => $results,
+            // 'monthlyReturn' => $monthlyReturn,
+            'totalAmount' => $totalAmount,
+            // 'quarterlyDividend' => $quarterlyDividend,
+            // 'referralEarning' => $referralEarning,
+            'affiliateEarning' => $affiliateEarning,
+            // 'dividendEarning' => $dividendEarning,
+            // 'ticketBonus' => $ticketBonus,
+            // 'selectedPayout' => $selectedPayout,
+        ]);
+    }
+
+    public function getDividendEarningPayoutDetails(Request $request)
+    {
+        $query = Earning::query()
+            ->with(['downline:id,name,email', 'user:id,name,email']);
+
+        if ($request->filled('search')) {
+            $search = '%' . $request->input('search') . '%';
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('downline', function ($downline) use ($search) {
+                    $downline->where('name', 'like', $search)
+                        ->orWhere('email', 'like', $search);
+                })
+                ->orWhereHas('user', function ($upline) use ($search){
+                    $upline->where('name', 'like', $search);
+                });
+            });
+        }
+
+        if ($request->filled('date')) {
+            $date = $request->input('date');
+            $dateRange = explode(' - ', $date);
+            $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+            $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+
+            $query->whereBetween('created_at', [$start_date, $end_date]);
+        }
+
+        // $monthlyReturn = $query->where('type', 'MonthlyReturn')->sum('after_amount');
+        // $quarterlyDividend = $query->where('type', 'Quarterly Divdend'))->sum('after_amount');
+        // $referralEarning = $query->where('type', 'ReferralEarning')->sum('after_amount');
+        // $affiliateEarning = $query->where('type', 'AffiliateEarning')->sum('after_amount');
+        $dividendEarning = $query->where('type', 'DividendEarning')->sum('after_amount');
+        // $ticketBonus = $query->where('type', 'Ticket Bonus')->sum('after_amount');
+
+        if ($request->filled('type')) {
+            $type = $request->input('type');
+            $query->where('type', $type);
+        }
+
+        if ($request->has('exportStatus')) {
+            return Excel::download(new EarningReportExport($query), Carbon::now() . '-' . $type . '-report.xlsx');
+        }
+
+        $results = $query->latest()->paginate(10);
+
+        $totalAmount = $query->sum('after_amount');
+
+        $results->each(function ($user_deposit) {
+            $user_deposit->user->profile_photo_url = $user_deposit->user->getFirstMediaUrl('profile_photo');
+        });
+
+        return response()->json([
+            'results' => $results,
+            // 'monthlyReturn' => $monthlyReturn,
+            'totalAmount' => $totalAmount,
+            // 'quarterlyDividend' => $quarterlyDividend,
+            // 'referralEarning' => $referralEarning,
+            // 'affiliateEarning' => $affiliateEarning,
+            'dividendEarning' => $dividendEarning,
             // 'ticketBonus' => $ticketBonus,
             // 'selectedPayout' => $selectedPayout,
         ]);

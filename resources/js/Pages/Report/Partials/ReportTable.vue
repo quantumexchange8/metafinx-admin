@@ -80,7 +80,7 @@ watch(
 
     <div class="relative overflow-x-auto sm:rounded-lg">
         <MonthlyReturnPayout
-            v-if="activePayout==='Monthly_Return'"
+            v-if="activePayout==='MonthlyReturn'"
             :refresh="refresh"
             :isLoading="isLoading"
             :search="search"
@@ -104,7 +104,7 @@ watch(
             @update:export="$emit('update:export', $event)"
         /> -->
         <ReferralEarningPayout
-            v-if="activePayout==='referral_earnings'"
+            v-if="activePayout==='ReferralEarning'"
             :refresh="refresh"
             :isLoading="isLoading"
             :search="search"
@@ -116,7 +116,7 @@ watch(
             @update:export="$emit('update:export', $event)"
         />
         <AffiliateEarningPayout
-            v-if="activePayout==='Affiliate_Earning'"
+            v-if="activePayout==='AffiliateEarning'"
             :refresh="refresh"
             :isLoading="isLoading"
             :search="search"
@@ -128,7 +128,7 @@ watch(
             @update:export="$emit('update:export', $event)"
         />
         <DividendEarningPayout
-            v-if="activePayout==='Dividend_Earning'"
+            v-if="activePayout==='DividendEarning'"
             :refresh="refresh"
             :isLoading="isLoading"
             :search="search"

@@ -28,7 +28,7 @@ const formatter = ref({
 const monthly = ref({data: []});
 const totalAmount = ref(0);
 const currentPage = ref(1);
-const refreshReferral = ref(props.refresh);
+const refreshMonth = ref(props.refresh);
 const isLoading = ref(props.isLoading);
 const emit = defineEmits(['update:loading', 'update:refresh']);
 const { formatDateTime, formatAmount } = transactionFormat();
@@ -57,7 +57,6 @@ const getResults = async (page = 1, search = '', date = '') => {
         const response = await axios.get(url);
         monthly.value = response.data.results;
         totalAmount.value = response.data.totalAmount;
-        
     } catch (error) {
         console.error(error.response.data);
     } finally {
@@ -77,7 +76,7 @@ const handlePageChange = (newPage) => {
 };
 
 watch(() => props.refresh, (newVal) => {
-    refreshReferral.value = newVal;
+    refreshMonth.value = newVal;
     if (newVal) {
         // Call the getResults function when refresh is true
         getResults();
@@ -86,7 +85,7 @@ watch(() => props.refresh, (newVal) => {
 });
 
 watch(() => props.exportStatus, (newVal) => {
-    refreshReferral.value = newVal;
+    refreshMonth.value = newVal;
     if (newVal) {
         let url = `/report/getMonthlyReturnPayoutDetails?exportStatus=yes`;
 
@@ -143,18 +142,27 @@ const paginationActiveClass = [
         </tr>
         
         <tr
-            v-for="referral in monthly.data"
+            v-for="month in monthly.data"
             class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
         >
-            <td class="px-3 py-2.5 inline-flex items-center gap-2">
-                <img :src="referral.user?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                {{ referral.user ? referral.user.name : 'N/A' }}
+            <td class="px-3 py-2.5">
+                <div class="flex items-center gap-2">
+                    <img :src="month.user?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                    <div class="flex flex-col">
+                        <div>
+                            {{ month.user ? month.user.name : 'N/A' }}
+                        </div>
+                        <div class="dark:text-gray-400">
+                            {{ month.user ? month.user.email : 'N/A' }}
+                        </div>
+                    </div>
+                </div>
             </td>   
             <td class="px-3 py-2.5">
-                {{ formatDateTime(referral.created_at) }}
+                {{ formatDateTime(month.created_at) }}
             </td>
             <td class="px-3 py-2.5">
-                ${{ formatAmount(referral.after_amount) }}
+                ${{ formatAmount(month.after_amount) }}
             </td>
         </tr>
         </tbody>

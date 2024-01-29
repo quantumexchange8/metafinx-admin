@@ -10,6 +10,12 @@ import {TailwindPagination} from "laravel-vue-pagination";
 import Loading from "@/Components/Loading.vue";
 import debounce from "lodash/debounce.js";
 import {transactionFormat} from "@/Composables/index.js";
+import {EditIcon} from "@/Components/Icons/outline.jsx";
+import Tooltip from "@/Components/Tooltip.vue";
+import Modal from "@/Components/Modal.vue";
+import { useForm } from '@inertiajs/vue3'
+import Label from "@/Components/Label.vue";
+import InputError from "@/Components/InputError.vue";
 
 const formatter = ref({
     date: 'YYYY-MM-DD',
@@ -21,8 +27,10 @@ const date = ref('');
 const currentPage = ref(1);
 const isLoading = ref(false);
 const refresh = ref(false);
+const editModal = ref(false);
+const dividendBonus = ref();
 
-const { formatAmount, formatDate, formatDateTime } = transactionFormat();
+const { formatAmount, formatDate, formatDateTime, formatDatePicker } = transactionFormat();
 
 function refreshTable() {
     isLoading.value = !isLoading.value;
@@ -89,6 +97,45 @@ watch(() => refresh.value, (newVal) => {
         refresh.value = false;
     }
 });
+
+const openModal = (dividendBonusId, dividends) => {
+    form.amount = dividends.amount;
+    form.date = formatDatePicker(dividends.release_date);
+    dividendBonus.value = dividends;
+    editModal.value = true;
+    // console.log(form.date);
+}
+
+const closeModal = () => {
+    editModal.value = false
+}
+
+const form = useForm({
+    amount: '',
+    date: '',
+});
+
+function clearField() {
+    form.amount = '';
+    form.date = '';
+}
+
+const submit = () => {
+    form.put(route('configuration.editDividendBonus', dividendBonus.value.id), {
+        onSuccess: () => {
+            form.reset();
+            clearField();
+            closeModal();
+        },
+    });
+}
+
+const isDividendReleased = (dividend) => {
+    const releaseDate = new Date(dividend.release_date);
+    const currentDate = new Date();
+
+    return releaseDate <= currentDate;
+}
 </script>
 
 <template>
@@ -120,11 +167,12 @@ watch(() => refresh.value, (newVal) => {
             </div>
             <div class="md:col-span-2">
                 <vue-tailwind-datepicker
-                    placeholder="Select dates"
-                    :formatter="formatter"
-                    separator=" - "
-                    v-model="date"
-                    input-classes="py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+                    id="dividend_bonus_release_date"
+                    placeholder="Select date"
+                    as-single
+                    :input-classes="form.errors.date ? 'py-2.5 border-error-500 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-error-500 dark:bg-gray-600 dark:text-white' :
+                    'py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white'"
+                    v-model="form.date"
                 />
             </div>
         </div>
@@ -147,6 +195,9 @@ watch(() => refresh.value, (newVal) => {
                     <th scope="col" class="px-3 py-4 text-center">
                         Amount
                     </th>
+                    <th scope="col" class="px-3 py-4 text-center">
+                        Action
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -166,10 +217,26 @@ watch(() => refresh.value, (newVal) => {
                         {{ formatDateTime(dividend.release_date, false) }}
                     </td>
                     <td class="px-3 py-4 text-center">
-                        2000
+                        {{ (dividend.total_Member) }}
                     </td>
                     <td class="px-3 py-4 text-center">
                         ${{ formatAmount(dividend.amount) }}
+                    </td>
+                    <td class="px-3 py-4 text-center">
+                        <Tooltip content="Edit Dividend Bonus" placement="bottom">
+                            <Button
+                                type="button"
+                                class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
+                                :class="{ 'opacity-50': isDividendReleased(dividend) }"
+                                variant="action"
+                                @click="openModal(dividend.id, dividend)"
+                                pill
+                                :disabled="isDividendReleased(dividend)"
+                            >
+                                <EditIcon aria-hidden="true" class="w-5 h-5 absolute" />
+                                <span class="sr-only">Edit Dividend Bonus</span>
+                            </Button>
+                        </Tooltip>
                     </td>
                 </tr>
                 </tbody>
@@ -192,4 +259,63 @@ watch(() => refresh.value, (newVal) => {
             </div>
         </div>
     </div>
+
+    <Modal :show="editModal" title="Edit Dividend Bonus" @close="closeModal">
+        <div v-if="dividendBonus">
+            <form @submit.prevent="submit" class="flex flex-col gap-8 w-full">
+                <div class="flex flex-col gap-5">
+                    <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
+                        <Label class="text-sm dark:text-white" for="dividend_bonus_amount" value="Dividend Bonus Amount" />
+                        <div class="md:col-span-3">
+                            <Input
+                                id="dividend_bonus_amount"
+                                type="number"
+                                min="0"
+                                class="flex flex-row items-center gap-3 w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600 px-3 py-0"
+                                :class="form.errors.amount ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                                placeholder="$ 0.00"
+                                autofocus
+                                v-model="form.amount"
+                            />
+                            <InputError :message="form.errors.amount" class="mt-2" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
+                        <Label class="text-sm dark:text-white" for="dividend_bonus_release_date" value="Dividend Bonus Release Date" />
+                        <div class="md:col-span-3">
+                            <vue-tailwind-datepicker
+                                id="dividend_bonus_release_date"
+                                placeholder="Select date"
+                                :formatter="formatter"
+                                as-single
+                                :input-classes="form.errors.date ? 'py-2.5 border-error-500 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-error-500 dark:bg-gray-600 dark:text-white' :
+                                'py-2.5 border-gray-400 w-full rounded-lg text-sm placeholder:text-base dark:placeholder:text-gray-400 focus:border-gray-400 focus:border-pink-700 focus:ring focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-white dark:border-gray-600 dark:bg-gray-600 dark:text-white'"
+                                v-model="form.date"
+                            />
+                            <InputError :message="form.errors.date" class="mt-2" />
+                        </div>
+                    </div>
+                </div>
+                <div class="flex pt-8 gap-3 justify-end border-t dark:border-gray-700">
+                    <Button
+                    variant="secondary"
+                    class="px-4 py-2 justify-center w-1/4 md:w-1/6"
+                    :disabled="form.processing"
+                    @click.prevent="closeModal"
+                    >
+                        <span class="text-sm font-semibold">Cancel</span>
+                    </Button>
+
+                    <Button
+                        variant="primary"
+                        class="px-4 py-2 justify-center w-1/4 md:w-1/6"
+                        :disabled="form.processing"
+                        @click.prevent="submit"
+                    >
+                        <span class="text-sm font-semibold">Confirm</span>
+                    </Button>
+                </div>
+            </form>
+        </div>
+    </Modal>
 </template>

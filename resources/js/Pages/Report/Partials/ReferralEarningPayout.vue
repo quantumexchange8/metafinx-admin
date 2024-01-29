@@ -60,7 +60,6 @@ const getResults = async (page = 1, search = '', type= '', date = '') => {
         const response = await axios.get(url);
         referrals.value = response.data.results;
         totalAmount.value = response.data.totalAmount;
-        // console.log(response.data.referralEarning);
     } catch (error) {
         console.error(error);
     } finally {
@@ -132,7 +131,7 @@ const paginationActiveClass = [
                 Name
             </th>
             <th scope="col" class="px-3 py-2.5">
-                Referral
+                Referee
             </th>
             <th scope="col" class="px-3 py-2.5">
                 Date
@@ -153,17 +152,29 @@ const paginationActiveClass = [
             v-for="referral in referrals.data"
             class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
         >
-            <td class="px-3 py-2.5 inline-flex items-center gap-2">
-                <img :src="referral.user?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                {{ referral.user ? referral.user.name : 'N/A' }}
+            <td class="px-3 py-2.5">
+                <div class="flex items-center gap-2">
+                    <img :src="referral.user?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                    <div class="flex flex-col">
+                        <div>
+                            {{ referral.user ? referral.user.name : 'N/A' }}
+                        </div>
+                        <div class="dark:text-gray-400">
+                            {{ referral.user ? referral.user.email : 'N/A' }}
+                        </div>
+                    </div>
+                </div>
             </td>
             <td class="px-3 py-2.5">
-                <div class="flex flex-col">
-                    <div>
-                        {{ referral.downline.name }}
-                    </div>
-                    <div class="dark:text-gray-400">
-                        {{ referral.downline.email }}
+                <div class="flex items-center gap-2">
+                    <img :src="referral.downline?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                    <div class="flex flex-col">
+                        <div>
+                            {{ referral.downline.name }}
+                        </div>
+                        <div class="dark:text-gray-400">
+                            {{ referral.downline.email }}
+                        </div>
                     </div>
                 </div>
             </td>

@@ -111,6 +111,19 @@ export function transactionFormat() {
         return `${day}/${month}/${year}`;
     }
 
+    function formatDatePicker(date) {
+        const formattedDate = new Date(date).toLocaleDateString('en-CA', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            timeZone: 'Asia/Kuala_Lumpur'
+        });
+
+        const [year, month, day] = formattedDate.split('-');
+        return `${year}-${month}-${day}`;
+    }
+
+
     function formatDateString(date) {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const formattedDate = new Date(date * 1000);
@@ -125,6 +138,7 @@ export function transactionFormat() {
     return {
         formatDateTime,
         formatDate,
+        formatDatePicker,
         formatDateString,
         getStatusClass,
         formatAmount,

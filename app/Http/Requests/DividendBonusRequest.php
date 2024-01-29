@@ -10,7 +10,7 @@ class DividendBonusRequest extends FormRequest
     {
         return [
             'amount' => ['required', 'numeric', 'min:0'],
-            'date' => ['required']
+            'date' => ['required', 'date', 'after_or_equal:today']
         ];
     }
 
