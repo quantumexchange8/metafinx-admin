@@ -260,7 +260,7 @@ class IpoSchemeController extends Controller
                 $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('standard_plan');
             } elseif ($investmentPlan->type == 'ebmi') {
                 $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('ebmi_plan');
-            } elseif ($investmentPlan->type == 'stacking') {
+            } elseif ($investmentPlan->type == 'staking') {
                 $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('stacking_plan');
             }
             

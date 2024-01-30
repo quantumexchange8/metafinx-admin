@@ -35,10 +35,10 @@ const refreshInfo = async () => {
         // Replace fetchData with your actual function for fetching data
         responseData.value = await fetchData();
 
-        totalMonthlyReturn.value = responseData.value.totalEarnings.MonthlyReturn;
-        totalReferralEarning.value = responseData.value.totalEarnings.ReferralEarning;
-        totalAffiliateEarning.value = responseData.value.totalEarnings.AffiliateEarning;
-        totalDividendEarning.value = responseData.value.totalEarnings.DividendEarning;
+        totalMonthlyReturn.value = responseData.value.totalEarnings.StandardRewards;
+        totalReferralEarning.value = responseData.value.totalEarnings.ReferralEarnings;
+        totalAffiliateEarning.value = responseData.value.totalEarnings.AffiliateEarnings;
+        totalDividendEarning.value = responseData.value.totalEarnings.DividendEarnings;
     } catch (error) {
         console.error('Error fetching data:', error);
     } finally {
@@ -101,7 +101,7 @@ const { formatDateTime, formatAmount } = transactionFormat();
         </div>
 
         <div v-if="!isLoading" class="flex items-center gap-8">
-            <p class="text-sm font-semibold text-gray-400 w-full">Total Monthly Return</p>
+            <p class="text-sm font-semibold text-gray-400 w-full">Total Standard Reward</p>
             <p class="text-sm dark:text-white w-full">$ {{ formatAmount(totalMonthlyReturn) }}</p>
         </div>
         <div v-if="!isLoading" class="flex items-center gap-8">

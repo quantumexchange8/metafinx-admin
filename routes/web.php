@@ -93,11 +93,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     /**
      * ==============================
-     *       XLC Setting
+     *       MXT Setting
      * ==============================
      */
-     Route::prefix('xlc_setting')->group(function () {
-        Route::get('/xlc_setting', [XlcController::class, 'xlc_setting'])->name('xlc.setting');
+     Route::prefix('mxt_setting')->group(function () {
+        Route::get('/mxt_setting', [XlcController::class, 'xlc_setting'])->name('xlc.setting');
         Route::get('/getCoinPaymentDetails', [XlcController::class, 'getCoinPaymentDetails'])->name('xlc.getCoinPaymentDetails');
         Route::get('/getStackingDetails', [XlcController::class, 'getStackingDetails'])->name('xlc.getStackingDetails');
         Route::get('/getTotalXlCoinByDays', [XlcController::class, 'getTotalXlCoinByDays'])->name('xlc.getTotalXlCoinByDays');

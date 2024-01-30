@@ -294,7 +294,7 @@ class MemberController extends Controller
             'walletSum' => floatval($walletSum),
             'referralCount' => $referralCount,
             'coins' => $coins,
-            'setting_coin' => SettingCoin::where('symbol', 'XLC/MYR')->first(),
+            'setting_coin' => SettingCoin::where('symbol', 'MXT/USD')->first(),
             // 'total_affiliate' => count($user->getChildrenIds()),
             'self_deposit' => floatval($this->getSelfDeposit($user)),
             'valid_affiliate_deposit' => floatval($this->getValidAffiliateDeposit($user)),
@@ -309,7 +309,16 @@ class MemberController extends Controller
         $walletSum = Wallet::where('user_id', $user->id)->sum('balance');
         $earningSum = Earning::where('upline_id', $user->id)->sum('after_amount');
 
-        $types = ['MonthlyReturn', 'ReferralEarning', 'AffiliateEarning', 'DividendEarning', 'AffiliateDividendEarning'];
+        $types = [
+            'StandardRewards', 
+            'ReferralEarnings', 
+            'AffiliateEarnings', 
+            'DividendEarnings', 
+            'AffiliateDividendEarnings',
+            'StackingRewards',
+            'BinaryReferralEarnings',
+            'PairingEarnings'
+        ];
 
         $totalEarnings = [];
         foreach ($types as $type) {

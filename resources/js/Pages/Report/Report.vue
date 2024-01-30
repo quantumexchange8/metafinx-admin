@@ -39,7 +39,7 @@ const tableDate = (dateValue) => {
 const payoutStats = ref([
     {
         key: 'MonthlyReturn',
-        label: 'Total Monthly Return Payout',
+        label: 'Total Standard Reward Payout',
         value: '$ ' + formatAmount(props.totatMonthlyReturn),
     },
     // {

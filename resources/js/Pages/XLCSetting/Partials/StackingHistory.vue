@@ -46,7 +46,7 @@ watch(
 const getResults = async (page = 1, search = '', date = '') => {
     historyLoading.value = true
     try {
-        let url = `/xlc_setting/getStackingDetails?page=${page}`;
+        let url = `/mxt_setting/getStackingDetails?page=${page}`;
 
         if (search) {
             url += `&search=${search}`;
@@ -87,7 +87,7 @@ watch(() => props.refresh, (newVal) => {
 watch(() => props.exportStatus, (newVal) => {
     historyLoading.value = newVal;
     if (newVal) {
-        let url = `/xlc_setting/getStackingDetails?exportStatus=yes`;
+        let url = `/mxt_setting/getStackingDetails?exportStatus=yes`;
 
         if (props.date) {
             url += `&date=${props.date}`;

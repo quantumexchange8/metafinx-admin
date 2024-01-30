@@ -47,7 +47,7 @@ const closeModal = () => {
                     {{ coin.setting_coin.name }}
                 </div>
                 <div class="text-xl font-semibold dark:text-white">
-                    {{ coin.unit }} XLC
+                    {{ coin.unit }} MXT
                 </div>
             </div>
                 <XLCoinLogo class="w-24 h-24"/>

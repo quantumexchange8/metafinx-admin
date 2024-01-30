@@ -47,7 +47,7 @@ watch(
 const getResults = async (page = 1, search = '', date = '', status = '') => {
     historyLoading.value = true
     try {
-        let url = `/xlc_setting/getCoinPaymentDetails?page=${page}`;
+        let url = `/mxt_setting/getCoinPaymentDetails?page=${page}`;
 
         if (search) {
             url += `&search=${search}`;
@@ -92,7 +92,7 @@ watch(() => props.refresh, (newVal) => {
 watch(() => props.exportStatus, (newVal) => {
     historyLoading.value = newVal;
     if (newVal) {
-        let url = `/xlc_setting/getCoinPaymentDetails?exportStatus=yes`;
+        let url = `/mxt_setting/getCoinPaymentDetails?exportStatus=yes`;
 
         if (props.date) {
             url += `&date=${props.date}`;
@@ -190,7 +190,7 @@ const closeModal = () => {
                     <div v-else-if="subscription.transaction_type == 'SwapCoin'">
                         {{ subscription.to_wallet.name }}
                     </div>
-                    <div v-else-if="subscription.transaction_type == 'Stacking'">
+                    <div v-else-if="subscription.transaction_type == 'Staking'">
                         {{ subscription.from_coin.address }}
                     </div>
                 </td>

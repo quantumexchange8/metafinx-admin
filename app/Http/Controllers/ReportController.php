@@ -21,9 +21,9 @@ class ReportController extends Controller
     public function index()
     {
 
-        $totatMonthlyReturn = Earning::where('type', 'MonthlyReturn')->sum('after_amount');
-        $totalReferralEarning = Earning::where('type', 'ReferralEarning')->sum('after_amount');
-        $totatAffiliateEarning = Earning::where('type', 'AffiliateEarning')->sum('after_amount');
+        $totatMonthlyReturn = Earning::where('type', 'StandardRewards')->sum('after_amount');
+        $totalReferralEarning = Earning::where('type', 'ReferralEarnings')->sum('after_amount');
+        $totatAffiliateEarning = Earning::where('type', 'AffiliateEarnings')->sum('after_amount');
         
         return Inertia::render('Report/Report', [
             'totatMonthlyReturn' => $totatMonthlyReturn,
@@ -61,7 +61,7 @@ class ReportController extends Controller
 
         // $monthlyReturn = $query->where('type', 'MonthlyReturn')->sum('after_amount');
         // $quarterlyDividend = $query->where('type', 'Quarterly Divdend'))->sum('after_amount');
-        $referralEarning = $query->where('type', 'ReferralEarning')->sum('after_amount');
+        $referralEarning = $query->where('type', 'ReferralEarnings')->sum('after_amount');
         // $affiliateEarning = $query->where('type', 'AffiliateEarning')->sum('after_amount');
         // $dividendEarning = $query->where('type', 'Dividend Earning')->sum('after_amount');
         // $ticketBonus = $query->where('type', 'Ticket Bonus')->sum('after_amount');
@@ -143,7 +143,17 @@ class ReportController extends Controller
             'datasets' => [],
         ];
 
-        $backgroundColors = ['ReferralEarning' => '#00C7BE', 'MonthlyReturn' => '#FF2D55', 'AffiliateEarning' => '#AF52DE', 'DividendEarning' => '#5856D6'];
+        $backgroundColors = [
+            'ReferralEarnings' => '#00C7BE', 
+            'StandardRewards' => '#FF2D55', 
+            'AffiliateEarnings' => '#AF52DE', 
+            'DividendEarnings' => '#5856D6',
+            'AffiliateDividendEarnings' => '#5856D6',
+            'StakingRewards' => '#5856D6',
+            'BinaryReferralEarnings' => '#5856D6',
+            'PairingEarnings' => '#5856D6',
+            'StandardRewards' => '#5856D6'
+        ];
 
         // $backgroundColors = ['Monthly Return' => '#FF2D55', 'Quarterly Dividend' => '#FDB022', 'ReferralEarning' => '#00C7BE', 
         // 'AffiliateEarning' => '#AF52DE', 'Dividend Earning' => '#5856D6', 'Ticket Bonus' => '#32ADE6'];
@@ -217,7 +227,17 @@ class ReportController extends Controller
             'datasets' => [],
         ];
 
-        $backgroundColors = ['ReferralEarning' => '#00C7BE', 'MonthlyReturn' => '#FF2D55', 'AffiliateEarning' => '#AF52DE', 'DividendEarnings' => '#5856D6'];
+        $backgroundColors = [
+            'ReferralEarnings' => '#00C7BE', 
+            'StandardRewards' => '#FF2D55', 
+            'AffiliateEarnings' => '#AF52DE', 
+            'DividendEarnings' => '#5856D6',
+            'AffiliateDividendEarnings' => '#5856D6',
+            'StakingRewards' => '#5856D6',
+            'BinaryReferralEarnings' => '#5856D6',
+            'PairingEarnings' => '#5856D6',
+            'StandardRewards' => '#5856D6'
+        ];
 
         // $backgroundColors = ['Monthly Return' => '#FF2D55', 'Quarterly Dividend' => '#FDB022', 'ReferralEarning' => '#00C7BE', 
         // 'AffiliateEarning' => '#AF52DE', 'Dividend Earning' => '#5856D6', 'Ticket Bonus' => '#32ADE6'];
@@ -269,7 +289,7 @@ class ReportController extends Controller
             $query->whereBetween('created_at', [$start_date, $end_date]);
         }
 
-        $monthlyReturn = $query->where('type', 'MonthlyReturn')->sum('after_amount');
+        $monthlyReturn = $query->where('type', 'StandardRewards')->sum('after_amount');
         // $quarterlyDividend = $query->where('type', 'Quarterly Divdend'))->sum('after_amount');
         // $referralEarning = $query->where('type', 'ReferralEarning')->sum('after_amount');
         // $affiliateEarning = $query->where('type', 'AffiliateEarning')->sum('after_amount');
@@ -336,7 +356,7 @@ class ReportController extends Controller
         // $monthlyReturn = $query->where('type', 'MonthlyReturn')->sum('after_amount');
         // $quarterlyDividend = $query->where('type', 'Quarterly Divdend'))->sum('after_amount');
         // $referralEarning = $query->where('type', 'ReferralEarning')->sum('after_amount');
-        $affiliateEarning = $query->where('type', 'AffiliateEarning')->sum('after_amount');
+        $affiliateEarning = $query->where('type', 'AffiliateEarnings')->sum('after_amount');
         // $dividendEarning = $query->where('type', 'Dividend Earning')->sum('after_amount');
         // $ticketBonus = $query->where('type', 'Ticket Bonus')->sum('after_amount');
 
@@ -401,7 +421,7 @@ class ReportController extends Controller
         // $quarterlyDividend = $query->where('type', 'Quarterly Divdend'))->sum('after_amount');
         // $referralEarning = $query->where('type', 'ReferralEarning')->sum('after_amount');
         // $affiliateEarning = $query->where('type', 'AffiliateEarning')->sum('after_amount');
-        $dividendEarning = $query->where('type', 'DividendEarning')->sum('after_amount');
+        $dividendEarning = $query->where('type', 'DividendEarnings')->sum('after_amount');
         // $ticketBonus = $query->where('type', 'Ticket Bonus')->sum('after_amount');
 
         if ($request->filled('type')) {

@@ -29,7 +29,7 @@ const fetchData = async () => {
 
         isLoading.value = true;
 
-        const response = await axios.get('/xlc_setting/getTotalXlCoinByDays', { params: { month: month.value, year: year.value } });
+        const response = await axios.get('/mxt_setting/getTotalXlCoinByDays', { params: { month: month.value, year: year.value } });
         const { labels, datasets } = response.data;
         chartData.value.labels = labels;
         chartData.value.datasets = datasets;

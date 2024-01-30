@@ -283,7 +283,7 @@ function copyTestingCode () {
                                     {{ coin.setting_coin.name }}
                                 </div>
                                 <div class="text-xl font-semibold dark:text-white">
-                                    {{ formatAmount(coin.unit) }} XLC 
+                                    {{ formatAmount(coin.unit) }} MXT 
                                 </div>
                             </div>
                             <div class="pt-4 h-6 inline-flex items-center gap-2">

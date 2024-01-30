@@ -27,7 +27,7 @@ const statusList = [
 
   { value: '', label: 'All' },
   { value: 'BuyCoin', label: 'Buy Coin' },
-  { value: 'Stacking', label: 'Stacking' },
+  { value: 'Staking', label: 'Staking' },
   { value: 'SwapCoin', label: 'Swap Coin' },
 
 ];
