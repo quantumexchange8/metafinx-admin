@@ -78,7 +78,7 @@ const updateContent = (newContent) => {
 
         <ConfigurationLink
             class="flex-col md:flex-row"
-            title="XLC Coin"
+            title="MXT Coin"
             @click="updateContent('CoinSetting')"
             :active="props.content==='CoinSetting'"
         >

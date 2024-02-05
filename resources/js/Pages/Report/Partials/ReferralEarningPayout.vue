@@ -125,68 +125,70 @@ const paginationActiveClass = [
     <div v-if="isLoading" class="w-full flex justify-center my-8">
         <Loading />
     </div>
-    <table v-else class="w-[650px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5 table-fixed">
-        <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">            <tr>
-            <th scope="col" class="px-3 py-2.5">
-                Name
-            </th>
-            <th scope="col" class="px-3 py-2.5">
-                Referee
-            </th>
-            <th scope="col" class="px-3 py-2.5">
-                Date
-            </th>
-            <th scope="col" class="px-3 py-2.5">
-                Amount
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-if="referrals.data.length === 0">
-            <th colspan="5" class="py-4 text-lg text-center">
-                No History
-            </th>
-        </tr>
-        
-        <tr
-            v-for="referral in referrals.data"
-            class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
-        >
-            <td class="px-3 py-2.5">
-                <div class="flex items-center gap-2">
-                    <img :src="referral.user?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                    <div class="flex flex-col">
-                        <div>
-                            {{ referral.user ? referral.user.name : 'N/A' }}
-                        </div>
-                        <div class="dark:text-gray-400">
-                            {{ referral.user ? referral.user.email : 'N/A' }}
-                        </div>
-                    </div>
-                </div>
-            </td>
-            <td class="px-3 py-2.5">
-                <div class="flex items-center gap-2">
-                    <img :src="referral.downline?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                    <div class="flex flex-col">
-                        <div>
-                            {{ referral.downline.name }}
-                        </div>
-                        <div class="dark:text-gray-400">
-                            {{ referral.downline.email }}
+    <div v-else class="overflow-x-auto">
+        <table class="w-[650px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
+            <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">            <tr>
+                <th scope="col" class="px-3 py-2.5">
+                    Name
+                </th>
+                <th scope="col" class="px-3 py-2.5">
+                    Referee
+                </th>
+                <th scope="col" class="px-3 py-2.5">
+                    Date
+                </th>
+                <th scope="col" class="px-3 py-2.5">
+                    Amount
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-if="referrals.data.length === 0">
+                <th colspan="5" class="py-4 text-lg text-center">
+                    No History
+                </th>
+            </tr>
+            
+            <tr
+                v-for="referral in referrals.data"
+                class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
+            >
+                <td class="px-3 py-2.5">
+                    <div class="flex items-center gap-2">
+                        <img :src="referral.user?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                        <div class="flex flex-col">
+                            <div>
+                                {{ referral.user ? referral.user.name : 'N/A' }}
+                            </div>
+                            <div class="dark:text-gray-400">
+                                {{ referral.user ? referral.user.email : 'N/A' }}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </td>
-            <td class="px-3 py-2.5">
-                {{ formatDateTime(referral.created_at) }}
-            </td>
-            <td class="px-3 py-2.5">
-                ${{ formatAmount(referral.after_amount) }}
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                </td>
+                <td class="px-3 py-2.5">
+                    <div class="flex items-center gap-2">
+                        <img :src="referral.downline?.profile_photo_url || 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                        <div class="flex flex-col">
+                            <div>
+                                {{ referral.downline.name }}
+                            </div>
+                            <div class="dark:text-gray-400">
+                                {{ referral.downline.email }}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-3 py-2.5">
+                    {{ formatDateTime(referral.created_at) }}
+                </td>
+                <td class="px-3 py-2.5">
+                    ${{ formatAmount(referral.after_amount) }}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
     <div class="flex justify-center mt-4" v-if="!isLoading">
         <TailwindPagination
             :item-classes=paginationClass
@@ -196,10 +198,10 @@ const paginationActiveClass = [
             @pagination-change-page="handlePageChange"
         >
             <template #prev-nav>
-                <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> Previous</span>
+                <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> <span class="hidden sm:flex">Previous</span></span>
             </template>
             <template #next-nav>
-                <span class="flex gap-2">Next <ArrowRightIcon class="w-5 h-5" /></span>
+                <span class="flex gap-2"><span class="hidden sm:flex">Next</span><ArrowRightIcon class="w-5 h-5" /></span>
             </template>
         </TailwindPagination>
     </div>

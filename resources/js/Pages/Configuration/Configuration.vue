@@ -56,12 +56,12 @@ const updateContent = (newContent) => {
             </section>
             <section
                 tabindex="-1"
-                class="md:hidden static inset-x-0 z-10 flex-shrink-0 h-28 bg-white dark:bg-gray-800 focus:outline-none"
+                class="md:hidden static inset-x-0 z-10 flex-shrink-0 h-auto bg-white dark:bg-gray-800 focus:outline-none"
                 aria-labelledby="secondTopbarHeader"
             >
                 <div class="flex flex-col w-full">
                     <!-- Panel header -->
-                    <div class="pb-4  px-0">
+                    <div class="pb-4 px-0">
                         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                             <h2 class="text-xl md:text-2xl font-semibold leading-tight">
                                 Configuration

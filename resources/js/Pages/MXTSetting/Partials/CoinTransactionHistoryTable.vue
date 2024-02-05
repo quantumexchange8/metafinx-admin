@@ -1,6 +1,6 @@
 <script setup>
-import CoinTransactionHistory from "@/Pages/XLCSetting/Partials/CoinTransactionHistory.vue";
-import StackingHistory from "@/Pages/XLCSetting/Partials/StackingHistory.vue";
+import CoinTransactionHistory from "@/Pages/MXTSetting/Partials/CoinTransactionHistory.vue";
+import StackingHistory from "@/Pages/MXTSetting/Partials/StackingHistory.vue";
 import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
 import {RefreshIcon, SearchIcon} from "@heroicons/vue/outline";

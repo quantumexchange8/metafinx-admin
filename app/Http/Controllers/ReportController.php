@@ -152,7 +152,6 @@ class ReportController extends Controller
             'StakingRewards' => '#5856D6',
             'BinaryReferralEarnings' => '#5856D6',
             'PairingEarnings' => '#5856D6',
-            'StandardRewards' => '#5856D6'
         ];
 
         // $backgroundColors = ['Monthly Return' => '#FF2D55', 'Quarterly Dividend' => '#FDB022', 'ReferralEarning' => '#00C7BE', 
@@ -236,7 +235,6 @@ class ReportController extends Controller
             'StakingRewards' => '#5856D6',
             'BinaryReferralEarnings' => '#5856D6',
             'PairingEarnings' => '#5856D6',
-            'StandardRewards' => '#5856D6'
         ];
 
         // $backgroundColors = ['Monthly Return' => '#FF2D55', 'Quarterly Dividend' => '#FDB022', 'ReferralEarning' => '#00C7BE', 

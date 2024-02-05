@@ -127,84 +127,86 @@ const closeModal = () => {
         <div v-if="depositLoading" class="w-full flex justify-center my-8">
             <Loading />
         </div>
-        <table v-else class="w-[800px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
-            <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
-            <tr>
-                <th scope="col" class="pl-5 py-2">
-                    Date
-                </th>
-                <th scope="col" class="py-2">
-                    Name
-                </th>
-                <th scope="col" class="py-2">
-                    Type
-                </th>
-                <th scope="col" class="py-2">
-                    Transaction ID
-                </th>
-                <th scope="col" class="py-2">
-                    Amount
-                </th>
-                <th scope="col" class="py-2 text-center">
-                    Status
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-if="withdrawals.data.length === 0">
-                <th colspan="5" class="py-4 text-lg text-center">
-                    No History
-                </th>
-            </tr>
-            <tr
-                v-for="withdrawal in withdrawals.data"
-                class="bg-white dark:bg-transparent text-xs text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
-                @click="openWithdrawalHistoryModal(withdrawal)"
-            >
-                <td class="pl-5 py-2">
-                    <div class="inline-flex items-center gap-2">
-                        {{ formatDateTime(withdrawal.created_at) }}
-                    </div>
-                </td>
-                <td class="py-2">
-                    <div class="inline-flex items-center gap-2">
-                        <img :src="withdrawal.user.profile_photo_url ? withdrawal.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        <div class="flex flex-col">
-                            <div>
-                                {{ withdrawal.user.name }}
+        <div v-else class="overflow-x-auto">
+            <table class="w-[800px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
+                <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
+                <tr>
+                    <th scope="col" class="pl-5 py-2">
+                        Date
+                    </th>
+                    <th scope="col" class="py-2">
+                        Name
+                    </th>
+                    <th scope="col" class="py-2">
+                        Type
+                    </th>
+                    <th scope="col" class="py-2">
+                        Transaction ID
+                    </th>
+                    <th scope="col" class="py-2">
+                        Amount
+                    </th>
+                    <th scope="col" class="py-2 text-center">
+                        Status
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-if="withdrawals.data.length === 0">
+                    <th colspan="5" class="py-4 text-lg text-center">
+                        No History
+                    </th>
+                </tr>
+                <tr
+                    v-for="withdrawal in withdrawals.data"
+                    class="bg-white dark:bg-transparent text-xs text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
+                    @click="openWithdrawalHistoryModal(withdrawal)"
+                >
+                    <td class="pl-5 py-2">
+                        <div class="inline-flex items-center gap-2">
+                            {{ formatDateTime(withdrawal.created_at) }}
+                        </div>
+                    </td>
+                    <td class="py-2">
+                        <div class="inline-flex items-center gap-2">
+                            <img :src="withdrawal.user.profile_photo_url ? withdrawal.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                            <div class="flex flex-col">
+                                <div>
+                                    {{ withdrawal.user.name }}
+                                </div>
+                                <div class="dark:text-gray-400">
+                                    {{ withdrawal.user.email }}
+                                </div>
                             </div>
-                            <div class="dark:text-gray-400">
-                                {{ withdrawal.user.email }}
+                        </div>
+                    </td>
+                    <td class="py-2">
+                        <div class="inline-flex items-center gap-2">
+                            <div v-if="withdrawal.from_wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                                <InternalWalletIcon class="mt-0.5 ml-0.5"/>
                             </div>
+                            <div v-else-if="withdrawal.from_wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                                <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
+                            </div>
+                            {{ withdrawal.from_wallet.name }}
                         </div>
-                    </div>
-                </td>
-                <td class="py-2">
-                    <div class="inline-flex items-center gap-2">
-                        <div v-if="withdrawal.from_wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
-                            <InternalWalletIcon class="mt-0.5 ml-0.5"/>
-                        </div>
-                        <div v-else-if="withdrawal.from_wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
-                            <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
-                        </div>
-                        {{ withdrawal.from_wallet.name }}
-                    </div>
-                </td>
-                <td class="py-2">
-                    {{ withdrawal.transaction_number }}
-                </td>
-                <td class="py-2">
-                    $ {{ withdrawal.amount }}
-                </td>
-                <td class="py-2 text-center">
-                    <span v-if="withdrawal.status === 'Success'" class="flex w-2 h-2 bg-green-500 dark:bg-success-500 mx-auto rounded-full"></span>
-                    <span v-else-if="withdrawal.status === 'Pending'" class="flex w-2 h-2 bg-red-500 dark:bg-warning-500 mx-auto rounded-full"></span>
-                    <span v-else-if="withdrawal.status === 'Processing'" class="flex w-2 h-2 bg-red-500 dark:bg-[#007AFF] mx-auto rounded-full"></span>
-                    <span v-else-if="withdrawal.status === 'Rejected'" class="flex w-2 h-2 bg-red-500 dark:bg-error-500 mx-auto rounded-full"></span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    </td>
+                    <td class="py-2">
+                        {{ withdrawal.transaction_number }}
+                    </td>
+                    <td class="py-2">
+                        $ {{ withdrawal.amount }}
+                    </td>
+                    <td class="py-2 text-center">
+                        <span v-if="withdrawal.status === 'Success'" class="flex w-2 h-2 bg-green-500 dark:bg-success-500 mx-auto rounded-full"></span>
+                        <span v-else-if="withdrawal.status === 'Pending'" class="flex w-2 h-2 bg-red-500 dark:bg-warning-500 mx-auto rounded-full"></span>
+                        <span v-else-if="withdrawal.status === 'Processing'" class="flex w-2 h-2 bg-red-500 dark:bg-[#007AFF] mx-auto rounded-full"></span>
+                        <span v-else-if="withdrawal.status === 'Rejected'" class="flex w-2 h-2 bg-red-500 dark:bg-error-500 mx-auto rounded-full"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <div class="flex justify-center mt-4" v-if="!depositLoading">
             <TailwindPagination
                 :item-classes=paginationClass
@@ -214,10 +216,10 @@ const closeModal = () => {
                 @pagination-change-page="handlePageChange"
             >
                 <template #prev-nav>
-                    <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> Previous</span>
+                    <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> <span class="hidden sm:flex">Previous</span></span>
                 </template>
                 <template #next-nav>
-                    <span class="flex gap-2">Next <ArrowRightIcon class="w-5 h-5" /></span>
+                    <span class="flex gap-2"><span class="hidden sm:flex">Next</span><ArrowRightIcon class="w-5 h-5" /></span>
                 </template>
             </TailwindPagination>
         </div>

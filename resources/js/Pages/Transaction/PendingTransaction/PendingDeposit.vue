@@ -237,93 +237,95 @@ const rejectTransaction = async () => {
         <div v-if="depositLoading" class="w-full flex justify-center my-8">
             <Loading />
         </div>
-        <table v-else class="w-[900px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
-            <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
-            <tr>
-                <th scope="col" class="py-3 mx-1 flex items-center justify-center">
-                    <Checkbox
-                        v-model="isAllSelected"
-                        @click="handleSelectAll"
-                    />
-                </th>
-                <th scope="col" class="py-3">
-                    Name
-                </th>
-                <th scope="col" class="py-3">
-                    Asset
-                </th>
-                <th scope="col" class="py-3">
-                    Date
-                </th>
-                <th scope="col" class="py-3">
-                    Transaction ID
-                </th>
-                <th scope="col" class="py-3">
-                    Amount
-                </th>
-                <th scope="col" class="py-3 text-center">
-                    Action
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-if="deposits.data.length === 0">
-                <th colspan="7" class="py-4 text-lg text-center">
-                    No Pending
-                </th>
-            </tr>
-            <tr
-                v-for="deposit in deposits.data"
-                class="bg-white dark:bg-transparent text-xs text-gray-900 dark:text-white border-b dark:border-gray-600"
-            >
-                <td class="py-3 mx-1 text-center">
-                    <Checkbox
-                        :checked="isAllSelected || isItemSelected(deposit.id, deposit.amount)"
-                        :model-value="isChecked.includes(deposit.id)"
-                        @update:model-value="updateChecked(deposit.id, deposit.amount)"
-                    />
-                </td>
-                <td class="py-3">
-                    <div class="inline-flex items-center gap-2">
-                        <img :src="deposit.user.profile_photo_url ? deposit.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        <div class="flex flex-col">
-                            <div>
-                                {{ deposit.user.name }}
+        <div v-else class="overflow-x-auto">
+            <table class="w-[900px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
+                <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
+                <tr>
+                    <th scope="col" class="py-3 mx-1 flex items-center justify-center">
+                        <Checkbox
+                            v-model="isAllSelected"
+                            @click="handleSelectAll"
+                        />
+                    </th>
+                    <th scope="col" class="py-3">
+                        Name
+                    </th>
+                    <th scope="col" class="py-3">
+                        Asset
+                    </th>
+                    <th scope="col" class="py-3">
+                        Date
+                    </th>
+                    <th scope="col" class="py-3">
+                        Transaction ID
+                    </th>
+                    <th scope="col" class="py-3">
+                        Amount
+                    </th>
+                    <th scope="col" class="py-3 text-center">
+                        Action
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-if="deposits.data.length === 0">
+                    <th colspan="7" class="py-4 text-lg text-center">
+                        No Pending
+                    </th>
+                </tr>
+                <tr
+                    v-for="deposit in deposits.data"
+                    class="bg-white dark:bg-transparent text-xs text-gray-900 dark:text-white border-b dark:border-gray-600"
+                >
+                    <td class="py-3 mx-1 text-center">
+                        <Checkbox
+                            :checked="isAllSelected || isItemSelected(deposit.id, deposit.amount)"
+                            :model-value="isChecked.includes(deposit.id)"
+                            @update:model-value="updateChecked(deposit.id, deposit.amount)"
+                        />
+                    </td>
+                    <td class="py-3">
+                        <div class="inline-flex items-center gap-2">
+                            <img :src="deposit.user.profile_photo_url ? deposit.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                            <div class="flex flex-col">
+                                <div>
+                                    {{ deposit.user.name }}
+                                </div>
+                                <div class="dark:text-gray-400">
+                                    {{ deposit.user.email }}
+                                </div>
                             </div>
-                            <div class="dark:text-gray-400">
-                                {{ deposit.user.email }}
+                        </div>
+                    </td>
+                    <td class="py-3">
+                        <div class="inline-flex items-center gap-2">
+                            <div v-if="deposit.to_wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                                <InternalWalletIcon class="mt-0.5 ml-0.5"/>
                             </div>
+                            <div v-else-if="deposit.to_wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                                <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
+                            </div>
+                            {{ deposit.to_wallet.name }}
                         </div>
-                    </div>
-                </td>
-                <td class="py-3">
-                    <div class="inline-flex items-center gap-2">
-                        <div v-if="deposit.to_wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
-                            <InternalWalletIcon class="mt-0.5 ml-0.5"/>
-                        </div>
-                        <div v-else-if="deposit.to_wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
-                            <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
-                        </div>
-                        {{ deposit.to_wallet.name }}
-                    </div>
-                </td>
-                <td class="py-3">
-                    {{ formatDateTime(deposit.created_at) }}
-                </td>
-                <td class="py-3">
-                    {{ deposit.transaction_number }}
-                </td>
-                <td class="py-3">
-                    ${{ deposit.amount }}
-                </td>
-                <td class="py-3 text-center">
-                    <Action
-                        :transaction="deposit"
-                    />
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    </td>
+                    <td class="py-3">
+                        {{ formatDateTime(deposit.created_at) }}
+                    </td>
+                    <td class="py-3">
+                        {{ deposit.transaction_number }}
+                    </td>
+                    <td class="py-3">
+                        ${{ deposit.amount }}
+                    </td>
+                    <td class="py-3 text-center">
+                        <Action
+                            :transaction="deposit"
+                        />
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <div class="flex justify-center mt-4" v-if="!depositLoading">
             <TailwindPagination
                 :item-classes=paginationClass
@@ -333,10 +335,10 @@ const rejectTransaction = async () => {
                 @pagination-change-page="handlePageChange"
             >
                 <template #prev-nav>
-                    <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> Previous</span>
+                    <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> <span class="hidden sm:flex">Previous</span></span>
                 </template>
                 <template #next-nav>
-                    <span class="flex gap-2">Next <ArrowRightIcon class="w-5 h-5" /></span>
+                    <span class="flex gap-2"><span class="hidden sm:flex">Next</span><ArrowRightIcon class="w-5 h-5" /></span>
                 </template>
             </TailwindPagination>
         </div>

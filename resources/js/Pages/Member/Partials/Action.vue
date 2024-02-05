@@ -38,7 +38,7 @@ const closeModal = () => {
 
 <template>
     <div class="flex justify-center">
-        <Tooltip content="View Details" placement="bottom" v-if="type === 'member'">
+        <Tooltip content="View Details" placement="bottom" v-if="type === 'member'" class="relative">
             <Button
                 type="button"
                 class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
@@ -50,7 +50,7 @@ const closeModal = () => {
                 <span class="sr-only">View Details</span>
             </Button>
         </Tooltip>
-        <Tooltip content="Affiliate Tree" placement="bottom" v-if="type === 'member'">
+        <Tooltip content="Affiliate Tree" placement="bottom" v-if="type === 'member'" class="relative">
             <Button
                 type="button"
                 class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
@@ -62,7 +62,7 @@ const closeModal = () => {
                 <span class="sr-only">Affiliate Tree</span>
             </Button>
         </Tooltip>
-        <Tooltip content="Delete Member" placement="bottom" v-if="type === 'member'">
+        <Tooltip content="Delete Member" placement="bottom" v-if="type === 'member'" class="relative">
             <Button
                 type="button"
                 class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"

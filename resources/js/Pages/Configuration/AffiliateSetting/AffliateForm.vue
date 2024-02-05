@@ -26,10 +26,10 @@ const fetchRankDetails = async (rank) => {
     await axios.get('/configuration/getSettingRank', { params: { rank_id: rank.id } })
         .then(response => {
             // Assuming your API response contains the rank details
-            rankDetail.value = response.data.settingRank;
-            referralEarning.value = response.data.referralEarning;
-            form.dividend_earnings = response.data.dividendEarning.map((dividend) => dividend.value);
-            form.affiliate_settings = response.data.affiliateSettings.map((affliateSetting) => affliateSetting.value);
+            rankDetail.value = response.data.settingRank || { value: null };
+            referralEarning.value = response.data.referralEarning || { value: null };
+            form.dividend_earnings = response.data.dividendEarning.map((dividend) => dividend.value) || { value: null };
+            form.affiliate_settings = response.data.affiliateSettings.map((affliateSetting) => affliateSetting.value) || { value: null };
         })
         .catch(error => {
             console.error('Error fetching rank details:', error);

@@ -229,6 +229,27 @@ class ConfigurationController extends Controller
             ->with('title', $request->name)
             ->with('success', $request->name . ' ' . $formattedValue . ' has been updated successfully.');
     }
+
+    public function editCoinPrice(CoinPriceRequest $request, $id)
+    {
+        $existingCoinPrice = CoinPrice::findOrFail($id);
+    
+        $existingDate = CoinPrice::where('price_date', $request->price_date)
+        ->where('id', '!=', $id)
+        ->first();
+        
+        if ($existingDate) {
+            throw ValidationException::withMessages(['date' => ['Release date already exists']]);
+        }
+    
+        $existingCoinPrice->update([
+            'price' => $request->price,
+            'price_date' => $request->date,
+        ]);
+    
+        return redirect()->back()->with('title', 'Coin Price Updated')->with('success', 'The coin price has been updated successfully.');
+    }
+
     
     public function getDividendBonus(Request $request)
     {
@@ -431,7 +452,7 @@ class ConfigurationController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('title', 'Setting Updated')->with('success', 'The XLC Coin price and date has been updated successfully.');
+        return redirect()->back()->with('title', 'Setting Updated')->with('success', 'The MXT Coin price and date has been updated successfully.');
     }
 
     public function updateCoinMarketTime(MarketTimeRequest $request)
@@ -470,6 +491,6 @@ class ConfigurationController extends Controller
             'frequency' => $request->frequency
         ]);
 
-        return redirect()->back()->with('title', 'Market Time Updated')->with('success', 'The XLC Coin market time has been updated successfully.');
+        return redirect()->back()->with('title', 'Market Time Updated')->with('success', 'The MXT Coin market time has been updated successfully.');
     }
 }

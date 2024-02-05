@@ -180,67 +180,69 @@ const isDividendReleased = (dividend) => {
             <div v-if="isLoading" class="w-full flex justify-center my-8">
                 <Loading />
             </div>
-            <table v-else class="w-[650px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 table-fixed">
-                <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
-                <tr>
-                    <th scope="col" class="px-3 py-4">
-                        Date
-                    </th>
-                    <th scope="col" class="px-3 py-4 text-center">
-                        Release Date
-                    </th>
-                    <th scope="col" class="px-3 py-4 text-center">
-                        Total Members Involved
-                    </th>
-                    <th scope="col" class="px-3 py-4 text-center">
-                        Amount
-                    </th>
-                    <th scope="col" class="px-3 py-4 text-center">
-                        Action
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-if="dividends.data.length === 0">
-                    <th colspan="4" class="py-4 text-lg text-center">
-                        No History
-                    </th>
-                </tr>
-                <tr
-                    v-for="dividend in dividends.data"
-                    class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 dark:hover:bg-gray-600"
-                >
-                    <td class="px-3 py-4">
-                        {{ formatDateTime(dividend.created_at) }}
-                    </td>
-                    <td class="px-3 py-4 text-center">
-                        {{ formatDateTime(dividend.release_date, false) }}
-                    </td>
-                    <td class="px-3 py-4 text-center">
-                        {{ (dividend.total_Member) }}
-                    </td>
-                    <td class="px-3 py-4 text-center">
-                        ${{ formatAmount(dividend.amount) }}
-                    </td>
-                    <td class="px-3 py-4 text-center">
-                        <Tooltip content="Edit Dividend Bonus" placement="bottom">
-                            <Button
-                                type="button"
-                                class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
-                                :class="{ 'opacity-50': isDividendReleased(dividend) }"
-                                variant="action"
-                                @click="openModal(dividend.id, dividend)"
-                                pill
-                                :disabled="isDividendReleased(dividend)"
-                            >
-                                <EditIcon aria-hidden="true" class="w-5 h-5 absolute" />
-                                <span class="sr-only">Edit Dividend Bonus</span>
-                            </Button>
-                        </Tooltip>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+            <div v-else class="overflow-x-auto">
+                <table class="w-[650px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 table-fixed">
+                    <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
+                    <tr>
+                        <th scope="col" class="px-3 py-4">
+                            Date
+                        </th>
+                        <th scope="col" class="px-3 py-4 text-center">
+                            Release Date
+                        </th>
+                        <th scope="col" class="px-3 py-4 text-center">
+                            Total Members Involved
+                        </th>
+                        <th scope="col" class="px-3 py-4 text-center">
+                            Amount
+                        </th>
+                        <th scope="col" class="px-3 py-4 text-center">
+                            Action
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-if="dividends.data.length === 0">
+                        <th colspan="4" class="py-4 text-lg text-center">
+                            No History
+                        </th>
+                    </tr>
+                    <tr
+                        v-for="dividend in dividends.data"
+                        class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 dark:hover:bg-gray-600"
+                    >
+                        <td class="px-3 py-4">
+                            {{ formatDateTime(dividend.created_at) }}
+                        </td>
+                        <td class="px-3 py-4 text-center">
+                            {{ formatDateTime(dividend.release_date, false) }}
+                        </td>
+                        <td class="px-3 py-4 text-center">
+                            {{ (dividend.total_Member) }}
+                        </td>
+                        <td class="px-3 py-4 text-center">
+                            ${{ formatAmount(dividend.amount) }}
+                        </td>
+                        <td class="px-3 py-4 text-center">
+                            <Tooltip content="Edit Dividend Bonus" placement="bottom" class="relative">
+                                <Button
+                                    type="button"
+                                    class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
+                                    :class="{ 'opacity-50': isDividendReleased(dividend) }"
+                                    variant="action"
+                                    @click="openModal(dividend.id, dividend)"
+                                    pill
+                                    :disabled="isDividendReleased(dividend)"
+                                >
+                                    <EditIcon aria-hidden="true" class="w-5 h-5 absolute" />
+                                    <span class="sr-only">Edit Dividend Bonus</span>
+                                </Button>
+                            </Tooltip>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
             <div class="flex justify-center mt-4" v-if="!isLoading">
                 <TailwindPagination
                     :item-classes=paginationClass
@@ -250,10 +252,10 @@ const isDividendReleased = (dividend) => {
                     @pagination-change-page="handlePageChange"
                 >
                     <template #prev-nav>
-                        <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> Previous</span>
+                        <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> <span class="hidden sm:flex">Previous</span></span>
                     </template>
                     <template #next-nav>
-                        <span class="flex gap-2">Next <ArrowRightIcon class="w-5 h-5" /></span>
+                        <span class="flex gap-2"><span class="hidden sm:flex">Next</span><ArrowRightIcon class="w-5 h-5" /></span>
                     </template>
                 </TailwindPagination>
             </div>

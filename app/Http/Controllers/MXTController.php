@@ -15,11 +15,11 @@ use App\Exports\StackingHistoryExport;
 use Carbon\Carbon;
 use DB;
 
-class XlcController extends Controller
+class MXTController extends Controller
 {
     //
 
-    public function xlc_setting()
+    public function mxt_setting()
     {
 
         $coinTransactions = CoinPayment::all();
@@ -31,7 +31,7 @@ class XlcController extends Controller
             $plan->plan_logo = $plan->getFirstMediaUrl('stacking_plan');
         });
 
-        return Inertia::render('XLCSetting/XLCSetting', [
+        return Inertia::render('MXTSetting/MXTSetting', [
             'coinTransactions' => $coinTransactions,
             'investmentPlans' => $investmentPlans,
         ]);
@@ -106,7 +106,7 @@ class XlcController extends Controller
         return response()->json($results);
     }
 
-    public function getTotalXlCoinByDays(Request $request)
+    public function getTotalMXTCoinByDays(Request $request)
     {
         $UnitData = Transaction::query()
                     ->when($request->filled('month'), function ($query) use ($request) {
@@ -170,7 +170,7 @@ class XlcController extends Controller
         return response()->json($chartData);
     }
 
-    public function getTotalXlCoinByMonth(Request $request)
+    public function getTotalMXTCoinByMonth(Request $request)
     {
 
         $UnitData = Transaction::query()

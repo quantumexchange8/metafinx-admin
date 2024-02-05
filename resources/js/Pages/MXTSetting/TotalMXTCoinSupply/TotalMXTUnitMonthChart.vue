@@ -4,9 +4,8 @@ import {onMounted, ref, watch} from "vue";
 import Chart from 'chart.js/auto'
 
 const props = defineProps({
-    selectedMonth: Number,
-    selectedYear: Number,
-});
+    selectedYear: Number
+})
 
 const chartData = ref({
     labels: [],
@@ -14,9 +13,7 @@ const chartData = ref({
 });
 
 const isLoading = ref(false)
-const month = ref(props.selectedMonth)
-const year = ref(props.selectedYear)
-
+const month = ref(props.selectedYear)
 let chartInstance = null;
 
 const fetchData = async () => {
@@ -25,14 +22,54 @@ const fetchData = async () => {
             chartInstance.destroy();
         }
 
-        const ctx = document.getElementById('dailyTotalXlCoin');
+        const ctx = document.getElementById('totalUnitMonth');
 
         isLoading.value = true;
 
-        const response = await axios.get('/mxt_setting/getTotalXlCoinByDays', { params: { month: month.value, year: year.value } });
+        const response = await axios.get('/mxt_setting/getTotalMXTCoinByMonth', { params: { year: month.value } });
         const { labels, datasets } = response.data;
         chartData.value.labels = labels;
         chartData.value.datasets = datasets;
+
+        if(datasets.length > 0) {
+            if(datasets[0]) {
+                datasets[0].backgroundColor = (context) => {
+                    const bgColor = [
+                        'rgba(253, 176, 34, 0.00)',
+                        'rgba(253, 176, 34, 0.00)'
+                    ];
+
+                    if (!context.chart.chartArea) {
+                        return;
+                    }
+
+                    const { ctx, data, chartArea: {top, bottom} } = context.chart;
+                    const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
+                    gradientBg.addColorStop(0, bgColor[0]);
+                    gradientBg.addColorStop(1, bgColor[1]);
+                    return gradientBg;
+                };
+            }
+            if(datasets[1]) {
+                datasets[1].backgroundColor = (context) => {
+                    const bgColor = [
+                        'rgba(253, 176, 34, 0.00)',
+                        'rgba(255, 45, 85, 0.40)'
+                    ];
+
+                    if (!context.chart.chartArea) {
+                        return;
+                    }
+
+                    const { ctx, data, chartArea: {top, bottom} } = context.chart;
+                    const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
+                    gradientBg.addColorStop(0, bgColor[0]);
+                    gradientBg.addColorStop(1, bgColor[1]);
+                    return gradientBg;
+                };
+            }
+        }
+
         isLoading.value = false
 
         // Create the chart after updating chartData
@@ -47,7 +84,6 @@ const fetchData = async () => {
                 maintainAspectRatio: false,
                 scales: {
                     y: {
-                        stacked: true,
                         ticks: {
                             color: '#9DA4AE',
                             font: {
@@ -55,12 +91,11 @@ const fetchData = async () => {
                                 size: 14,
                                 weight: 400,
                             },
-                            grace: '10%',
-                            beginAtZero: true
                         },
+                        grace: '10%',
+                        beginAtZero: true
                     },
                     x: {
-                        stacked: true,
                         ticks: {
                             color: '#9DA4AE',
                             font: {
@@ -89,8 +124,6 @@ const fetchData = async () => {
             }
         });
     } catch (error) {
-        const ctx = document.getElementById('dailyTotalMembers');
-
         isLoading.value = false
         console.error('Error fetching chart data:', error);
     }
@@ -102,10 +135,9 @@ onMounted(async () => {
     // Watch for changes in the date and fetch data when it changes
 
     watch(
-        [() => props.selectedMonth, () => props.selectedYear], // Array of expressions to watch
-        ([newMonth, newYear]) => {
-            // This callback will be called when selectedMonth or selectedYear changes.
-            month.value = newMonth;
+        () => props.selectedYear, // Expression to watch
+        (newYear) => {
+            // This callback will be called when selectedMonth changes.
             year.value = newYear;
             fetchData();
         }
@@ -120,6 +152,7 @@ onMounted(async () => {
         <Loading />
     </div>
     <div class="h-60">
-        <canvas id="dailyTotalXlCoin" height="276"></canvas>
+        <canvas id="totalUnitMonth"></canvas>
     </div>
+    
 </template>

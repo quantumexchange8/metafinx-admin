@@ -118,64 +118,66 @@ watch(() => refresh.value, (newVal) => {
             <div v-if="isLoading" class="w-full flex justify-center my-8">
                 <Loading />
             </div>
-            <table v-else class="w-[650px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 table-fixed">
-                <thead
-                    class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
-                    <tr>
-                        <th scope="col" class="px-3 py-4">
-                            Date
-                        </th>
-                        <th scope="col" class="px-3 py-4 text-center">
-                            Name
-                        </th>
-                        <th scope="col" class="px-3 py-4 text-center">
-                            Amount
-                        </th>
-                        <th scope="col" class="px-3 py-4 text-center">
-                            Updated By
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="fees.data.length === 0">
-                        <th colspan="4" class="py-4 text-lg text-center">
-                            No History
-                        </th>
-                    </tr>
-                    <tr v-for="fee in fees.data"
-                        class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 dark:hover:bg-gray-600">
-                        <td class="px-3 py-4">
-                            {{ formatDateTime(fee.created_at) }}
-                        </td>
-                        <td class="px-3 py-4 text-center">
-                            {{ (fee.name) }}
-                        </td>
-                        <td class="px-3 py-4 text-center">
-                            <div v-if="fee.slug === 'withdrawal-fee'">
-                                $&nbsp;{{ formatAmount(fee.value) }}
-                            </div>
-                            <div v-else-if="fee.slug === 'gas-fee' || 'stacking-fee'">
-                                {{ formatAmount(fee.value) }}%
-                            </div>
-                        </td>
-                        <td class="px-3 py-4 text-center">
-                            {{ fee.user.name }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div v-else class="overflow-x-auto">
+                <table class="w-[650px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 table-fixed">
+                    <thead
+                        class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
+                        <tr>
+                            <th scope="col" class="px-3 py-4">
+                                Date
+                            </th>
+                            <th scope="col" class="px-3 py-4 text-center">
+                                Name
+                            </th>
+                            <th scope="col" class="px-3 py-4 text-center">
+                                Amount
+                            </th>
+                            <th scope="col" class="px-3 py-4 text-center">
+                                Updated By
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="fees.data.length === 0">
+                            <th colspan="4" class="py-4 text-lg text-center">
+                                No History
+                            </th>
+                        </tr>
+                        <tr v-for="fee in fees.data"
+                            class="bg-white dark:bg-transparent text-xs font-normal text-gray-900 dark:text-white border-b dark:border-gray-600 dark:hover:bg-gray-600">
+                            <td class="px-3 py-4">
+                                {{ formatDateTime(fee.created_at) }}
+                            </td>
+                            <td class="px-3 py-4 text-center">
+                                {{ (fee.name) }}
+                            </td>
+                            <td class="px-3 py-4 text-center">
+                                <div v-if="fee.slug === 'withdrawal-fee'">
+                                    $&nbsp;{{ formatAmount(fee.value) }}
+                                </div>
+                                <div v-else-if="fee.slug === 'gas-fee' || 'stacking-fee'">
+                                    {{ formatAmount(fee.value) }}%
+                                </div>
+                            </td>
+                            <td class="px-3 py-4 text-center">
+                                {{ fee.user.name }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <div class="flex justify-center mt-4" v-if="!isLoading">
-                <TailwindPagination :item-classes=paginationClass :active-classes=paginationActiveClass :data="fees"
-                    :limit=2 @pagination-change-page="handlePageChange">
+                <TailwindPagination 
+                    :item-classes=paginationClass 
+                    :active-classes=paginationActiveClass 
+                    :data="fees"
+                    :limit=2 @pagination-change-page="handlePageChange"
+                >
                     <template #prev-nav>
-                        <span class="flex gap-2">
-                            <ArrowLeftIcon class="w-5 h-5" /> Previous
-                        </span>
+                        <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> <span class="hidden sm:flex">Previous</span></span>
                     </template>
                     <template #next-nav>
-                        <span class="flex gap-2">Next
-                            <ArrowRightIcon class="w-5 h-5" />
-                        </span>
+                        <span class="flex gap-2"><span class="hidden sm:flex">Next</span><ArrowRightIcon class="w-5 h-5" /></span>
                     </template>
                 </TailwindPagination>
             </div>

@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import XLCCoinChart from "@/Pages/XLCSetting/TotalXlcoinSupply/XLCCoinChart.vue";
-import CoinTransactionHistoryTable from "@/Pages/XLCSetting/Partials/CoinTransactionHistoryTable.vue";
+import MXTCoinChart from "@/Pages/MXTSetting/TotalMXTCoinSupply/MXTCoinChart.vue";
+import CoinTransactionHistoryTable from "@/Pages/MXTSetting/Partials/CoinTransactionHistoryTable.vue";
 import {computed, ref} from 'vue'
 import { Switch } from '@headlessui/vue'
 import AddInvestmentPlan from "@/Pages/IpoSchemeSetting/Partials/AddInvestmentPlan.vue";
@@ -96,7 +96,7 @@ const updateStatus = async (planId, newStatus) => {
                 </div>
             </div>
             <div class="pt-5 md:pt-0 col-span-3">
-                <XLCCoinChart 
+                <MXTCoinChart
                     :currentYear="currentYear"
                 />
             </div>

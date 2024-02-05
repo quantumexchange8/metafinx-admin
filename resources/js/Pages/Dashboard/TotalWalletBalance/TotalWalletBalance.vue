@@ -47,7 +47,7 @@ const selectFilterType = (type) => {
 
         <div class="w-full">
             <TabGroup>
-                <div class="flex w-full gap-5">
+                <div class="flex flex-wrap w-full gap-5">
                     <TabList class="flex space-x-1 rounded-xl bg-gray-900/20 dark:bg-transparent w-full max-w-md">
                         <Tab
                             v-for="category in Object.keys(categories)"

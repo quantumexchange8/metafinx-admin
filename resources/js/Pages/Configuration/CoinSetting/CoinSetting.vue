@@ -135,7 +135,7 @@ const submitMarketTime = () => {
         <form class="flex flex-col gap-8 w-full md:w-4/5">
             <div class="flex flex-col gap-5">
                 <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
-                    <Label class="text-sm dark:text-white" for="price" value="XLC Coin Price" />
+                    <Label class="text-sm dark:text-white" for="price" value="MXT Coin Price" />
                     <div class="md:col-span-3">
                         <Input
                             id="price"

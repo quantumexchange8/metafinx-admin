@@ -113,7 +113,7 @@ const exportTransaction = () => {
                         <Input withIcon id="search" type="text" class="block w-full border border-transparent" placeholder="Search" v-model="search" />
                     </InputIconWrapper>
                 </div>
-                <div class="w-auto md:w-full">
+                <div class="w-full md:w-[280px]">
                     <vue-tailwind-datepicker
                         placeholder="Select dates"
                         :formatter="formatter"
@@ -123,7 +123,7 @@ const exportTransaction = () => {
                         class="w-full md:w-[230px]"
                     />
                 </div>
-                <div class="w-auto md:w-full">
+                <div class="w-full md:w-[280px]">
                     <BaseListbox
                         id="statusID"
                         class="rounded-lg text-base w-full md:w-[155px] text-black dark:text-white dark:bg-gray-600"
@@ -133,11 +133,12 @@ const exportTransaction = () => {
 
                     />
                 </div>
-                <div class="w-auto md:w-full">
+                <div class="w-full">
                     <Button
                         type="button"
                         variant="secondary"
                         @click="refreshTable"
+                        class="w-full md:w-auto flex items-center justify-center px-3 py-2 border border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
                     >
                         Clear
                     </Button>

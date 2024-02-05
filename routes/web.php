@@ -7,7 +7,7 @@ use App\Http\Controllers\IpoSchemeController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\XlcController;
+use App\Http\Controllers\MXTController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -97,11 +97,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
      * ==============================
      */
      Route::prefix('mxt_setting')->group(function () {
-        Route::get('/mxt_setting', [XlcController::class, 'xlc_setting'])->name('xlc.setting');
-        Route::get('/getCoinPaymentDetails', [XlcController::class, 'getCoinPaymentDetails'])->name('xlc.getCoinPaymentDetails');
-        Route::get('/getStackingDetails', [XlcController::class, 'getStackingDetails'])->name('xlc.getStackingDetails');
-        Route::get('/getTotalXlCoinByDays', [XlcController::class, 'getTotalXlCoinByDays'])->name('xlc.getTotalXlCoinByDays');
-        Route::get('/getTotalXlCoinByMonth', [XlcController::class, 'getTotalXlCoinByMonth'])->name('xlc.getTotalXlCoinByMonth');
+        Route::get('/mxt_setting', [MXTController::class, 'mxt_setting'])->name('mxt.setting');
+        Route::get('/getCoinPaymentDetails', [MXTController::class, 'getCoinPaymentDetails'])->name('mxt.getCoinPaymentDetails');
+        Route::get('/getStackingDetails', [MXTController::class, 'getStackingDetails'])->name('mxt.getStackingDetails');
+        Route::get('/getTotalMXTCoinByDays', [MXTController::class, 'getTotalMXTCoinByDays'])->name('mxt.getTotalMXTCoinByDays');
+        Route::get('/getTotalMXTCoinByMonth', [MXTController::class, 'getTotalMXTCoinByMonth'])->name('mxt.getTotalMXTCoinByMonth');
 
      });
 
@@ -147,6 +147,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/getDays', [ConfigurationController::class, 'getDays'])->name('configuration.getDays');
         Route::post('/updateCoinPrice', [ConfigurationController::class, 'updateCoinPrice'])->name('configuration.updateCoinPrice');
         Route::post('/updateCoinMarketTime', [ConfigurationController::class, 'updateCoinMarketTime'])->name('configuration.updateCoinMarketTime');
+        Route::put('/editCoinPrice/{id}', [ConfigurationController::class, 'editCoinPrice'])->name('configuration.editCoinPrice');
     });
 
     /**

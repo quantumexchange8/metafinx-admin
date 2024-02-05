@@ -66,7 +66,7 @@ const submitForm = () => {
 
 <template>
     <div class="inline-flex justify-center items-center gap-2">
-        <Tooltip content="Approve" placement="bottom">
+        <Tooltip content="Approve" placement="bottom" class="relative">
             <Button
                 type="button"
                 pill
@@ -78,7 +78,7 @@ const submitForm = () => {
                 <span class="sr-only">View</span>
             </Button>
         </Tooltip>
-        <Tooltip content="Reject" placement="bottom">
+        <Tooltip content="Reject" placement="bottom" class="relative">
             <Button
                 type="button"
                 pill
@@ -90,7 +90,7 @@ const submitForm = () => {
                 <span class="sr-only">Transfer Upline</span>
             </Button>
         </Tooltip>
-        <Tooltip content="View" placement="bottom">
+        <Tooltip content="View" placement="bottom" class="relative">
             <Button
                 type="button"
                 pill

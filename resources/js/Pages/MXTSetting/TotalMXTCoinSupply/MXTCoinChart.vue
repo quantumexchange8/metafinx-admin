@@ -7,8 +7,8 @@ import Chart from 'chart.js/auto'
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import Button from '@/Components/Button.vue'
 import BaseListbox from "@/Components/BaseListbox.vue";
-import TotalXlcUnitDayChart from "@/Pages/XLCSetting/TotalXlcoinSupply/TotalXlcUnitDayChart.vue";
-import TotalXlcUnitMonthChart from "@/Pages/XLCSetting/TotalXlcoinSupply/TotalXlcUnitMonthChart.vue";
+import TotalMXTUnitDayChart from "@/Pages/MXTSetting/TotalMXTCoinSupply/TotalMXTUnitDayChart.vue";
+import TotalMXTUnitMonthChart from "@/Pages/MXTSetting/TotalMXTCoinSupply/TotalMXTUnitMonthChart.vue";
 import { RefreshIcon, SearchIcon } from "@heroicons/vue/outline";
 
 const date = ref('');
@@ -74,7 +74,7 @@ function refreshTable() {
         <div class="flex flex-col dark:bg-transparent mt-2">
             <TabGroup>
                 <div class="flex flex-wrap gap-5 w-full">
-                    <TabList class="flex dark:bg-transparent w-full max-w-[362px]">
+                    <TabList class="flex dark:bg-transparent w-full">
                         <Tab
                                 v-for="category in Object.keys(categories)"
                                 as="template"
@@ -120,23 +120,25 @@ function refreshTable() {
                                 
                             </Tab>
                     </TabList>
-                    <div v-if="filterType==='Daily'" class="flex gap-5 w-[276px]">
+                    <div v-if="filterType==='Daily'" class="flex gap-5 w-full">
                             <BaseListbox
                                 v-model="selectedMonth"
                                 :options="months"
-                                class="w-32"
+                                class="w-full"
                             />
                             <BaseListbox
                                 v-model="selectedYear"
                                 :options="years"
-                                class="w-32"
+                                class="w-full"
                             />
                     </div>
-                    <div v-else>
+                    <div v-else class="w-full">
                         <BaseListbox
                             v-if="filterType==='Monthly'"
                             v-model="selectedYear"
                             :options="years"
+                            class="w-full"
+
                         />
                     </div>
                 </div>
@@ -147,7 +149,7 @@ function refreshTable() {
                         'rounded-xl dark:bg-transparent',
                         ]"
                     >
-                        <TotalXlcUnitDayChart
+                        <TotalMXTUnitDayChart
                             :selectedMonth="selectedMonth"
                             :selectedYear="selectedYear"
                         />
@@ -157,7 +159,7 @@ function refreshTable() {
                         'rounded-xl dark:bg-transparent',
                         ]"
                     >
-                        <TotalXlcUnitMonthChart
+                        <TotalMXTUnitMonthChart
                             :selectedYear="selectedYear"
                         />
                     </TabPanel>

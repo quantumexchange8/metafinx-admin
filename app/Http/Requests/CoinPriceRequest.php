@@ -10,7 +10,7 @@ class CoinPriceRequest extends FormRequest
     {
         return [
             'price' => ['required'],
-            'date' => ['required', 'date', 'unique:coin_prices,price_date']
+            'date' => ['required', 'date', 'after_or_equal:today']
         ];
     }
 
@@ -22,7 +22,7 @@ class CoinPriceRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'price' => 'XLC Coin Price',
+            'price' => 'MXT Coin Price',
             'date' => 'Price Date',
         ];
     }

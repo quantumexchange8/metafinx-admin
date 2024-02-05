@@ -115,81 +115,83 @@ const closeModal = () => {
         <div v-if="transferLoading" class="w-full flex justify-center my-8">
             <Loading />
         </div>
-        <table v-else class="w-[800px] table-fixed md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
-            <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
-            <tr>
-                <th scope="col" class="pl-5 py-2">
-                    Date
-                </th>
-                <th scope="col" class="py-2">
-                    Name
-                </th>
-                <th scope="col" class="py-2">
-                    Transfer From
-                </th>
-                 <th scope="col" class="py-2">
-                    Transfer To
-                </th>
-                <th scope="col" class="py-2">
-                    Transfer Amount
-                </th>
-                <!-- <th scope="col" class="py-2">
-                    Balance
-                </th> -->
-                <!-- <th scope="col" class="py-2">
-                    Remark
-                </th> -->
-                <th scope="col" class="py-2 text-center">
-                    Status
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-if="transfers.data.length === 0">
-                <th colspan="6" class="py-4 text-lg text-center">
-                    No History
-                </th>
-            </tr>
-            <tr
-                v-for="transfer in transfers.data"
-                class="bg-white dark:bg-transparent text-xs text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
-                @click="openTransferHistoryModal(transfer)"
-            >
-                <td class="pl-5 py-2">
-                    {{ formatDateTime(transfer.created_at) }}
-                </td>
-                <td class="py-2">
-                    <div class="inline-flex items-center gap-2">
-                        <img :src="transfer.user.profile_photo_url ? transfer.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        <div class="flex flex-col">
-                            <div>
-                                {{ transfer.user.name }}
-                            </div>
-                            <div class="dark:text-gray-400">
-                                {{ transfer.user.email }}
+        <div v-else class="overflow-x-auto">
+            <table class="w-[800px] table-fixed md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
+                <thead class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
+                <tr>
+                    <th scope="col" class="pl-5 py-2">
+                        Date
+                    </th>
+                    <th scope="col" class="py-2">
+                        Name
+                    </th>
+                    <th scope="col" class="py-2">
+                        Transfer From
+                    </th>
+                    <th scope="col" class="py-2">
+                        Transfer To
+                    </th>
+                    <th scope="col" class="py-2">
+                        Transfer Amount
+                    </th>
+                    <!-- <th scope="col" class="py-2">
+                        Balance
+                    </th> -->
+                    <!-- <th scope="col" class="py-2">
+                        Remark
+                    </th> -->
+                    <th scope="col" class="py-2 text-center">
+                        Status
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-if="transfers.data.length === 0">
+                    <th colspan="6" class="py-4 text-lg text-center">
+                        No History
+                    </th>
+                </tr>
+                <tr
+                    v-for="transfer in transfers.data"
+                    class="bg-white dark:bg-transparent text-xs text-gray-900 dark:text-white border-b dark:border-gray-600 hover:cursor-pointer dark:hover:bg-gray-600"
+                    @click="openTransferHistoryModal(transfer)"
+                >
+                    <td class="pl-5 py-2">
+                        {{ formatDateTime(transfer.created_at) }}
+                    </td>
+                    <td class="py-2">
+                        <div class="inline-flex items-center gap-2">
+                            <img :src="transfer.user.profile_photo_url ? transfer.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                            <div class="flex flex-col">
+                                <div>
+                                    {{ transfer.user.name }}
+                                </div>
+                                <div class="dark:text-gray-400">
+                                    {{ transfer.user.email }}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </td>
-                <td class="py-2">
-                    {{ transfer.from_wallet.name }}
-                </td>
-                <td class="py-2">
-                    {{ transfer.to_wallet.name }}
-                </td>
-                <td class="py-2">
-                   $ {{ formatAmount(transfer.transaction_amount) }}
-                </td>
-                <!-- <td class="py-2">
-                    {{ transfer.remarks }}
-                </td> -->
-                <td v-if="transfer.status == 'Success'" class="py-2 text-center">
-                    <span v-if="transfer.status === 'Success'" class="flex w-2 h-2 bg-green-500 dark:bg-green-500 mx-auto rounded-full"></span>
-                    <span v-else class="flex w-2 h-2 bg-green-500 dark:bg-error-500 mx-auto rounded-full"></span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    </td>
+                    <td class="py-2">
+                        {{ transfer.from_wallet.name }}
+                    </td>
+                    <td class="py-2">
+                        {{ transfer.to_wallet.name }}
+                    </td>
+                    <td class="py-2">
+                    $ {{ formatAmount(transfer.transaction_amount) }}
+                    </td>
+                    <!-- <td class="py-2">
+                        {{ transfer.remarks }}
+                    </td> -->
+                    <td v-if="transfer.status == 'Success'" class="py-2 text-center">
+                        <span v-if="transfer.status === 'Success'" class="flex w-2 h-2 bg-green-500 dark:bg-green-500 mx-auto rounded-full"></span>
+                        <span v-else class="flex w-2 h-2 bg-green-500 dark:bg-error-500 mx-auto rounded-full"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <div class="flex justify-center mt-4" v-if="!transferLoading">
             <TailwindPagination
                 :item-classes=paginationClass
@@ -199,10 +201,10 @@ const closeModal = () => {
                 @pagination-change-page="handlePageChange"
             >
                 <template #prev-nav>
-                    <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> Previous</span>
+                    <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> <span class="hidden sm:flex">Previous</span></span>
                 </template>
                 <template #next-nav>
-                    <span class="flex gap-2">Next <ArrowRightIcon class="w-5 h-5" /></span>
+                    <span class="flex gap-2"><span class="hidden sm:flex">Next</span><ArrowRightIcon class="w-5 h-5" /></span>
                 </template>
             </TailwindPagination>
         </div>

@@ -57,7 +57,7 @@ const openInNewTab = (url) => {
 </script>
 
 <template>
-    <div>
+    <div class>
         <Tooltip content="Unsubscribe" placement="bottom" v-if="type === 'investment'">
             <Button
                 type="button"
@@ -70,26 +70,28 @@ const openInNewTab = (url) => {
                 <span class="sr-only">Unsubscribe</span>
             </Button>
         </Tooltip>
-        <Button
-            type="button"
-            class="justify-center px-3 py-2 gap-2 grow focus:outline-none"
-            variant="gray"
-            @click="openMemberModal('edit_member')"
-            v-if="type === 'member'"
-        >
-            <EditIcon aria-hidden="true" class="w-5 h-5" />
-            <span class="text-sm">Edit</span>
-        </Button>
-        <Button
-            type="button"
-            class="justify-center px-3 py-2 ml-2 gap-2 grow focus:outline-none"
-            variant="success"
-            @click="openInNewTab(route('member.impersonate', props.member_details.id))"
-            v-if="type === 'member'"
-        >
-            <AccessIcon aria-hidden="true" class="w-5 h-5" />
-            <span class="text-sm">Access</span>
-        </Button>
+        <div class="flex flex-col space-y-2">
+            <Button
+                type="button"
+                class="justify-center px-3 py-2 gap-2 grow focus:outline-none"
+                variant="gray"
+                @click="openMemberModal('edit_member')"
+                v-if="type === 'member'"
+            >
+                <EditIcon aria-hidden="true" class="w-5 h-5" />
+                <span class="text-sm">Edit</span>
+            </Button>
+            <Button
+                type="button"
+                class="justify-center px-3 py-2 gap-2 grow focus:outline-none"
+                variant="success"
+                @click="openInNewTab(route('member.impersonate', props.member_details.id))"
+                v-if="type === 'member'"
+            >
+                <AccessIcon aria-hidden="true" class="w-5 h-5" />
+                <span class="text-sm">Access</span>
+            </Button>
+        </div>
         <Tooltip content="Wallet Adjustment" placement="bottom" v-if="type === 'wallet'">
             <Button
                 type="button"
