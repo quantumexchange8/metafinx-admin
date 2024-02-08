@@ -73,6 +73,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/coin_adjustment', [MemberController::class, 'coin_adjustment'])->name('member.coin_adjustment');
 
         Route::get('/impersonate/{user}', [MemberController::class, 'impersonate'])->name('member.impersonate');
+
+        Route::get('getBinaryData/{id}', [MemberController::class, 'getBinaryData'])->name('member.getBinaryData');
+        Route::get('getAvailableDistributor', [MemberController::class, 'getAvailableDistributor'])->name('member.getAvailableDistributor');
+        Route::get('getAvailableBinaryAffiliate/{id}', [MemberController::class, 'getAvailableBinaryAffiliate'])->name('member.getAvailableBinaryAffiliate');
+        Route::post('addDistributor', [MemberController::class, 'addDistributor'])->name('member.addDistributor');
+        Route::get('getLastChild/{id}', [MemberController::class, 'getLastChild'])->name('member.getLastChild');
+        Route::get('getPendingPlacementCount/{id}', [MemberController::class, 'getPendingPlacementCount'])->name('member.getPendingPlacementCount');
+        Route::get('checkCoinStackingExistence/{id}', [MemberController::class, 'checkCoinStackingExistence'])->name('member.checkCoinStackingExistence');
     });
 
     /**

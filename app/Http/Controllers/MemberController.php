@@ -36,6 +36,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MemberListingExport;
 use App\Exports\MemberListingTypeExport;
 use App\Services\RunningNumberService;
+use App\Models\CoinMultiLevel;
+use App\Models\CoinStacking;
 
 class MemberController extends Controller
 {
@@ -485,9 +487,21 @@ class MemberController extends Controller
     public function affiliate_tree($id)
     {
         $user = User::find($id);
+        $downline = User::where('upline_id', $id)->with(['coinStaking'])->get();
+
+        // Get the upline's ID
+        $uplineId = User::where('id', $id)->value('upline_id');
+        $uplineStaking = true;
+
+        if ($uplineId) {
+            // If there is an upline, check if they have a coin stacking record
+            $uplineStaking = CoinStacking::where('user_id', $uplineId)->exists();
+        }
 
         return Inertia::render('Member/MemberAffiliates/MemberAffiliate', [
-            'user' => $user
+            'user' => $user,
+            'downline' => $downline,
+            'uplineStaking' => $uplineStaking,
         ]);
     }
 
@@ -698,6 +712,321 @@ class MemberController extends Controller
         }
 
         return Inertia::location($url);
+    }
+
+    public function getBinaryData(Request $request, $id)
+    {
+        $searchUser = null;
+        $searchTerm = $request->input('search');
+
+        if ($searchTerm) {
+            // dd('asdasd');
+            $searchUser = User::where('name', 'like', '%' . $searchTerm . '%')
+                ->orWhere('email', 'like', '%' . $searchTerm . '%')
+                ->first();
+
+            if (!$searchUser) {
+                return response()->json(['error' => 'User not found for the given search term.'], 404);
+            }
+        }
+
+        $user = $searchUser ?? CoinMultiLevel::with(['user:id,name,email,setting_rank_id', 'sponsor.user'])->where('user_id', $id)->first();
+
+
+        $users = CoinMultiLevel::whereHas('upline', function ($query) use ($user) {
+            $query->where('id', $user->id);
+        })->get();
+
+//        if ($searchUser) {
+//            $query->orWhere('id', $searchUser->id);
+//        }
+//
+//        $users = $query->get();
+
+        $level = 0;
+        $binaryData = [
+            'id' => $user->id,
+            'name' => $user->user->name,
+            'profile_photo' => $user->user->getFirstMediaUrl('profile_photo'),
+            'position' => $user->position,
+            'sponsor_name' => $user->sponsor ? $user->sponsor->user->name : null,
+            'sponsor_email' => $user->sponsor ? $user->sponsor->user->email : null,
+            'sponsor_profile_photo' => $user->sponsor ? $user->sponsor->user->getFirstMediaUrl('profile_photo') : null,
+            'email' => $user->user->email,
+            'level' => $level,
+            'rank' => $user->user->setting_rank_id,
+            'personal_amount' => $user->coin_stacking_amount,
+            'left_amount' => $this->getLeftTotalAmount($user),
+            'right_amount' => $this->getRightTotalAmount($user),
+            'children' => $users->map(function ($user) {
+                return $this->mapBinaryUser($user, 0);
+            })
+        ];
+
+        return response()->json($binaryData);
+    }
+
+    protected function mapBinaryUser($user, $level)
+    {
+        $children = $user->children;
+        $childrenCount = count($children);
+
+        $mappedChildren = $children->map(function ($child) use ($level) {
+            return $this->mapBinaryUser($child, $level + 1);
+        });
+
+        $mappedUser = [
+            'id' => $user->id,
+            'name' => $user->user->name,
+            'profile_photo' => $user->user->getFirstMediaUrl('profile_photo'),
+            'position' => $user->position,
+            'sponsor' => $user->sponsor->user->name ?? null,
+            'email' => $user->user->email,
+            'level' => $level + 1,
+            'rank' => $user->user->setting_rank_id,
+            'personal_amount' => $user->coin_stacking_amount,
+            'left_amount' => $this->getLeftAmount($user),
+            'right_amount' => $this->getRightAmount($user),
+        ];
+
+        // Add 'children' only if there are children
+        if (!$mappedChildren->isEmpty()) {
+            // Separate children into 'left' and 'right' arrays
+            $leftChildren = [];
+            $rightChildren = [];
+
+            foreach ($mappedChildren as $mapChild) {
+                if ($mapChild['position'] == 'left') {
+                    $leftChildren[] = (object)$mapChild;
+                } else {
+                    $rightChildren[] = (object)$mapChild;
+                }
+            }
+
+            // Handle the case of a single child
+            if (count($mappedChildren) == 1) {
+                if ($leftChildren) {
+                    $mappedUser['children'] = [(object)$leftChildren[0], (object)null];
+                } elseif ($rightChildren) {
+                    $mappedUser['children'] = [(object)null, (object)$rightChildren[0]];
+                }
+            } else {
+                // Merge 'left' and 'right' children into the 'children' array
+                $mappedUser['children'] = array_merge($leftChildren, $rightChildren);
+            }
+        } else {
+            $mappedUser['children'] = [];
+        }
+
+        return $mappedUser;
+    }
+
+
+    public function getAvailableDistributor(Request $request)
+    {
+        $existed_users_ids = CoinMultiLevel::get()->pluck('user_id');
+
+        $users = User::query()
+            ->where('role', '=', 'user')
+            ->whereNotIn('id', $existed_users_ids)
+            ->when($request->filled('query'), function ($query) use ($request) {
+                $search = $request->input('query');
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->select('id', 'name', 'email')
+            ->get();
+
+        $users->each(function ($users) {
+            $users->profile_photo = $users->getFirstMediaUrl('profile_photo');
+        });
+
+        return response()->json($users);
+    }
+
+    public function addDistributor(Request $request)
+    {
+        $upline = CoinMultiLevel::find($request->upline_id);
+        $coinStakingPrice = CoinStacking::where('user_id', $request->user_id)->where('status', 'OnGoingPeriod')->sum('stacking_price');
+
+        // Ensure the specified position is either 'left' or 'right'
+        $position = ($request->position === 'left' || $request->position === 'right') ? $request->position : 'left';
+
+        // Update the hierarchy list based on the upline
+        if ($upline->id == 1) {
+            // If the upline is the root node, the hierarchy list will be the user's ID
+            $hierarchyList = '-' . $request->upline_id . '-';
+        } else {
+            // Otherwise, prepend the upline's hierarchy list with a '-' if it's not empty
+            $hierarchyList = $upline->hierarchy_list . $upline->id . '-';
+        }
+
+        // Create the distributor with the provided parameters
+        CoinMultiLevel::create([
+            'user_id' => $request->user_id,
+            'sponsor_id' => $request->id,
+            'upline_id' => $upline->id,
+            'hierarchy_list' => $hierarchyList,
+            'position' => $position,
+            'coin_stacking_amount' => $coinStakingPrice,
+        ]);
+
+        // Redirect back with success message
+        return redirect()->back()->with('title', 'Add Distributor')->with('success', 'Distributor has been successfully added!');
+    }
+
+    protected function getLeftAmount($child)
+    {
+        $ids = $child->getChildrenIds();
+
+        return CoinMultiLevel::query()
+            ->whereIn('id', $ids)
+            ->where('position', 'left')
+            ->sum('coin_stacking_amount');
+    }
+
+    protected function getRightAmount($child)
+    {
+        $ids = $child->getChildrenIds();
+
+        return CoinMultiLevel::query()
+            ->whereIn('id', $ids)
+            ->where('position', 'right')
+            ->sum('coin_stacking_amount');
+    }
+
+    protected function getLeftTotalAmount($child)
+    {
+        $ids = $child->getChildrenIds();
+
+        $leftAmount = CoinMultiLevel::query()
+            ->whereIn('id', $ids)
+            ->whereHas('upline', function ($query) {
+                $query->where('position', 'left');
+            })
+            ->sum('coin_stacking_amount');
+
+        $rightAmount = CoinMultiLevel::query()
+            ->whereIn('id', $ids)
+            ->whereHas('upline', function ($query) {
+                $query->where('position', 'left');
+            })
+            ->where('position', 'right')
+            ->sum('coin_stacking_amount');
+
+        $leftPosition = $child->position;
+        if ($leftPosition == 'left') {
+            return $leftAmount;
+        } elseif ($leftPosition == 'right') {
+            return $rightAmount;
+        } else {
+            return $leftAmount + $rightAmount;
+        }
+    }
+    protected function getRightTotalAmount($child)
+    {
+        $ids = $child->getChildrenIds();
+
+        $leftAmount = CoinMultiLevel::query()
+            ->whereIn('id', $ids)
+            ->whereHas('upline', function ($query) {
+                $query->where('position', 'right');
+            })
+            ->where('position', 'left')
+            ->sum('coin_stacking_amount');
+
+        $rightAmount = CoinMultiLevel::query()
+            ->whereIn('id', $ids)
+            ->whereHas('upline', function ($query) {
+                $query->where('position', 'right');
+            })
+            ->sum('coin_stacking_amount');
+
+        $leftPosition = $child->position;
+        if ($leftPosition == 'right') {
+            return $leftAmount;
+        } elseif ($leftPosition == 'left') {
+            return $rightAmount;
+        } else {
+            return $leftAmount + $rightAmount;
+        }
+    }
+
+    public function getAvailableBinaryAffiliate(Request $request, $id)
+    {
+        $user = User::find($id);
+        $existedUserIds = CoinMultiLevel::pluck('user_id');
+        $childrenIds = $user->children()->pluck('id');
+
+        $query = User::with(['coinStaking', 'media'])
+            ->whereIn('id', $childrenIds)
+            ->where('role', 'user')
+            ->whereNotIn('id', $existedUserIds)
+            ->when($request->filled('query'), function ($query) use ($request) {
+                $search = $request->input('query');
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+
+        // Transform each user to include only the specified attributes
+        $transformedUsers = $query->getCollection()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'created_at' => $user->created_at,
+                'profile_photo' => $user->getFirstMediaUrl('profile_photo'),
+                'coin_staking' => $user->coinStaking,
+                'media' => $user->media->toArray(),
+            ];
+        });
+
+        // Replace the items in the paginated results with the transformed users
+        $query->setCollection($transformedUsers);
+
+        return response()->json($query);
+    }
+
+    public function getLastChild(Request $request, $id)
+    {
+        $user = User::find($id);
+        $position = $request->position;
+        $binaryAuthUser = CoinMultiLevel::where('user_id', $user->id)->first();
+
+        $last_child = $binaryAuthUser->getLastChild($position);
+        if ($last_child) {
+            $last_child->profile_photo = $last_child->user->getFirstMediaUrl('profile_photo');
+        }
+
+        return response()->json($last_child);
+    }
+
+    public function getPendingPlacementCount($id)
+    {
+        $user = User::find($id);
+        $childrenIds = $user->children()->pluck('id')->toArray();
+        $existedUsersIds = CoinMultiLevel::pluck('user_id')->toArray();
+
+        return CoinStacking::where('auto_assign_at', '>=', now())
+            ->whereDate('created_at', '>=', now()->subDay())
+            ->whereIn('user_id', $childrenIds)
+            ->whereNotIn('user_id', $existedUsersIds)
+            ->distinct('user_id')
+            ->count();
+    }
+
+    public function checkCoinStackingExistence($id)
+    {
+        // Check if the user exists in the coin stacking table
+        $exists = CoinStacking::where('user_id', $id)->exists();
+
+        return response()->json($exists);
     }
 
 }

@@ -132,4 +132,18 @@ class User extends Authenticatable implements HasMedia
         return $this->hasMany(InvestmentSubscription::class, 'user_id', 'id');
     }
 
+    public function coins(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Coin::class, 'user_id', 'id');
+    }
+
+    public function coinStaking(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CoinStacking::class, 'user_id', 'id');
+    }
+
+    public function binary(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(CoinMultiLevel::class, 'user_id', 'id');
+    }
 }
