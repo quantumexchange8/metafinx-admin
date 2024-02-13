@@ -39,8 +39,8 @@ class ConfigurationController extends Controller
                 ->from('settings')
                 ->groupBy('name', 'slug');
         })
-        ->get(); 
-                            
+        ->get();
+
         // Check if $coin_market_time is not null to avoid errors
         if ($coin_market_time) {
             $openTime = Carbon::parse($coin_market_time->open_time);
@@ -171,7 +171,7 @@ class ConfigurationController extends Controller
         if ($existingDate) {
             throw ValidationException::withMessages(['date' => ['Release date already exists']]);
         }
-        
+
         $settingBonus = SettingBonus::create([
             'name' => 'Dividend Bonus',
             'type' => 'dividend_bonuses',
@@ -185,28 +185,28 @@ class ConfigurationController extends Controller
     public function editDividendBonus(DividendBonusRequest $request, $id)
     {
         $existingDividendBonus = SettingBonus::findOrFail($id);
-    
+
         $existingDate = SettingBonus::where('release_date', $request->date)
         ->where('id', '!=', $id)
         ->first();
-        
+
         if ($existingDate) {
             throw ValidationException::withMessages(['date' => ['Release date already exists']]);
         }
-    
+
         $existingDividendBonus->update([
             'amount' => $request->amount,
             'release_date' => $request->date,
         ]);
-    
+
         return redirect()->back()->with('title', 'Dividend Bonus Updated')->with('success', 'The dividend bonus has been updated successfully.');
     }
-    
+
     public function editMasterSetting(TicketBonusRequest $request)
     {
         $symbol = '';
-    
-        if ($request->slug == 'withdrawal-fee') 
+
+        if ($request->slug == 'withdrawal-fee')
         {
             $symbol = '$ ';
         }if ($request->slug == 'gas-fee' || 'stacking-fee') {
@@ -219,7 +219,7 @@ class ConfigurationController extends Controller
             'value' => $request->value,
             'updated_by' => \Auth::id(),
         ]);
-    
+
         $formattedValue = ($request->slug == 'gas-fee' || $request->slug == 'stacking-fee')
         ? $request->value . $symbol
         : $symbol . ' ' . $request->value;
@@ -233,24 +233,24 @@ class ConfigurationController extends Controller
     public function editCoinPrice(CoinPriceRequest $request, $id)
     {
         $existingCoinPrice = CoinPrice::findOrFail($id);
-    
+
         $existingDate = CoinPrice::where('price_date', $request->price_date)
         ->where('id', '!=', $id)
         ->first();
-        
+
         if ($existingDate) {
             throw ValidationException::withMessages(['date' => ['Release date already exists']]);
         }
-    
+
         $existingCoinPrice->update([
             'price' => $request->price,
             'price_date' => $request->date,
         ]);
-    
+
         return redirect()->back()->with('title', 'Coin Price Updated')->with('success', 'The coin price has been updated successfully.');
     }
 
-    
+
     public function getDividendBonus(Request $request)
     {
         $dividends = SettingBonus::query()
@@ -275,12 +275,12 @@ class ConfigurationController extends Controller
             ->paginate(10);
 
             $totalMemberCount = InvestmentSubscription::distinct('user_id')->count();
-    
+
             $dividends->transform(function ($dividend) use ($totalMemberCount) {
                 $dividend->total_Member = $totalMemberCount;
                 return $dividend;
             });
-    
+
         return response()->json($dividends);
     }
 
@@ -399,7 +399,7 @@ class ConfigurationController extends Controller
                 $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
                 $query->whereBetween('price_date', [$start_date, $end_date]);
             })
-            ->latest()
+            ->orderByDesc('price_date')
             ->paginate(10);
 
         return response()->json($coin_prices);
@@ -420,7 +420,7 @@ class ConfigurationController extends Controller
 
     public function updateCoinPrice(CoinPriceRequest $request)
     {
-        $price_date = CoinPrice::latest()->first();
+        $price_date = CoinPrice::orderByDesc('price_date')->first();
         $current_conversion_rate = ConversionRate::latest()->first();
 
         $date = now()->parse($price_date->price_date)->addDays(2);
@@ -428,7 +428,6 @@ class ConfigurationController extends Controller
 
         // Check if the provided date is not the expected next date
         if ($request->date > $expectedNextDate) {
-            dd($request->date > $expectedNextDate, $request->date);
             throw ValidationException::withMessages([
                 'date' => "Please fill in the missing date '{$expectedNextDate}'.",
             ]);

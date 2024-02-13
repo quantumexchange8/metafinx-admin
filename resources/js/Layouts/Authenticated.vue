@@ -4,7 +4,7 @@ import Sidebar from '@/Components/Sidebar/Sidebar.vue'
 import Navbar from '@/Components/Navbar.vue'
 import { sidebarState } from '@/Composables'
 import Alert from "@/Components/Alert.vue";
-import {onUnmounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import {Inertia} from "@inertiajs/inertia";
 import {usePage} from "@inertiajs/vue3";
 import ToastList from "@/Components/ToastList.vue";
@@ -32,6 +32,10 @@ let removeFinishEventListener = Inertia.on("finish", () => {
         alertMessage.value = page.props.warning
     }
 });
+
+onMounted(() => {
+    document.documentElement.classList.add('dark');
+})
 
 onUnmounted(() => removeFinishEventListener());
 </script>
