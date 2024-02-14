@@ -11,11 +11,13 @@ import {TailwindPagination} from "laravel-vue-pagination";
 import debounce from "lodash/debounce.js";
 import {transactionFormat} from "@/Composables/index.js";
 import MonthlyReturnPayout from "@/Pages/Report/Partials/MonthlyReturnPayout.vue";
-import QuarterlyDividendPayout from "@/Pages/Report/Partials/QuarterlyDividendPayout.vue";
 import ReferralEarningPayout from "@/Pages/Report/Partials/ReferralEarningPayout.vue";
 import AffiliateEarningPayout from "@/Pages/Report/Partials/AffiliateEarningPayout.vue";
 import DividendEarningPayout from "@/Pages/Report/Partials/DividendEarningPayout.vue";
-import TicketBonusPayout from "@/Pages/Report/Partials/TicketBonusPayout.vue";
+import AffiliateDividendEarningPayout from "@/Pages/Report/Partials/AffiliateDividendEarningPayout.vue";
+import StakingReward from "@/Pages/Report/Partials/StakingReward.vue";
+import ReferralEarningsStaking from "@/Pages/Report/Partials/ReferralEarningsStaking.vue";
+import PairingEarning from "@/Pages/Report/Partials/PairingEarning.vue";
 
 const emit = defineEmits(['search', 'date', 'update:export'])
 const props = defineProps({
@@ -80,7 +82,7 @@ watch(
 
     <div class="relative overflow-x-auto sm:rounded-lg">
         <MonthlyReturnPayout
-            v-if="activePayout==='MonthlyReturn'"
+            v-if="activePayout === 'StandardRewards'"
             :refresh="refresh"
             :isLoading="isLoading"
             :search="search"
@@ -91,20 +93,8 @@ watch(
             @update:refresh="refresh = $event"
             @update:export="$emit('update:export', $event)"
         />
-        <!-- <QuarterlyDividendPayout
-            v-if="activePayout==='Quarterly_Dividend'"
-            :refresh="refresh"
-            :isLoading="isLoading"
-            :search="search"
-            :date="date"
-            :type="activePayout"
-            :exportStatus = "exportStatus"
-            @update:loading="isLoading = $event"
-            @update:refresh="refresh = $event"
-            @update:export="$emit('update:export', $event)"
-        /> -->
         <ReferralEarningPayout
-            v-if="activePayout==='ReferralEarning'"
+            v-if="activePayout === 'ReferralEarnings'"
             :refresh="refresh"
             :isLoading="isLoading"
             :search="search"
@@ -116,7 +106,7 @@ watch(
             @update:export="$emit('update:export', $event)"
         />
         <AffiliateEarningPayout
-            v-if="activePayout==='AffiliateEarning'"
+            v-if="activePayout === 'AffiliateEarnings'"
             :refresh="refresh"
             :isLoading="isLoading"
             :search="search"
@@ -128,7 +118,7 @@ watch(
             @update:export="$emit('update:export', $event)"
         />
         <DividendEarningPayout
-            v-if="activePayout==='DividendEarning'"
+            v-if="activePayout === 'DividendEarnings'"
             :refresh="refresh"
             :isLoading="isLoading"
             :search="search"
@@ -139,8 +129,8 @@ watch(
             @update:refresh="refresh = $event"
             @update:export="$emit('update:export', $event)"
         />
-        <!-- <TicketBonusPayout
-            v-if="activePayout==='Ticket_Bonus'"
+        <AffiliateDividendEarningPayout
+            v-if="activePayout === 'AffiliateDividendEarnings'"
             :refresh="refresh"
             :isLoading="isLoading"
             :search="search"
@@ -150,7 +140,44 @@ watch(
             @update:loading="isLoading = $event"
             @update:refresh="refresh = $event"
             @update:export="$emit('update:export', $event)"
-        /> -->
+        />
+        <StakingReward
+            v-if="activePayout === 'StakingRewards'"
+            :refresh="refresh"
+            :isLoading="isLoading"
+            :search="search"
+            :date="date"
+            :type="activePayout"
+            :exportStatus = "exportStatus"
+            @update:loading="isLoading = $event"
+            @update:refresh="refresh = $event"
+            @update:export="$emit('update:export', $event)"
+        />
+        <ReferralEarningsStaking
+            v-if="activePayout === 'ReferralEarningsStaking'"
+            :refresh="refresh"
+            :isLoading="isLoading"
+            :search="search"
+            :date="date"
+            :type="activePayout"
+            :exportStatus = "exportStatus"
+            @update:loading="isLoading = $event"
+            @update:refresh="refresh = $event"
+            @update:export="$emit('update:export', $event)"
+        />
+        <PairingEarning
+            v-if="activePayout === 'PairingEarnings'"
+            :refresh="refresh"
+            :isLoading="isLoading"
+            :search="search"
+            :date="date"
+            :type="activePayout"
+            :exportStatus = "exportStatus"
+            @update:loading="isLoading = $event"
+            @update:refresh="refresh = $event"
+            @update:export="$emit('update:export', $event)"
+        />
+        
     </div>
 
 </template>

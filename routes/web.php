@@ -184,8 +184,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/getAffiliateEarningPayoutDetails', [ReportController::class, 'getAffiliateEarningPayoutDetails'])->name('report.getAffiliateEarningPayoutDetails');
         Route::get('/getDividendEarningPayoutDetails', [ReportController::class, 'getDividendEarningPayoutDetails'])->name('report.getDividendEarningPayoutDetails');
 
-        Route::get('/getTotalPayoutByDays', [ReportController::class, 'getTotalPayoutByDays'])->name('report.getTotalPayoutByDays');
-        Route::get('/getTotalPayoutByMonths', [ReportController::class, 'getTotalPayoutByMonths'])->name('report.getTotalPayoutByMonths');
+        Route::get('/getTotalPayoutByDays/{type}/{category}', [ReportController::class, 'getTotalPayoutByDays'])->name('report.getTotalPayoutByDays');
+        Route::get('/getTotalPayoutByMonths/{type}/{category}', [ReportController::class, 'getTotalPayoutByMonths'])->name('report.getTotalPayoutByMonths');
+
+        Route::get('/getEarningPayoutDetails/{type}/{category}', [ReportController::class, 'getEarningPayoutDetails'])->name('report.getEarningPayoutDetails');
     });
 });
 

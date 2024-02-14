@@ -5,11 +5,9 @@ import debounce from "lodash/debounce.js";
 import Chart from 'chart.js/auto'
 
 const props = defineProps({
-    selectedMonth: Number,
     selectedYear: Number,
     search: String,
     date: String,
-    type: String,
 })
 
 const chartData = ref({
@@ -17,7 +15,6 @@ const chartData = ref({
     datasets: [],
 });
 const isLoading = ref(false)
-const month = ref(props.selectedMonth)
 const year = ref(props.selectedYear)
 const searchChart = ref(props.search);
 const dateChart = ref(props.date);
@@ -26,13 +23,15 @@ let chartInstance = null;
 const fetchData = async () => {
     try {
         if (chartInstance) {
+            chartInstance.clear();
             chartInstance.destroy();
         }
 
-        const ctx = document.getElementById('dailyPayout');
+        const ctx = document.getElementById('monthlyPayout');
 
         isLoading.value = true;
-        const response = await axios.get('/report/getTotalPayoutByDays/StandardRewards', { params: { year: year.value , month: month.value , search: searchChart.value , date: dateChart.value } });
+
+        const response = await axios.get('/report/getTotalPayoutByMonths/ReferralEarnings/staking', { params: { year: year.value , search: searchChart.value , date: dateChart.value } });
         const { labels, datasets } = response.data;
         chartData.value.labels = labels;
         chartData.value.datasets = datasets;
@@ -53,7 +52,7 @@ const fetchData = async () => {
             [
                 'rgba(0, 199, 190, 0.4)',
                 'rgba(0, 199, 190, 0)',
-                'ReferralEarning',
+                'ReferralEarnings',
                 'Referral Earning'
             ],
             [
@@ -81,6 +80,7 @@ const fetchData = async () => {
                 if (dataset) {
                     const label = dataset.label;
                     const matchingColor = gradientColors.find(colorData => colorData[2] === label);
+
                     if (matchingColor) {
                         dataset.backgroundColor = (context) => {
                             const bgColor = matchingColor;
@@ -154,6 +154,7 @@ const fetchData = async () => {
                 },
                 plugins: {
                     legend: {
+                        display: false,
                         labels: {
                             font: {
                                 family: 'Inter, sans-serif',
@@ -171,10 +172,10 @@ const fetchData = async () => {
             }
         });
     } catch (error) {
-        const ctx = document.getElementById('dailyPayout');
+        const ctx = document.getElementById('monthlyPayout');
 
         isLoading.value = false
-        console.error('Error fetching chart data:', error.response.data);
+        console.error('Error fetching chart data:', error);
     }
 }
 
@@ -184,10 +185,10 @@ onMounted(async () => {
     // Watch for changes in the date and fetch data when it changes
 
     watch(
-        () => props.selectedMonth, // Expression to watch
-        (newMonth) => {
+        () => props.selectedYear, // Expression to watch
+        (newYear) => {
             // This callback will be called when selectedMonth changes.
-            month.value = newMonth;
+            year.value = newYear;
             fetchData();
         }
     );
@@ -208,6 +209,6 @@ onMounted(async () => {
         <Loading />
     </div>
     <div>
-        <canvas id="dailyPayout" height="350"></canvas>
+        <canvas id="monthlyPayout" height="350"></canvas>
     </div>
 </template>

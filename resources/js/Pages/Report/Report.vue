@@ -1,18 +1,31 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import PayoutChart from "@/Pages/Report/Charts/PayoutChart.vue";
 import ReportTable from "@/Pages/Report/Partials/ReportTable.vue";
 import {onMounted, ref, watch, computed} from 'vue'
 import debounce from "lodash/debounce.js";
 import {transactionFormat} from "@/Composables/index.js";
 import Button from "@/Components/Button.vue";
 import {CloudDownloadIcon} from "@/Components/Icons/outline.jsx";
+import PayoutChart from "@/Pages/Report/Charts/TotalStandardReward/PayoutChart.vue";
+import PayoutReferralEarningChart from "@/Pages/Report/Charts/TotalReferralEarning/PayoutReferralEarningChart.vue";
+import PayoutAffiliateEarningChart from "@/Pages/Report/Charts/TotalAffiliateEarning/PayoutAffiliateEarningChart.vue";
+import PayoutDividendEarningChart from "@/Pages/Report/Charts/TotalDividendEarning/PayoutDividendEarningChart.vue";
+import PayoutAffiliateDividendEarningChart from "@/Pages/Report/Charts/TotalAffiliateDividendEarning/PayoutAffiliateDividendEarningChart.vue";
+import PayoutStakingRewardChart from "@/Pages/Report/Charts/TotalStakingReward/PayoutStakingRewardChart.vue";
+import PayoutReferralEarningStakingChart from "@/Pages/Report/Charts/TotalReferralEarningStaking/PayoutReferralEarningStakingChart.vue";
+import PayoutPairingEarningChart from "@/Pages/Report/Charts/TotalPairingEarning/PayoutPairingEarningChart.vue";
+
 
 const props = defineProps({
     report: Object,
     totatMonthlyReturn: String,
     totalReferralEarning: String,
     totatAffiliateEarning: String,
+    totatDividendEarning: String,
+    totatAffiliateDividendEarning: String,
+    totatStakingReward: String,
+    totatReferralStaking: String,
+    totatPairingEarning: String,
 })
 
 const { formatAmount, formatDateTime } = transactionFormat();
@@ -20,13 +33,15 @@ const { formatAmount, formatDateTime } = transactionFormat();
 const isLoading = ref(false);
 const search = ref('');
 const date = ref('');
+const type = ref('');
 const currentYear = new Date().getFullYear();
-const activePayout = ref('MonthlyReturn');
+const activePayout = ref('StandardRewards');
 const monthlyPayout = ref(0);
 const referralEarning = ref(0);
 const affiliateEarning = ref(0);
 const dividendEarning = ref(0);
 const exportStatus = ref(false);
+const category = ref('standard');
 
 const tableSearch = (searchValue) => {
     search.value = searchValue;
@@ -38,40 +53,53 @@ const tableDate = (dateValue) => {
 
 const payoutStats = ref([
     {
-        key: 'MonthlyReturn',
+        key: 'StandardRewards',
         label: 'Total Standard Reward Payout',
         value: '$ ' + formatAmount(props.totatMonthlyReturn),
+        category: 'standard'
     },
-    // {
-    //     key: 'Quarterly_Dividend',
-    //     label: 'Total Quarterly Dividend Payout',
-    //     value: '$ ' + formatAmount(quarterlyDividend.value),
-    // },
     {
-        key: 'ReferralEarning',
+        key: 'ReferralEarnings',
         label: 'Total Referral Earning Payout',
         value: '$ ' + formatAmount(props.totalReferralEarning),
+        category: 'standard'
     },
     {
-        key: 'AffiliateEarning',
+        key: 'AffiliateEarnings',
         label: 'Total Affiliate Earning Payout',
         value: '$ ' + formatAmount(props.totatAffiliateEarning),
+        category: 'standard'
     },
     {
-        key: 'DividendEarning',
+        key: 'DividendEarnings',
         label: 'Total Dividend Earning Payout',
-        value: '$ ' + formatAmount(dividendEarning.value),
+        value: '$ ' + formatAmount(props.totatDividendEarning),
+        category: 'standard'
     },
-    // {
-    //     key: 'Pairing Bonus',
-    //     label: 'Total Pairing Bonus',
-    //     value: '$ ' + formatAmount(dividendEarning.value),
-    // },
-    // {
-    //     key: 'Ticket_Bonus',
-    //     label: 'Total Ticket Bonus Payout',
-    //     value: '$ ' + formatAmount(ticketBonus.value),
-    // },
+    {
+        key: 'AffiliateDividendEarnings',
+        label: 'Total Affiliate Dividend Earnings Payout',
+        value: '$ ' + formatAmount(props.totatAffiliateDividendEarning),
+        category: 'standard'
+    },
+    {
+        key: 'StakingRewards',
+        label: 'Total Staking Rewards Payout',
+        value: '$ ' + formatAmount(props.totatStakingReward),
+        category: 'standard'
+    },
+    {
+        key: 'ReferralEarningsStaking',
+        label: 'Total Referral Earnings Payout (Staking)',
+        value: '$ ' + formatAmount(props.totatReferralStaking),
+        category: 'staking'
+    },
+    {
+        key: 'PairingEarnings',
+        label: 'Total Pairing Earnings Payout',
+        value: '$ ' + formatAmount(props.totatPairingEarning),
+        category: 'standard'
+    },
 ]);
 
 const totalReferralEarningStat = payoutStats.value.find(stat => stat.key === 'ReferralEarning');
@@ -93,11 +121,11 @@ const getResults = async (page = 1, search = '', date = '') => {
         const response = await axios.get(url);
         // monthlyPayout.value = response.data.monthlyPayout;
         // quarterlyDividend.value = response.data.quarterlyDividend;
-        referralEarning.value = response.data.referralEarning;
+        // referralEarning.value = response.data.referralEarning;
         // affiliateEarning.value = response.data.affiliateEarning;
         // dividendEarning.value = response.data.dividendEarning;
         // ticketBonus.value = response.data.ticketBonus;
-        totalReferralEarningStat.value = '$ ' + formatAmount(referralEarning.value);
+        // totalReferralEarningStat.value = '$ ' + formatAmount(referralEarning.value);
     } catch (error) {
         console.error(error);
     } finally {
@@ -118,6 +146,9 @@ const isActivePayout = (key) => {
         : 'dark:bg-gray-700';
 };
 
+const selectCategory = (category) => {
+    category.value === category
+}
 const exportReport = () => {
     exportStatus.value = true;
 }
@@ -163,8 +194,8 @@ const activePayoutLabel = computed(() => {
             </div>
         </template>
 
-        <div class="grid grid-cols-1 md:grid-cols-5 md:gap-5">
-            <div class="grid grid-cols-2 md:grid-cols-1 gap-5 col-span-1">
+        <div class="grid grid-cols-1 md:grid-cols-1 md:gap-5">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-5 col-span-4">
                 <div
                     v-for="payoutStat in payoutStats"
                     :key="payoutStat.key"
@@ -184,21 +215,80 @@ const activePayoutLabel = computed(() => {
             </div>
             <div class="pt-5 md:pt-0 col-span-4">
                 <PayoutChart 
-                :currentYear="currentYear"
-                :activePayout="activePayoutLabel"
-                :search="search"
-                :date="date"
+                    v-if="activePayout == 'StandardRewards'"
+                    :currentYear="currentYear"
+                    :activePayout="activePayoutLabel"
+                    :search="search"
+                    :date="date"
+                    :type="activePayout"
+                />
+                <PayoutReferralEarningChart
+                    v-if="activePayout == 'ReferralEarnings'"
+                    :currentYear="currentYear"
+                    :activePayout="activePayoutLabel"
+                    :search="search"
+                    :date="date"
+                    :type="activePayout"
+                />
+                <PayoutAffiliateEarningChart
+                    v-if="activePayout == 'AffiliateEarnings'"
+                    :currentYear="currentYear"
+                    :activePayout="activePayoutLabel"
+                    :search="search"
+                    :date="date"
+                    :type="activePayout"
+                />
+                <PayoutDividendEarningChart
+                    v-if="activePayout == 'DividendEarnings'"
+                    :currentYear="currentYear"
+                    :activePayout="activePayoutLabel"
+                    :search="search"
+                    :date="date"
+                    :type="activePayout"
+                />
+                <PayoutAffiliateDividendEarningChart
+                    v-if="activePayout == 'AffiliateDividendEarnings'"
+                    :currentYear="currentYear"
+                    :activePayout="activePayoutLabel"
+                    :search="search"
+                    :date="date"
+                    :type="activePayout"
+                />
+                <PayoutStakingRewardChart
+                    v-if="activePayout == 'StakingRewards'"
+                    :currentYear="currentYear"
+                    :activePayout="activePayoutLabel"
+                    :search="search"
+                    :date="date"
+                    :type="activePayout"
+                />
+                <PayoutReferralEarningStakingChart
+                    v-if="activePayout == 'ReferralEarningsStaking'"
+                    :currentYear="currentYear"
+                    :activePayout="activePayoutLabel"
+                    :search="search"
+                    :date="date"
+                    :type="activePayout"
+                />
+                <PayoutPairingEarningChart
+                    v-if="activePayout == 'PairingEarnings'"
+                    :currentYear="currentYear"
+                    :activePayout="activePayoutLabel"
+                    :search="search"
+                    :date="date"
+                    :type="activePayout"
                 />
             </div>
         </div>
 
         <div class="p-5 my-5 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700">
+        {{ exportStatus }}
             <ReportTable 
-            :activePayout="activePayout"
-            :exportStatus="exportStatus"
-            @update:export="exportStatus = $event"
-            @search="tableSearch"
-            @date="tableDate"
+                :activePayout="activePayout"
+                :exportStatus="exportStatus"
+                @update:export="exportStatus = $event"
+                @search="tableSearch"
+                @date="tableDate"
             />
         </div>
 

@@ -32,7 +32,7 @@ const fetchData = async () => {
         const ctx = document.getElementById('dailyPayout');
 
         isLoading.value = true;
-        const response = await axios.get('/report/getTotalPayoutByDays/StandardRewards', { params: { year: year.value , month: month.value , search: searchChart.value , date: dateChart.value } });
+        const response = await axios.get('/report/getTotalPayoutByDays/DividendEarnings/standard', { params: { year: year.value , month: month.value , search: searchChart.value , date: dateChart.value } });
         const { labels, datasets } = response.data;
         chartData.value.labels = labels;
         chartData.value.datasets = datasets;
@@ -65,7 +65,7 @@ const fetchData = async () => {
             [
                 'rgba(88,86,214, 0.40)',
                 'rgba(88,86,214, 0.00)',
-                'DividendEarning',
+                'DividendEarnings',
                 'Dividend Earning'
             ],
             [

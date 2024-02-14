@@ -2,14 +2,15 @@
 import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
 import BaseListbox from "@/Components/BaseListbox.vue";
 import {ref} from "vue";
-import PayoutDayChart from "@/Pages/Report/Charts/PayoutDayChart.vue";
-import PayoutMonthChart from "@/Pages/Report/Charts/PayoutMonthChart.vue";
+import PayoutAffiliateEarningDayChart from "@/Pages/Report/Charts/TotalAffiliateEarning/PayoutAffiliateEarningDayChart.vue";
+import PayoutAffiliateEarningMonthChart from "@/Pages/Report/Charts/TotalAffiliateEarning/PayoutAffiliateEarningMonthChart.vue";
 
 const props = defineProps({
     currentYear: Number,
     activePayout: String,
     search: String,
     date: String,
+    type: String,
 })
 
 const categories = ref({
@@ -112,10 +113,13 @@ const selectFilterType = (type) => {
                         'rounded-xl dark:bg-transparent p-3',
                         ]"
                     >
-                        <PayoutDayChart
+                        <PayoutAffiliateEarningDayChart
+                            
                             :selectedMonth="selectedMonth"
+                            :selectedYear="selectedYear"
                             :search="props.search"
                             :date="props.date"
+                            :type="props.type"
                         />
                     </TabPanel>
                     <TabPanel
@@ -123,7 +127,7 @@ const selectFilterType = (type) => {
                         'rounded-xl dark:bg-transparent p-3',
                         ]"
                     >
-                        <PayoutMonthChart
+                        <PayoutAffiliateEarningMonthChart
                             :selectedYear="selectedYear"
                             :search="props.search"
                             :date="props.date"
