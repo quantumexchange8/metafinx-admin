@@ -21,6 +21,7 @@ import {TailwindPagination} from "laravel-vue-pagination";
 import {transactionFormat} from "@/Composables/index.js";
 import Modal from "@/Components/Modal.vue";
 import Loading from "@/Components/Loading.vue";
+import debounce from "lodash/debounce.js";
 
 const binaryTree = ref({});
 // Use refs to store functions
@@ -34,14 +35,21 @@ const { formatAmount, formatTime } = transactionFormat();
 const props = defineProps({
     downline: Array,
     user: Object,
+    search: String,
 })
+
+watch(
+    () => props.search,
+    debounce((searchValue) => {
+        getResults(searchValue);
+    }, 300)
+);
 
 const getResults = async (search = '') => {
     try {
         let url = `/member/getBinaryData/${props.user.id}`;
 
         if (search) {
-            console.log(search)
             url += `?search=${search}`;
         }
 
@@ -121,271 +129,10 @@ const getAffiliateResults = async (page = 1, search = '') => {
 
 getAffiliateResults();
 
-const paginationClass = [
-    'bg-transparent border-0 dark:text-gray-400 dark:enabled:hover:text-white'
-];
-
-const paginationActiveClass = [
-    'border dark:border-gray-600 dark:bg-gray-600 rounded-full text-[#FF9E23] dark:text-white'
-];
-
-const handlePageChange = (newPage) => {
-    if (newPage >= 1) {
-        currentPage.value = newPage;
-        getAffiliateResults(currentPage.value, search.value);
-    }
-};
-
-const timeLeft = ref('');
-const calculateTimeLeft = (datetime) => {
-    const currentTime = new Date(); // Get the current time
-
-    // Create a Date object for today's date with the target time (12 AM)
-    const targetTime = new Date(datetime);
-    targetTime.setHours(0, 0, 0, 0); // Set target time to 12 AM
-
-    // If the target time is earlier than the current time, set it to tomorrow
-    if (targetTime.getTime() <= currentTime.getTime()) {
-        targetTime.setDate(targetTime.getDate() + 1);
-    }
-
-    // Calculate the time difference
-    const timeDiff = targetTime.getTime() - currentTime.getTime();
-
-    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-
-    timeLeft.value = `${hours}h ${minutes}m ${seconds}s`;
-    return timeLeft.value; // Return the formatted time left
-};
-
-// Update the countdown every second
-onMounted(() => {
-    const interval = setInterval(() => {
-        referralTableData.value.data.forEach(dataItem => {
-            dataItem.coin_staking.forEach(coinStak => {
-                calculateTimeLeft(coinStak.auto_assign_at);
-            });
-        });
-    }, 1000);
-
-    fetchPendingPlacementCount();
-    setInterval(fetchPendingPlacementCount, 5000);
-
-    // Clear the interval when the component is unmounted
-    onUnmounted(() => {
-        clearInterval(interval);
-    });
-});
-
-const positions = [
-    {
-        name: 'Left',
-        value: 'left'
-    },
-    {
-        name: 'Right',
-        value: 'right'
-    }
-]
-
-const placementModal = ref(false);
-const selectedDistributor = ref();
-const selectPosition = ref(positions[0]);
-const lastChild = ref();
-const getPendingPlacementCount = ref();
-
-const openPlacementModal = (distributor) => {
-    placementModal.value = true;
-    selectedDistributor.value = distributor;
-    getLastChild();
-}
-
-const closeModal = () => {
-    placementModal.value = false
-}
-
-watch(selectPosition, () => {
-    getLastChild();
-})
-
-const getLastChild = async () => {
-    try {
-        let url = `/member/getLastChild/${props.user.id}?position=${selectPosition.value.value}`;
-
-        const response = await axios.get(url);
-        lastChild.value = response.data;
-    } catch (error) {
-        console.error(error);
-        console.error("Error fetching data:", error.message);
-    }
-}
-
-const form = useForm({
-    id: '',
-    user_id: '',
-    upline_id: '',
-    position: ''
-})
-
-const submit = () => {
-    form.id = props.user.id;
-    form.position = selectPosition.value.value;
-    form.user_id = selectedDistributor.value.id;
-    form.upline_id = lastChild.value.id;
-    form.post(route('member.addDistributor'), {
-        onSuccess: () => {
-            closeModal();
-            form.reset();
-        },
-    });
-};
-
-watchEffect(() => {
-    if (usePage().props.title !== null) {
-        getAffiliateResults();
-    }
-});
-
-const fetchPendingPlacementCount = async () => {
-    try {
-        const response = await fetch(`/member/getPendingPlacementCount/${props.user.id}`);
-        if (response.ok) {
-            // Update the count with the fetched data
-            getPendingPlacementCount.value = await response.json();
-        } else {
-            console.error('Failed to fetch data:', response.statusText);
-        }
-    } catch (error) {
-        console.error('Error fetching data:', error.message);
-    }
-};
-const coinStackingExists = ref(false);
-
-const checkCoinStackingExistence = async () => {
-    try {
-        const response = await axios.get(`/member/checkCoinStackingExistence/${props.user.id}`);
-        coinStackingExists.value = response.data; // Update coin stacking existence based on response
-    } catch (error) {
-        console.error('Error checking coin stacking existence:', error);
-        coinStackingExists.value = false; // Set coin stacking existence to false in case of an error
-    }
-};
-
-checkCoinStackingExistence();
 </script>
 
 <template>
-
-    <div class="w-full py-5">
-        <div class="w-full rounded-xl bg-gray-700 p-2">
-            <Disclosure v-slot="{ open }">
-                <DisclosureButton
-                class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
-                >
-                    <div class="flex items-center gap-2">
-                        <div class="text-white text-base">Pending Placement</div>
-                        <div v-if="getPendingPlacementCount > 0" class="bg-pink-500 w-5 h-5 rounded-full flex justify-center">
-                            {{ getPendingPlacementCount }}
-                        </div>
-                    </div>
-                <ChevronDownIcon
-                    :class="open ? 'rotate-180 transform' : ''"
-                    class="h-5 w-5 text-purple-500"
-                />
-                </DisclosureButton>
-                <DisclosurePanel class="px-4 pb-2 text-sm text-gray-500">
-                    <div v-if="isLoading" class="w-full flex justify-center my-8">
-                        <Loading />
-                    </div>
-                    <div v-else class="overflow-x-auto">
-                        <table class="w-[650px] md:w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-5">
-                            <thead
-                                class="text-xs font-medium text-gray-700 uppercase bg-gray-50 dark:bg-transparent dark:text-gray-400 border-b dark:border-gray-600">
-                                <tr>
-                                    <th scope="col" class="p-3 uppercase">
-                                        {{ $t('public.affiliate.members') }}
-                                    </th>
-                                    <th scope="col" class="p-3 uppercase">
-                                        Staking (MXT)
-                                    </th>
-                                    <th scope="col" class="p-3 uppercase">
-                                        Placement Time Left
-                                    </th>
-                                    <th scope="col" class="p-3 uppercase text-center">
-                                        Placement
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-if="referralTableData.data.length === 0">
-                                <th colspan="4" class="py-4 text-lg text-center">
-                                    {{$t('public.no_data')}}
-                                </th>
-                            </tr>
-                                <tr
-                                    class="bg-white dark:bg-transparent text-xs text-gray-900 dark:text-white border-b dark:border-gray-600"
-                                    v-for="referee in referralTableData.data"
-                                >
-                                    <td class="p-3">
-                                        {{ referee.name }}
-                                    </td>
-                                    <td class="p-3">
-                                       <div v-if="referee.coin_staking.length > 0">
-                                           <div v-for="coinStak in referee.coin_staking">
-                                               {{ formatAmount(coinStak.stacking_unit, 4) }} ($ {{ formatAmount(coinStak.stacking_price) }})
-                                           </div>
-                                       </div>
-                                        <div v-else>
-                                            -
-                                        </div>
-                                    </td>
-                                    <td class="p-3">
-                                        <div v-if="referee.coin_staking.length > 0">
-                                            <div v-for="coinStak in referee.coin_staking">
-                                               {{ calculateTimeLeft(coinStak.auto_assign_at) }}
-                                            </div>
-                                        </div>
-                                        <div v-else>
-                                            -
-                                        </div>
-                                    </td>
-                                    <td class="p-3 flex justify-center">
-                                        <Button
-                                            type="button"
-                                            variant="gray"
-                                            size="sm"
-                                            @click="openPlacementModal(referee)"
-                                        >
-                                            Place
-                                        </Button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="flex justify-center mt-4" v-if="!isLoading">
-                        <TailwindPagination
-                            :item-classes=paginationClass
-                            :active-classes=paginationActiveClass
-                            :data="referralTableData"
-                            :limit=2 @pagination-change-page="handlePageChange"
-                        >
-                            <template #prev-nav>
-                                <span class="flex gap-2"><ArrowLeftIcon class="w-5 h-5" /> <span class="hidden sm:flex">{{$t('public.previous')}}</span></span>
-                            </template>
-                            <template #next-nav>
-                                <span class="flex gap-2"><span class="hidden sm:flex">{{$t('public.next')}}</span> <ArrowRightIcon class="w-5 h-5" /></span>
-                            </template>
-                        </TailwindPagination>
-                    </div>
-                </DisclosurePanel>
-            </Disclosure>
-        </div>
-    </div>
-
-    <div class="flex items-center self-stretch justify-between mb-3">
+    <div class="flex items-center self-stretch justify-between mt-8 mb-3">
         <div class="text-base font-normal text-gray-600 dark:text-gray-400">
             Note: Only add distributor that currently have no associated legs.
         </div>
@@ -429,7 +176,7 @@ checkCoinStackingExistence();
         </div>
     </div>
 
-    <div class="relative overflow-hidden bg-gray-900 bg-[radial-gradient(#333d4b_2px,transparent_1px)] [background-size:52px_52px] min-h-[400px] max-h-[600px] mb-12">
+    <div class="relative overflow-hidden bg-gray-900 bg-[radial-gradient(#333d4b_2px,transparent_1px)] [background-size:52px_52px] h-screen mb-12">
         <div ref="binaryTree" class="flex flex-col justify-center items-center">
             <div class="container mx-auto text-center pt-24">
                 <div class="items-center justify-center flex">
@@ -460,111 +207,5 @@ checkCoinStackingExistence();
             </div>
         </div>
     </div>
-
-    <!-- Placement Modal-->
-    <Modal :show="placementModal" title="New Placement" @close="closeModal">
-        <div class="flex flex-col gap-8">
-            <div class="flex flex-col sm:flex-row gap-1 space-y-2 sm:space-y-0 items-start self-stretch">
-                <div class="text-base text-gray-800 dark:text-white w-52">
-                    Distributor
-                </div>
-                <div class="p-5 bg-gray-400 dark:bg-gray-700 rounded-xl w-full">
-                    <div class="flex items-center gap-2">
-                        <img :src="selectedDistributor.profile_photo ? selectedDistributor.profile_photo : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        <div class="flex flex-col gap-1">
-                            <div class="flex gap-2 items-center text-left text-gray-900 dark:text-white">
-                                <div class="text-sm font-semibold">
-                                    {{ selectedDistributor.name }}
-                                </div>
-                            </div>
-                            <div class="text-left text-xs text-gray-600 dark:text-gray-400">
-                                {{ selectedDistributor.email }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="flex flex-col sm:flex-row gap-1 space-y-2 sm:space-y-0 items-start self-stretch">
-                <div class="text-base text-gray-800 dark:text-white w-52">
-                    Placement
-                </div>
-                <div class="w-full">
-                    <RadioGroup v-model="selectPosition" class="flex gap-1 md:gap-4 flex-col md:flex-row">
-                        <div class="flex flex-row w-full gap-4">
-                            <RadioGroupOption
-                                as="template"
-                                v-for="plan in positions"
-                                :key="plan.name"
-                                :value="plan"
-                                v-slot="{ active, checked }"
-                                class="w-full"
-                                :disabled="plan.value === 'right' && !coinStackingExists"
-                            >
-                                <div
-                                    :class="[
-                                        checked ? 'bg-gray-600 dark:text-white border-2 border-white' : 'bg-gray-700',
-                                        plan.value === 'right' && !coinStackingExists ? 'hover:cursor-not-allowed dark:bg-gray-700' : ''
-                                    ]"
-                                    class="relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none"
-                                >
-                                    <div class="flex w-full items-center justify-center">
-                                        <div class="flex items-center">
-                                            <div class="text-sm">
-                                                <RadioGroupLabel
-                                                    as="p"
-                                                    :class="[
-                                                        checked ? 'text-white' : '',
-                                                        plan.value === 'right' && !coinStackingExists ? 'dark:text-gray-600' : 'text-white'
-                                                    ]"
-                                                    class="font-medium"
-                                                >
-                                                    {{ plan.name }}
-                                                </RadioGroupLabel>
-                                                <RadioGroupDescription
-                                                    as="span"
-                                                    :class="checked ? 'dark:text-white' : 'dark:text-white'"
-                                                    class="inline"
-                                                >
-                                                </RadioGroupDescription>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </RadioGroupOption>
-                        </div>
-                    </RadioGroup>
-                </div>
-            </div>
-            <div class="flex flex-col sm:flex-row gap-1 space-y-2 sm:space-y-0 items-start self-stretch">
-                <div class="text-base text-gray-800 dark:text-white w-52">
-                    Place under
-                </div>
-                <div class="p-5 bg-gray-400 dark:bg-gray-700 rounded-xl w-full">
-                    <div v-if="lastChild" class="flex items-center gap-2">
-                        <img :src="lastChild.profile_photo ? lastChild.profile_photo : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
-                        <div class="flex flex-col gap-1">
-                            <div class="flex gap-2 items-center text-left text-gray-900 dark:text-white">
-                                <div class="text-sm font-semibold">
-                                    {{ lastChild.user.name }}
-                                </div>
-                            </div>
-                            <div class="text-left text-xs text-gray-600 dark:text-gray-400">
-                                {{ lastChild.user.email }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
-
-        <div class="pb-5 grid grid-cols-2 gap-4 w-full md:w-1/3 md:float-right">
-            <Button variant="secondary" type="button" class="justify-center" @click.prevent="closeModal">
-                Cancel
-            </Button>
-            <Button class="justify-center" @click="submit" :disabled="form.processing">Confirm</Button>
-        </div>
-    </Modal>
 
 </template>

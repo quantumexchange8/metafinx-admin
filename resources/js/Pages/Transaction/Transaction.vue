@@ -106,7 +106,7 @@ const exportTransaction = () => {
             </div>
             <div class="flex flex-wrap md:flex-nowrap gap-3 mt-3 md:mt-0">
                 <div class="w-full">
-                    <InputIconWrapper class="w-full md:w-[280px]">
+                    <InputIconWrapper class="w-full">
                         <template #icon>
                             <SearchIcon aria-hidden="true" class="w-5 h-5" />
                         </template>
@@ -133,7 +133,7 @@ const exportTransaction = () => {
 
                     />
                 </div>
-                <div class="w-full">
+                <div>
                     <Button
                         type="button"
                         variant="secondary"

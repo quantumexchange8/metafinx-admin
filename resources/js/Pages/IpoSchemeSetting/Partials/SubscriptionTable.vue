@@ -83,9 +83,9 @@ const clearFilters = () => {
                 />
             </div>
             <div class="w-full">
-                <BaseListbox 
-                    v-model="status" 
-                    :options="statusList" 
+                <BaseListbox
+                    v-model="status"
+                    :options="statusList"
                     placeholder="Filter status"
                 />
             </div>
@@ -105,7 +105,7 @@ const clearFilters = () => {
                     @click="exportSubscription"
                 >
                     <CloudDownloadIcon aria-hidden="true" class="w-5 h-5" />
-                    <span>Export as Excel</span>
+                    <span>Export</span>
                 </Button>
             </div>
         </div>

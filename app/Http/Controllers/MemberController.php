@@ -106,7 +106,7 @@ class MemberController extends Controller
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
-        
+
         // if ($request->has('exportStatus')) {
         //     if($request->type != null){
         //         return Excel::download(new MemberListingTypeExport($members), Carbon::now() . '-' . $request->type . '-report.xlsx');
@@ -122,8 +122,8 @@ class MemberController extends Controller
             $user->kyc_upload_date = $user->getMedia('back_identity')->first()->created_at ?? null;
             $user->active_investment_amount = $this->getActiveSubscriptionAmount($user);
         });
-        
-        
+
+
 
         return response()->json($members);
     }
@@ -241,7 +241,7 @@ class MemberController extends Controller
     public function viewMemberDetails($id)
     {
         $user = User::with('media')->find($id);
-        
+
 
         $upline = User::with('media')
         ->where('id', $user->upline_id)
@@ -312,10 +312,10 @@ class MemberController extends Controller
         $earningSum = Earning::where('upline_id', $user->id)->sum('after_amount');
 
         $types = [
-            'StandardRewards', 
-            'ReferralEarnings', 
-            'AffiliateEarnings', 
-            'DividendEarnings', 
+            'StandardRewards',
+            'ReferralEarnings',
+            'AffiliateEarnings',
+            'DividendEarnings',
             'AffiliateDividendEarnings',
             'StackingRewards',
             'BinaryReferralEarnings',
@@ -364,13 +364,13 @@ class MemberController extends Controller
 
         $wallet = Wallet::find($request->wallet_id);
         $new_balance = $wallet->balance + $amount;
-        
+
         if ($new_balance < 0 || $amount == 0) {
             throw ValidationException::withMessages(['amount' => 'Insufficient balance']);
         }
 
         $adjustment_id = RunningNumberService::getID('adjustment');
-        
+
         $wallet_balance = Transaction::create([
             'user_id' => $request->user_id,
             'from_wallet_id' => $request->wallet_id,
@@ -507,17 +507,24 @@ class MemberController extends Controller
 
     public function getTreeData(Request $request, $id)
     {
-
         $searchUser = null;
         $searchTerm = $request->input('search');
+        $childrenIds = User::find($id)->getChildrenIds();
+        $childrenIds[] = User::find($id)->id;
 
         if ($searchTerm) {
+
             $searchUser = User::where('name', 'like', '%' . $searchTerm . '%')
                 ->orWhere('email', 'like', '%' . $searchTerm . '%')
+                ->whereIn('id', $childrenIds)
                 ->first();
 
             if (!$searchUser) {
-                return response()->json(['error' => 'User not found for the given search term.'], 404);
+                return User::find($id);
+            }
+
+            if (!in_array($searchUser->id, $childrenIds)) {
+                return User::find($id);
             }
         }
 
@@ -718,24 +725,32 @@ class MemberController extends Controller
     {
         $searchUser = null;
         $searchTerm = $request->input('search');
+        $binaryUser = CoinMultiLevel::with(['user:id,name,email,setting_rank_id', 'sponsor.user'])->where('user_id', $id)->first();
+        $binaryChildrenIds = $binaryUser->getChildrenIds();
+        $binaryChildrenIds[] = $binaryUser->id;
 
         if ($searchTerm) {
-            // dd('asdasd');
-            $searchUser = User::where('name', 'like', '%' . $searchTerm . '%')
-                ->orWhere('email', 'like', '%' . $searchTerm . '%')
+            $searchUser = CoinMultiLevel::whereHas('user', function ($query) use ($searchTerm) {
+                $query->where('name', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('email', 'like', '%' . $searchTerm . '%');
+            })
+                ->whereIn('id', $binaryChildrenIds)
                 ->first();
 
             if (!$searchUser) {
-                return response()->json(['error' => 'User not found for the given search term.'], 404);
+                return $binaryUser;
+            }
+
+            if (!in_array($searchUser->id, $binaryChildrenIds)) {
+                return $binaryUser;
             }
         }
 
-        $user = $searchUser ?? CoinMultiLevel::with(['user:id,name,email,setting_rank_id', 'sponsor.user'])->where('user_id', $id)->first();
-
+        $user = $searchUser ?? $binaryUser;
 
         $users = CoinMultiLevel::whereHas('upline', function ($query) use ($user) {
             $query->where('id', $user->id);
-        })->get();
+        })->whereIn('id', $binaryChildrenIds)->get();
 
 //        if ($searchUser) {
 //            $query->orWhere('id', $searchUser->id);
@@ -755,13 +770,22 @@ class MemberController extends Controller
             'email' => $user->user->email,
             'level' => $level,
             'rank' => $user->user->setting_rank_id,
-            'personal_amount' => $user->coin_stacking_amount,
-            'left_amount' => $this->getLeftTotalAmount($user),
-            'right_amount' => $this->getRightTotalAmount($user),
+            'personal_amount' => $this->getPersonalStakingAmount($user),
+            'left_amount' => $this->getLeftAmount($user),
+            'right_amount' => $this->getRightAmount($user),
             'children' => $users->map(function ($user) {
                 return $this->mapBinaryUser($user, 0);
             })
         ];
+
+        // Ensure 'children' array contains two elements (left and right)
+        if (count($binaryData['children']) == 1) {
+            if ($binaryData['children'][0]['position'] == 'left') {
+                $binaryData['children'] = [(object)$binaryData['children'][0], (object)null];
+            } elseif ($binaryData['children'][0]['position'] == 'right') {
+                $binaryData['children'] = [(object)null, (object)$binaryData['children'][0]];
+            }
+        }
 
         return response()->json($binaryData);
     }
@@ -784,7 +808,7 @@ class MemberController extends Controller
             'email' => $user->user->email,
             'level' => $level + 1,
             'rank' => $user->user->setting_rank_id,
-            'personal_amount' => $user->coin_stacking_amount,
+            'personal_amount' => $this->getPersonalStakingAmount($user),
             'left_amount' => $this->getLeftAmount($user),
             'right_amount' => $this->getRightAmount($user),
         ];
@@ -877,81 +901,41 @@ class MemberController extends Controller
         return redirect()->back()->with('title', 'Add Distributor')->with('success', 'Distributor has been successfully added!');
     }
 
+    protected function getPersonalStakingAmount($child)
+    {
+        return CoinStacking::where('user_id', $child->user_id)
+            ->where('status', 'OnGoingPeriod')
+            ->sum('stacking_price');
+    }
+
     protected function getLeftAmount($child)
     {
         $ids = $child->getChildrenIds();
 
-        return CoinMultiLevel::query()
+        $binary_user_id = CoinMultiLevel::query()
             ->whereIn('id', $ids)
             ->where('position', 'left')
-            ->sum('coin_stacking_amount');
+            ->pluck('user_id')
+            ->toArray();
+
+        return CoinStacking::whereIn('user_id', $binary_user_id)
+            ->where('status', 'OnGoingPeriod')
+            ->sum('stacking_price');
     }
 
     protected function getRightAmount($child)
     {
         $ids = $child->getChildrenIds();
 
-        return CoinMultiLevel::query()
+        $binary_user_id = CoinMultiLevel::query()
             ->whereIn('id', $ids)
             ->where('position', 'right')
-            ->sum('coin_stacking_amount');
-    }
+            ->pluck('user_id')
+            ->toArray();
 
-    protected function getLeftTotalAmount($child)
-    {
-        $ids = $child->getChildrenIds();
-
-        $leftAmount = CoinMultiLevel::query()
-            ->whereIn('id', $ids)
-            ->whereHas('upline', function ($query) {
-                $query->where('position', 'left');
-            })
-            ->sum('coin_stacking_amount');
-
-        $rightAmount = CoinMultiLevel::query()
-            ->whereIn('id', $ids)
-            ->whereHas('upline', function ($query) {
-                $query->where('position', 'left');
-            })
-            ->where('position', 'right')
-            ->sum('coin_stacking_amount');
-
-        $leftPosition = $child->position;
-        if ($leftPosition == 'left') {
-            return $leftAmount;
-        } elseif ($leftPosition == 'right') {
-            return $rightAmount;
-        } else {
-            return $leftAmount + $rightAmount;
-        }
-    }
-    protected function getRightTotalAmount($child)
-    {
-        $ids = $child->getChildrenIds();
-
-        $leftAmount = CoinMultiLevel::query()
-            ->whereIn('id', $ids)
-            ->whereHas('upline', function ($query) {
-                $query->where('position', 'right');
-            })
-            ->where('position', 'left')
-            ->sum('coin_stacking_amount');
-
-        $rightAmount = CoinMultiLevel::query()
-            ->whereIn('id', $ids)
-            ->whereHas('upline', function ($query) {
-                $query->where('position', 'right');
-            })
-            ->sum('coin_stacking_amount');
-
-        $leftPosition = $child->position;
-        if ($leftPosition == 'right') {
-            return $leftAmount;
-        } elseif ($leftPosition == 'left') {
-            return $rightAmount;
-        } else {
-            return $leftAmount + $rightAmount;
-        }
+        return CoinStacking::whereIn('user_id', $binary_user_id)
+            ->where('status', 'OnGoingPeriod')
+            ->sum('stacking_price');
     }
 
     public function getAvailableBinaryAffiliate(Request $request, $id)
@@ -1027,6 +1011,44 @@ class MemberController extends Controller
         $exists = CoinStacking::where('user_id', $id)->exists();
 
         return response()->json($exists);
+    }
+
+    public function getDistributorDetail(Request $request)
+    {
+        $binaryDetail = CoinMultiLevel::find($request->id);
+        $currentStakingUnit = CoinStacking::where('user_id', $binaryDetail->user_id)
+            ->where('status', 'OnGoingPeriod')
+            ->sum('stacking_unit');
+
+        $accruedStakingUnit = CoinStacking::where('user_id', $binaryDetail->user_id)
+            ->where('status', 'MaturityPeriod')
+            ->sum('stacking_unit');
+
+        $currentStakingPrice = CoinStacking::where('user_id', $binaryDetail->user_id)
+            ->where('status', 'OnGoingPeriod')
+            ->sum('stacking_price');
+
+        $accruedStakingPrice = CoinStacking::where('user_id', $binaryDetail->user_id)
+            ->where('status', 'MaturityPeriod')
+            ->sum('stacking_price');
+
+        $detail = [
+            'name' => $binaryDetail->user->name,
+            'email' => $binaryDetail->user->email,
+            'profile_photo' => $binaryDetail->user->getFirstMediaUrl('profile_photo') ?? null,
+            'sponsor_name' => $binaryDetail->sponsor ? $binaryDetail->sponsor->user->name : null,
+            'sponsor_email' => $binaryDetail->sponsor ? $binaryDetail->sponsor->user->email : null,
+            'sponsor_profile_photo' => $binaryDetail->sponsor ? $binaryDetail->sponsor->user->getFirstMediaUrl('profile_photo') : null,
+            'upline_name' => $binaryDetail->upline ? $binaryDetail->upline->user->name : null,
+            'upline_email' => $binaryDetail->upline ? $binaryDetail->upline->user->email : null,
+            'upline_profile_photo' => $binaryDetail->upline ? $binaryDetail->upline->user->getFirstMediaUrl('profile_photo') : null,
+            'email' => $binaryDetail->user->email,
+            'level' => $request->level,
+            'current_staking' => number_format($currentStakingUnit, 4) . ' MXT ($ ' . number_format($currentStakingPrice, 2) . ')',
+            'accrued_staking' => number_format($accruedStakingUnit, 4) . ' MXT ($ ' . number_format($accruedStakingPrice, 2) . ')'
+        ];
+
+        return response()->json($detail);
     }
 
 }

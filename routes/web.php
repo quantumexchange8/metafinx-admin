@@ -81,6 +81,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('getLastChild/{id}', [MemberController::class, 'getLastChild'])->name('member.getLastChild');
         Route::get('getPendingPlacementCount/{id}', [MemberController::class, 'getPendingPlacementCount'])->name('member.getPendingPlacementCount');
         Route::get('checkCoinStackingExistence/{id}', [MemberController::class, 'checkCoinStackingExistence'])->name('member.checkCoinStackingExistence');
+        Route::get('getDistributorDetail', [MemberController::class, 'getDistributorDetail'])->name('affiliate.getDistributorDetail');
     });
 
     /**

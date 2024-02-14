@@ -8,17 +8,21 @@ import {SearchIcon} from "@heroicons/vue/outline";
 import InputIconWrapper from "@/Components/InputIconWrapper.vue";
 
 const props = defineProps({
-    user: Object
+    user: Object,
+    search: String
 })
 
-let search = ref(null);
+const search = ref(props.search);
 let root = ref({});
 const isLoading = ref(false);
 
-watch(search, debounce(function() {
-    isLoading.value = true;
-    getResults(search.value);
-}, 300));
+watch(
+    () => props.search,
+    debounce((searchValue) => {
+        isLoading.value = true;
+        getResults(searchValue);
+    }, 300)
+);
 
 const getResults = async (search = '') => {
     isLoading.value = true;
@@ -62,21 +66,6 @@ getResults();
                 LVL 3
             </div>
         </div>
-    </div>
-    <div class="pt-8">
-        <InputIconWrapper>
-            <template #icon>
-                <SearchIcon aria-hidden="true" class="w-5 h-5" />
-            </template>
-            <Input
-                withIcon
-                id="search"
-                type="text"
-                class="block border-transparent w-full md:w-1/3"
-                placeholder="Search"
-                v-model="search"
-            />
-        </InputIconWrapper>
     </div>
     <AffiliateChild
         :node="root"

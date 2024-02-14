@@ -121,7 +121,7 @@ const exportMember = () => {
                         </Button>
                     </div>
                 </div>
-                
+
             </div>
         </template>
 
@@ -136,7 +136,7 @@ const exportMember = () => {
                 />
             </div>
 
-            <div class="mt-5 flex flex-row items-center justify-between gap-3 w-full">
+            <div class="mt-5 flex flex-col sm:flex-row items-center sm:justify-between gap-3 w-full">
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="w-full lg:w-[280px]">
                         <InputIconWrapper class="md:col-span-2">
@@ -164,16 +164,17 @@ const exportMember = () => {
                             placeholder="Filter rank"
                         />
                     </div>
-                    <div class="w-full md:w-auto">
-                        <Button
-                            type="button"
-                            class="w-full md:w-auto flex items-center justify-center px-3 py-2 border border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
-                            variant="transparent"
-                            @click="clearFilters"
-                        >
-                            Clear
-                        </Button>
-                    </div>
+                </div>
+
+                <div class="w-full md:w-auto">
+                    <Button
+                        type="button"
+                        class="w-full md:w-auto flex items-center justify-center px-3 py-2 border border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+                        variant="transparent"
+                        @click="clearFilters"
+                    >
+                        Clear
+                    </Button>
                 </div>
 
                <!-- <div class="flex justify-end">-->

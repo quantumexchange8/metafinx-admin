@@ -29,7 +29,7 @@ class ReportController extends Controller
         $totatStakingReward = Earning::where('type', 'StakingRewards')->sum('after_amount');
         $totatReferralStaking = Earning::where('type', 'ReferralEarnings')->where('category', 'staking')->sum('after_amount');
         $totatPairingEarning = Earning::where('type', 'PairingEarnings')->sum('after_amount');
-        
+
         return Inertia::render('Report/Report', [
             'totatMonthlyReturn' => $totatMonthlyReturn,
             'totalReferralEarning' => $totalReferralEarning,
@@ -38,13 +38,13 @@ class ReportController extends Controller
             'totatAffiliateDividendEarning' => $totatAffiliateDividendEarning ? 0 : "0.00",
             'totatStakingReward' => $totatStakingReward ? 0 : "0.00",
             'totatReferralStaking' => $totatReferralStaking,
-            'totatPairingEarning' => $totatPairingEarning ? 0 : "0.00",
+            'totatPairingEarning' => number_format($totatPairingEarning, 2),
         ]);
     }
 
     public function getPayoutDetails(Request $request)
     {
-        
+
         $query = Earning::query()
             ->with(['downline:id,name,email', 'user:id,name,email'])
             ->where('type', 'ReferralEarnings')
@@ -115,7 +115,7 @@ class ReportController extends Controller
             ->where('type', $type)
             ->where('category', $category)
             ->get();
-        
+
         // Get unique type to create datasets
         $uniquePayoutType = $payouts->pluck('type')->unique();
 
@@ -128,9 +128,9 @@ class ReportController extends Controller
         ];
 
         $backgroundColors = [
-            'ReferralEarnings' => '#00C7BE', 
-            'StandardRewards' => '#FF2D55', 
-            'AffiliateEarnings' => '#AF52DE', 
+            'ReferralEarnings' => '#00C7BE',
+            'StandardRewards' => '#FF2D55',
+            'AffiliateEarnings' => '#AF52DE',
             'DividendEarnings' => '#5856D6',
             'AffiliateDividendEarnings' => '#5856D6',
             'StakingRewards' => '#5856D6',
@@ -209,9 +209,9 @@ class ReportController extends Controller
         ];
 
         $backgroundColors = [
-            'ReferralEarnings' => '#00C7BE', 
-            'StandardRewards' => '#FF2D55', 
-            'AffiliateEarnings' => '#AF52DE', 
+            'ReferralEarnings' => '#00C7BE',
+            'StandardRewards' => '#FF2D55',
+            'AffiliateEarnings' => '#AF52DE',
             'DividendEarnings' => '#5856D6',
             'AffiliateDividendEarnings' => '#5856D6',
             'StakingRewards' => '#5856D6',
@@ -244,7 +244,7 @@ class ReportController extends Controller
         $query = Earning::query()
             ->with(['downline:id,name,email', 'user:id,name,email'])
             ->where('type', 'StandardRewards');
-        
+
         if ($request->filled('search')) {
             $search = '%' . $request->input('search') . '%';
             $query->where(function ($q) use ($search) {
@@ -266,7 +266,7 @@ class ReportController extends Controller
 
             $query->whereBetween('created_at', [$start_date, $end_date]);
         }
-        
+
         $monthlyReturn = $query->where('type', 'StandardRewards')->sum('after_amount');
 
         if ($request->filled('type')) {
@@ -320,7 +320,7 @@ class ReportController extends Controller
 
             $query->whereBetween('created_at', [$start_date, $end_date]);
         }
-       
+
         $affiliateEarning = $query->where('type', 'AffiliateEarnings')->sum('after_amount');
 
         if ($request->filled('type')) {
