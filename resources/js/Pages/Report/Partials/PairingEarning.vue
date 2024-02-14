@@ -44,7 +44,7 @@ watch(
 const getResults = async (page = 1, search = '', date = '') => {
     isLoading.value = true
     try {
-        let url = `/report/getEarningPayoutDetails/PairingEarnings/standard?page=${page}`;
+        let url = `/report/getEarningPayoutDetails/PairingEarnings/staking?page=${page}`;
 
         if (search) {
             url += `&search=${search}`;

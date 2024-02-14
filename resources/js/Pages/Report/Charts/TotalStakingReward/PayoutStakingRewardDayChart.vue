@@ -32,7 +32,7 @@ const fetchData = async () => {
         const ctx = document.getElementById('dailyPayout');
 
         isLoading.value = true;
-        const response = await axios.get('/report/getTotalPayoutByDays/StakingRewards/standard', { params: { year: year.value , month: month.value , search: searchChart.value , date: dateChart.value } });
+        const response = await axios.get('/report/getTotalPayoutByDays/StakingRewards/staking', { params: { year: year.value , month: month.value , search: searchChart.value , date: dateChart.value } });
         const { labels, datasets } = response.data;
         chartData.value.labels = labels;
         chartData.value.datasets = datasets;
