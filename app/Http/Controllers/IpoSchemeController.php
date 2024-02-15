@@ -240,6 +240,7 @@ class IpoSchemeController extends Controller
             'investment_min_amount' => $request->investment_min_amount,
             'roi_per_annum' => $request->roi_per_annum,
             'investment_period' => $request->investment_period,
+            'commision_multiplier' => $request->commision_multiplier,
         ]);
 
         $descriptionItems = $request->descriptions;
@@ -257,15 +258,16 @@ class IpoSchemeController extends Controller
         
         if ($request->hasfile('plan_logo')){
             if ($investmentPlan->type == 'standard') {
+                $investmentPlan->clearMediaCollection('standard_plan');
                 $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('standard_plan');
             } elseif ($investmentPlan->type == 'ebmi') {
+                $investmentPlan->clearMediaCollection('ebmi_plan');
                 $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('ebmi_plan');
             } elseif ($investmentPlan->type == 'staking') {
+                $investmentPlan->clearMediaCollection('stacking_plan');
                 $investmentPlan->addMedia($request->plan_logo)->toMediaCollection('stacking_plan');
             }
-            
         }
-
         return redirect()->back()->with('title', 'Investment plan updated')->with('success', 'This investment plan has been updated successfully.');
     }
 

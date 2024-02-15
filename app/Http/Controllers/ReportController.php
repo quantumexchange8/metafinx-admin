@@ -451,7 +451,7 @@ class ReportController extends Controller
 
         return response()->json([
             'results' => $results,
-            'totalAmount' => $totalAmount,
+            'totalAmount' => $totalEarning,
             'totalEarning' => $totalEarning,
         ]);
     }

@@ -7,6 +7,7 @@ import { Switch } from '@headlessui/vue'
 import AddInvestmentPlan from "@/Pages/IpoSchemeSetting/Partials/AddInvestmentPlan.vue";
 import Button from "@/Components/Button.vue";
 import EditInvestmentPlan from "@/Pages/IpoSchemeSetting/Partials/EditInvestmentPlan.vue";
+import {transactionFormat} from "@/Composables/index.js";
 
 const props = defineProps({
     investmentPlans: Object,
@@ -14,7 +15,13 @@ const props = defineProps({
     totalEarningCount: String,
     onGoingAmountCount: String,
     coinTransactions: Object,
+    currentCoinPrice: Object,
+    totalSupply: Object,
+    totalStaking: String,
+    currentInvestor: Number,
 })
+
+const { formatAmount } = transactionFormat();
 
 const currentYear = new Date().getFullYear();
 
@@ -60,7 +67,7 @@ const updateStatus = async (planId, newStatus) => {
                             Current MXT Coin Price (today)
                         </div>
                         <div class="text-xl font-semibold">
-                            MYR 
+                            $ {{ props.currentCoinPrice.price }}
                         </div>
                     </div>
                 </div>
@@ -70,7 +77,7 @@ const updateStatus = async (planId, newStatus) => {
                             Current Investors (pax)
                         </div>
                         <div class="text-xl font-semibold">
-                            
+                            {{ props.currentInvestor }}
                         </div>
                     </div>
                 </div>
@@ -80,17 +87,17 @@ const updateStatus = async (planId, newStatus) => {
                             Total Supply
                         </div>
                         <div class="text-xl font-semibold">
-                            
+                            {{ formatAmount(props.totalSupply.accumulate_supply) }}
                         </div>
                     </div>
                 </div>
                 <div class="px-5 py-2.5 flex items-center rounded-[10px] dark:bg-gray-700">
                     <div class="grid gap-2">
                         <div class="text-xs font-medium dark:text-gray-400">
-                            Market Capitalisation
+                            Total Staking Amount
                         </div>
                         <div class="text-xl font-semibold">
-                            MYR 
+                            $ {{ formatAmount(props.totalStaking) }}
                         </div>
                     </div>
                 </div>
@@ -123,7 +130,7 @@ const updateStatus = async (planId, newStatus) => {
                                     {{ investmentPlan.name['en'] }}
                                 </div>
                                 <div class="font-normal dark:text-gray-400">
-                                    {{ investmentPlan.roi_per_annum }}% p.a.
+                                    {{ investmentPlan.commision_multiplier }}% p.a.
                                 </div>
                             </div>
                         </div>

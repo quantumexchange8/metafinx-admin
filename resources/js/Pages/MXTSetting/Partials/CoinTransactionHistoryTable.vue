@@ -79,10 +79,10 @@ const exportTransaction = () => {
                 placeholder="Filter status"
             />
         </div>
-        <div class="flex justify-end w-full">
+        <div class="flex justify-end">
             <Button
                 type="button"
-                class="justify-center w-full md:w-full gap-2 border border-gray-600 text-white text-sm dark:hover:bg-gray-600"
+                class="justify-center w-full md:px-3.5 md:w-40 gap-2 border border-gray-600 text-white text-sm dark:hover:bg-gray-600"
                 variant="transparent"
                 @click="exportTransaction"
             >

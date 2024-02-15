@@ -9,6 +9,9 @@ use App\Models\CoinPayment;
 use App\Models\InvestmentPlan;
 use App\Models\Transaction;
 use App\Models\CoinStacking;
+use App\Models\SettingCoin;
+use App\Models\Earning;
+use App\Models\InvestmentSubscription;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CoinTransactionExport;
 use App\Exports\StackingHistoryExport;
@@ -31,9 +34,20 @@ class MXTController extends Controller
             $plan->plan_logo = $plan->getFirstMediaUrl('stacking_plan');
         });
 
+        $currentDate = Carbon::today()->toDateString();
+        
+        $currentCoinPrice = CoinPrice::where('price_date', $currentDate)->first();
+        $currentInvestor = InvestmentSubscription::whereIn('status', ['CoolingPeriod', 'OnGoingPeriod'])->distinct()->count('user_id');
+        $totalSupply = SettingCoin::where('symbol', 'MXT/USD')->first();
+        $totalStaking = Earning::where('category', 'staking')->sum('after_amount');
+        
         return Inertia::render('MXTSetting/MXTSetting', [
             'coinTransactions' => $coinTransactions,
             'investmentPlans' => $investmentPlans,
+            'currentCoinPrice' => $currentCoinPrice,
+            'totalSupply' => $totalSupply,
+            'totalStaking' => $totalStaking,
+            'currentInvestor' => $currentInvestor,
         ]);
     }
 

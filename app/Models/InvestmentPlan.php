@@ -24,6 +24,7 @@ class InvestmentPlan extends Model implements HasMedia
         'roi_per_annum',
         'status',
         'type',
+        'commision_multiplier',
     ];
 
     public function getActivitylogOptions(): LogOptions

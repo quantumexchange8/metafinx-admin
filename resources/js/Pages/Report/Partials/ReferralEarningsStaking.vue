@@ -185,5 +185,10 @@ const paginationActiveClass = [
             </template>
         </TailwindPagination>
     </div>
+    <div class="flex items-center">
+        <div class="text-xl font-semibold">
+            Total Amount: ${{ formatAmount(totalAmount) }}
+        </div>
+    </div>
     
 </template>

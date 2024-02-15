@@ -47,6 +47,7 @@ const form = useForm({
     investment_period: String(props.investmentPlan.investment_period),
     descriptions: props.investmentPlan.descriptions.map((description) => description.description),
     plan_logo: null,
+    commision_multiplier: props.investmentPlan.commision_multiplier,
 })
 
 const onPlanLogoChanges = (event) => {
@@ -399,7 +400,7 @@ const removeDescription = (index) => {
                         <InputError :message="form.errors.investment_min_amount" class="mt-2" />
                     </div>
                 </div>
-                <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                <div v-if="investmentPlan.type == 'standard'" class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
                     <Label class="text-sm dark:text-white md:w-1/4" for="roi_per_annum" value="ROI per annum" />
                     <div class="flex flex-col w-full">
                         <Input
@@ -413,6 +414,19 @@ const removeDescription = (index) => {
                         />
                         <InputError :message="form.errors.roi_per_annum" class="mt-2" />
                     </div>
+                </div>
+                <div v-else class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                    <Label class="text-sm dark:text-white md:w-1/4" for="staking_reward" value="Staking Reward" />
+                    <Input
+                            id="staking_reward"
+                            min="0"
+                            type="number"
+                            placeholder="0%"
+                            class="block w-full"
+                            :class="form.errors.commision_multiplier ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                            v-model="form.commision_multiplier"
+                        />
+                        <InputError :message="form.errors.commision_multiplier" class="mt-2" />
                 </div>
                 <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
                     <Label class="text-sm dark:text-white md:w-1/4" for="investment_period" value="Investment period (months)" />

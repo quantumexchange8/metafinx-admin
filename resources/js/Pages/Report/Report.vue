@@ -282,7 +282,7 @@ const activePayoutLabel = computed(() => {
         </div>
 
         <div class="p-5 my-5 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700">
-        {{ exportStatus }}
+       
             <ReportTable 
                 :activePayout="activePayout"
                 :exportStatus="exportStatus"

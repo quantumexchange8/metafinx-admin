@@ -32,7 +32,10 @@ const fetchData = async () => {
         const data = response.data.data;
         const backgroundColors = ['#FFB2AB', '#FF2D55', '#FEC84B', '#F79009'];
         const dataLabels = ['Member', 'LVL 1', 'LVL 2', 'LVL 3'];
-
+        
+        // Reset datasets array
+        chartData.value.datasets = [];
+        
         // Initialize datasets based on the number of setting ranks
         for (let settingRankId = 1; settingRankId <= 4; settingRankId++) {
             const dataset = {

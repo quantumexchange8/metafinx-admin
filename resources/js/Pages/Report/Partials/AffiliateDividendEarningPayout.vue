@@ -160,10 +160,10 @@ const paginationActiveClass = [
                     </div>
                 </td>
                 <td class="px-3 py-2.5">
-                    {{ formatDateTime(dividend.user.created_at) }}
+                    {{ formatDateTime(dividend.created_at) }}
                 </td>
                 <td class="px-3 py-2.5">
-                    ${{ formatAmount(dividend.total_earnings) }}
+                    ${{ formatAmount(dividend.after_amount) }}
                 </td>
             </tr>
             </tbody>
@@ -185,5 +185,9 @@ const paginationActiveClass = [
             </template>
         </TailwindPagination>
     </div>
-    
+    <div class="flex items-center">
+        <div class="text-xl font-semibold">
+            Total Amount: ${{ formatAmount(totalAmount) }}
+        </div>
+    </div>
 </template>

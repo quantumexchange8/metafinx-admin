@@ -154,6 +154,7 @@ const fetchData = async () => {
                 },
                 plugins: {
                     legend: {
+                        display: false,
                         labels: {
                             font: {
                                 family: 'Inter, sans-serif',
