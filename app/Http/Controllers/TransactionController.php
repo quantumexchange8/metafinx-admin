@@ -105,8 +105,9 @@ class TransactionController extends Controller
 
                 $this->updateTransaction($transaction);
 
-                if ($transaction->type == 'Deposit') {
-                    $wallet = Wallet::find($transaction->from_wallet_id);
+                if ($transaction->transaction_type == 'Deposit') {
+                    
+                    $wallet = Wallet::find($transaction->to_wallet_id);
                     $wallet->balance += $transaction->amount;
                     $wallet->save();
                 }
@@ -118,10 +119,12 @@ class TransactionController extends Controller
                 'status' => 'Success'
             ]);
 
-            $this->updateTransaction($transaction);
+            if (App::environment('production')) {
+                $this->updateTransaction($transaction);
+            }
 
-            if ($transaction->type == 'Deposit') {
-                $wallet = Wallet::find($transaction->from_wallet_id);
+            if ($transaction->transaction_type == 'Deposit') {
+                $wallet = Wallet::find($transaction->to_wallet_id);                
                 $wallet->balance += $transaction->amount;
                 $wallet->save();
             }
@@ -149,7 +152,7 @@ class TransactionController extends Controller
                         $this->updateTransaction($transaction);
                     }
 
-                    if ($transaction->type == 'Withdrawal') {
+                    if ($transaction->transaction_type == 'Withdrawal') {
                         $wallet = Wallet::find($transaction->from_wallet_id);
 
                         $wallet->balance += $transaction->amount;
@@ -162,14 +165,15 @@ class TransactionController extends Controller
 
             $transaction->update([
                 'status' => 'Rejected',
-                'remarks'=> $request->remark
+                'remarks'=> $request->remark,
+                'new_wallet_amount' => $transaction->new_wallet_amount += $transaction->amount
             ]);
 
             if (App::environment('production')) {
                 $this->updateTransaction($transaction);
             }
 
-            if ($transaction->type == 'Withdrawal') {
+            if ($transaction->transaction_type == 'Withdrawal') {
                 $wallet = Wallet::find($transaction->from_wallet_id);
 
                 $wallet->balance += $transaction->amount;
