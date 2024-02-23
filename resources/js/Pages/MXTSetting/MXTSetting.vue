@@ -77,7 +77,7 @@ const updateStatus = async (planId, newStatus) => {
                             Current Investors (pax)
                         </div>
                         <div class="text-xl font-semibold">
-                            {{ props.currentInvestor }}
+                            {{ props.currentInvestor ? props.currentInvestor : '0' }}
                         </div>
                     </div>
                 </div>
