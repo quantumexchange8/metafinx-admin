@@ -15,8 +15,8 @@ import CoinSettingTable from "@/Pages/Configuration/CoinSetting/CoinSettingTable
 const props = defineProps({
     settingCoin: Object,
     totalCoinSupply: Number,
-    conversionRate: Object,
-    coinMarketTime: Object,
+    // conversionRate: Object,
+    // coinMarketTime: Object,
 })
 
 const formatter = ref({
@@ -30,18 +30,18 @@ const meridiem = [
 ]
 
 const { formatAmount } = transactionFormat();
-const frequency = ref(props.coinMarketTime.frequency);
+// const frequency = ref(props.coinMarketTime.frequency);
 const isFormDirty = ref(false);
 const isMarketTimeFormDirty = ref(false);
 const price = ref('');
 const date = ref('');
-const conversion_rate = ref(props.conversionRate.price);
-const open_time_hr = ref(props.coinMarketTime.open_time_hr);
-const open_time_min = ref(props.coinMarketTime.open_time_min);
-const open_time_meridiem = ref(props.coinMarketTime.open_time_meridiem);
-const close_time_hr = ref(props.coinMarketTime.close_time_hr);
-const close_time_min = ref(props.coinMarketTime.close_time_min);
-const close_time_meridiem = ref(props.coinMarketTime.close_time_meridiem);
+// const conversion_rate = ref(props.conversionRate.price);
+// const open_time_hr = ref(props.coinMarketTime.open_time_hr);
+// const open_time_min = ref(props.coinMarketTime.open_time_min);
+// const open_time_meridiem = ref(props.coinMarketTime.open_time_meridiem);
+// const close_time_hr = ref(props.coinMarketTime.close_time_hr);
+// const close_time_min = ref(props.coinMarketTime.close_time_min);
+// const close_time_meridiem = ref(props.coinMarketTime.close_time_meridiem);
 
 const form = useForm({
     setting_coin_id: props.settingCoin.id,
@@ -50,16 +50,16 @@ const form = useForm({
     conversion_rate: '',
 })
 
-const marketTimeForm = useForm({
-    market_time_id: props.coinMarketTime.id,
-    open_time_hr: props.coinMarketTime.open_time_hr,
-    open_time_min: props.coinMarketTime.open_time_min,
-    open_time_meridiem: props.coinMarketTime.open_time_meridiem,
-    close_time_hr: props.coinMarketTime.close_time_hr,
-    close_time_min: props.coinMarketTime.close_time_min,
-    close_time_meridiem: props.coinMarketTime.close_time_meridiem,
-    frequency: {},
-})
+// const marketTimeForm = useForm({
+//     market_time_id: props.coinMarketTime.id,
+//     open_time_hr: props.coinMarketTime.open_time_hr,
+//     open_time_min: props.coinMarketTime.open_time_min,
+//     open_time_meridiem: props.coinMarketTime.open_time_meridiem,
+//     close_time_hr: props.coinMarketTime.close_time_hr,
+//     close_time_min: props.coinMarketTime.close_time_min,
+//     close_time_meridiem: props.coinMarketTime.close_time_meridiem,
+//     frequency: {},
+// })
 
 function clearField() {
     form.amount = '';
@@ -81,13 +81,13 @@ function loadDays(query, setOptions) {
         });
 }
 
-watch([price, date, conversion_rate], () => {
+watch([price, date], () => {
     isFormDirty.value = true;
 });
 
-watch([open_time_hr, open_time_min, open_time_meridiem, close_time_hr, close_time_min, close_time_meridiem, frequency], () => {
-    isMarketTimeFormDirty.value = true;
-});
+// watch([open_time_hr, open_time_min, open_time_meridiem, close_time_hr, close_time_min, close_time_meridiem, frequency], () => {
+//     isMarketTimeFormDirty.value = true;
+// });
 
 const submit = () => {
     form.price = price.value;
@@ -166,7 +166,7 @@ const submitMarketTime = () => {
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
+                <!-- <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
                     <Label class="text-sm dark:text-white" for="conversion_rate" value="Conversion Rate" />
                     <div class="md:col-span-3">
                         <Input
@@ -181,7 +181,7 @@ const submitMarketTime = () => {
                         />
                         <InputError :message="form.errors.conversion_rate" class="mt-2" />
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="flex pt-8 gap-3 justify-end border-t dark:border-gray-700">
                 <Button
@@ -199,7 +199,7 @@ const submitMarketTime = () => {
         <h3 class="text-base font-semibold dark:text-white border-b dark:border-gray-700 w-full md:w-4/5 pb-3">
             Market Time
         </h3>
-        <form class="flex flex-col gap-8 w-full md:w-4/5">
+        <!-- <form class="flex flex-col gap-8 w-full md:w-4/5">
             <div class="flex flex-col gap-5">
                 <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
                     <Label class="text-sm dark:text-white" for="open_time" value="Open Time" />
@@ -308,7 +308,7 @@ const submitMarketTime = () => {
                     <span class="text-sm font-semibold">Save</span>
                 </Button>
             </div>
-        </form>
+        </form> -->
         <CoinSettingTable />
     </div>
 
