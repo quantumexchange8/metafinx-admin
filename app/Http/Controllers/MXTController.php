@@ -37,6 +37,10 @@ class MXTController extends Controller
         $currentDate = Carbon::today()->toDateString();
         
         $currentCoinPrice = CoinPrice::where('price_date', $currentDate)->first();
+        
+        if ($currentCoinPrice == null) {
+            $currentCoinPrice = CoinPrice::latest()->first();
+        }
         $currentInvestor = InvestmentSubscription::whereIn('status', ['CoolingPeriod', 'OnGoingPeriod'])->distinct()->count('user_id');
         $totalSupply = SettingCoin::where('symbol', 'MXT/USD')->first();
         $totalStaking = Earning::where('category', 'staking')->sum('after_amount');
