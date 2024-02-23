@@ -57,7 +57,7 @@ const getPlaceholder = (slug) => {
                 <h2>
                     <span v-if="setting.slug === 'withdrawal-fee'">$</span>
                     {{ setting.value }}
-                    <span v-if="setting.slug === 'gas-fee' || setting.slug === 'stacking-fee'">%</span>
+                    <span v-if="setting.slug === 'gas-fee' || setting.slug === 'stacking-fee' || setting.slug === 'deposit-fee'">%</span>
                 </h2>
             </div>
 

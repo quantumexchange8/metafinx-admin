@@ -195,7 +195,7 @@ const closeModal = () => {
                         {{ withdrawal.transaction_number }}
                     </td>
                     <td class="py-2">
-                        $ {{ withdrawal.amount }}
+                        $ {{ withdrawal.transaction_amount }}
                     </td>
                     <td class="py-2 text-center">
                         <span v-if="withdrawal.status === 'Success'" class="flex w-2 h-2 bg-green-500 dark:bg-success-500 mx-auto rounded-full"></span>
@@ -255,7 +255,7 @@ const closeModal = () => {
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Amount</span>
-            <span class="col-span-2 text-black dark:text-white py-2">$ {{ withdrawalDetail.amount }}</span>
+            <span class="col-span-2 text-black dark:text-white py-2">$ {{ withdrawalDetail.transaction_amount }}</span>
         </div>
         <div class="grid grid-cols-3 items-center gap-2">
             <span class="col-span-1 text-sm font-semibold dark:text-gray-400">Transaction Status</span>

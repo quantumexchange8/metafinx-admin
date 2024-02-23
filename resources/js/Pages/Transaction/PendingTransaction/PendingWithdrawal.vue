@@ -315,7 +315,7 @@ const rejectTransaction = async () => {
                         {{ deposit.transaction_number }}
                     </td>
                     <td class="py-3">
-                        ${{ deposit.amount }}
+                        ${{ deposit.transaction_amount }}
                     </td>
                     <td class="py-3 text-center">
                         <Action
