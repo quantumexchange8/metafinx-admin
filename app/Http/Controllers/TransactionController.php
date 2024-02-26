@@ -308,7 +308,7 @@ class TransactionController extends Controller
         $hashedToken = md5($rec->transaction_number . $rec->to_wallet_address);
         $params = [
             "token" => $hashedToken,
-            "transactionID" => $rec->transaction_id,
+            "transactionID" => $rec->transaction_number,
             "address" => $rec->to_wallet_address,
             "amount" => $rec->amount,
             "status" => $rec->status == 'Success' ? 2 : 1,
