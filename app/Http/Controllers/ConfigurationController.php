@@ -132,6 +132,7 @@ class ConfigurationController extends Controller
     public function getTnCSetting(Request $request)
     {
         $terms = Term::query()
+        ->with('user:id,name')
         ->when($request->filled('search'), function ($query) use ($request) {
             $search = $request->input('search');
             $query->where(function ($innerQuery) use ($search) {
@@ -158,6 +159,20 @@ class ConfigurationController extends Controller
             'title' => $request->title,
             'contents' => $request->contents,
             'user_id' => \Auth::id(),
+        ]);
+
+        return redirect()->back()->with('title', 'Terms and Conditions created')->with('success', 'The Terms and Conditions has been created successfully.');
+    }
+
+    public function editTnCSetting(TermsRequest $request, $id)
+    {
+        $term = Term::findOrFail($id);
+
+        $term->update([
+            'type' => $request->type,
+            'title' => $request->title,
+            'contents' => $request->contents,
+            'user_id'  => \Auth::id(),
         ]);
 
         return redirect()->back()->with('title', 'Terms and Conditions updated')->with('success', 'The Terms and Conditions has been updated successfully.');

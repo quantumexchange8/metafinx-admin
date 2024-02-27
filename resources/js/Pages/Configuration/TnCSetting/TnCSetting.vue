@@ -10,18 +10,22 @@ import debounce from "lodash/debounce.js";
 import {transactionFormat} from "@/Composables/index.js";
 import {ArrowLeftIcon, ArrowRightIcon, SearchIcon} from "@heroicons/vue/outline";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
-import {AddIcon, CloudDownloadIcon, MemberDetailIcon} from "@/Components/Icons/outline.jsx";
+import {AddIcon, CloudDownloadIcon, MemberDetailIcon, EditIcon} from "@/Components/Icons/outline.jsx";
 import InputIconWrapper from "@/Components/InputIconWrapper.vue";
 import {TailwindPagination} from "laravel-vue-pagination";
 import Loading from "@/Components/Loading.vue";
 import Modal from "@/Components/Modal.vue";
 import Tooltip from "@/Components/Tooltip.vue";
+import TipTapEditor from "@/Components/TipTapEditor.vue";
+import BaseListbox from "@/Components/BaseListbox.vue";
 
 const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
 });
 
+const editTnCSettingModal = ref(false);
+const editTnCSettingData = ref({});
 const tncsettings = ref({data: []});
 const search = ref('');
 const date = ref('');
@@ -30,6 +34,20 @@ const currentPage = ref(1);
 const { formatDateTime } = transactionFormat();
 const tncSettingModal = ref(false);
 const tncSettingDetail = ref();
+
+const form = useForm({
+    type: '',
+    title: '',
+    contents: '',
+})
+
+const previewTitle = ref('');
+const previewContents = ref('');
+
+watch(form, (watchFormSubject) => {
+    previewTitle.value = watchFormSubject.title;
+    previewContents.value = watchFormSubject.contents;
+});
 
 watch(
     [search, date],
@@ -90,8 +108,41 @@ const openTnCSettingModal = (tncsetting) => {
 }
 
 const closeModal = () => {
-    tncSettingModal.value = false
+    tncSettingModal.value = false;
+    editTnCSettingModal.value = false;
+
 }
+
+const openEditModal = (tncsetting) => {
+    editTnCSettingData.value = tncsetting;
+    editTnCSettingModal.value = true;
+    form.type = editTnCSettingData.value.type
+    form.title = editTnCSettingData.value.title
+    form.contents = editTnCSettingData.value.contents
+};
+
+const submit = () => {
+    form.put(route('configuration.editTnCSetting', editTnCSettingData.value.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeModal();
+            form.reset();
+        },
+    })
+}
+
+const tncSetting = [
+  { value: 'staking_subscription', label: "Staking Subscription" },
+  { value: 'staking_learn_more', label: "Staking Learn More" },
+  { value: 'standard_subscription', label: "Standard Subscription" },
+  { value: 'standard_learn_more', label: "Standard Learn More" },
+  { value: 'buy_coin', label: "Buy Coin" },
+  { value: 'deposit', label: "Deposit" },
+  { value: 'swap', label: "Swap Coin" },
+  { value: 'withdrawal', label: "Withdrawal" },
+  { value: 'sign_up', label: "Sign Up" },
+];
+
 </script>
 
 <template>
@@ -134,9 +185,6 @@ const closeModal = () => {
                                 <th Date="col" class="px-3 py-4">
                                     Date
                                 </th>
-                                <th Date="col" class="px-3 py-4">
-                                    Type
-                                </th>
                                 <th scope="col" class="px-3 py-4">
                                     Title
                                 </th>
@@ -162,13 +210,10 @@ const closeModal = () => {
                                     {{ formatDateTime(tncsetting.created_at) }}
                                 </td>
                                 <td class="px-3 py-4">
-                                    {{ tncsetting.type }}
-                                </td>
-                                <td class="px-3 py-4">
                                     {{ tncsetting.title }}
                                 </td>
                                 <td class="px-3 py-4">
-                                    {{ tncsetting.user_id }}
+                                    {{ tncsetting.user.name }}
                                 </td>
                                 <td class="px-3 py-4">
                                     <Tooltip content="View Details" placement="bottom" class="relative">
@@ -181,6 +226,18 @@ const closeModal = () => {
                                         >
                                             <MemberDetailIcon aria-hidden="true" class="w-5 h-5 absolute" />
                                             <span class="sr-only">View Details</span>
+                                        </Button>
+                                    </Tooltip>
+                                    <Tooltip content="Edit T&C Setting" placement="bottom" class="relative">
+                                        <Button
+                                            type="button"
+                                            class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
+                                            variant="action"
+                                            pill
+                                            @click="openEditModal(tncsetting)"
+                                        >
+                                            <EditIcon aria-hidden="true" class="w-5 h-5 absolute" />
+                                            <span class="sr-only">Edit T&C Setting</span>
                                         </Button>
                                     </Tooltip>
                                 </td>
@@ -213,5 +270,67 @@ const closeModal = () => {
         <div class="text-xs dark:text-gray-400">{{ formatDateTime(tncSettingDetail.created_at) }}</div>
         <div class="my-5 dark:text-white">{{ tncSettingDetail.title }}</div>
         <div class="dark:text-gray-300 text-sm prose max-w-none leading-3" v-html="tncSettingDetail.contents"></div>
+    </Modal>
+    <Modal :show="editTnCSettingModal" title="Edit T&C Setting" max-width="6xl" @close="closeModal">
+        <div class="grid grid-rows-2 md:grid-rows-1 md:grid-cols-2 gap-5 w-full">
+            <form
+                @submit.prevent="submit"
+                class="flex flex-col gap-5"
+            >
+                <div class="space-y-2">
+                    <Label class="text-sm dark:text-white" for="type" value="Type" />
+                    <div class="md:col-span-3">
+                    <BaseListbox
+                        v-model="form.type"
+                        :options=tncSetting
+                        :error="form.errors.type"
+                    />
+                </div>
+                    <InputError :message="form.errors.type" class="mt-2" />
+                </div>
+
+                <div class="space-y-2">
+                    <Label class="text-sm dark:text-white" for="title" value="Title" />
+                    <Input
+                        id="title"
+                        type="text"
+                        placeholder="Enter title"
+                        class="block w-full"
+                        :class="form.errors.title ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                        v-model="form.title"
+                    />
+                    <InputError :message="form.errors.title" class="mt-2" />
+                </div>
+                <div class="space-y-2">
+                    <Label class="text-sm dark:text-white" for="content" value="Contents" />
+                    <TipTapEditor
+                        v-model="form.contents"
+                    />
+                    <InputError :message="form.errors.contents" class="mt-2" />
+                </div>
+                <div class="flex pt-8 gap-3 justify-end border-t dark:border-gray-700">
+                    <Button variant="secondary" class="px-4 py-2 justify-center" @click="closeModal">
+                        <span class="text-sm font-semibold">Cancel</span>
+                    </Button>
+                    <Button variant="primary" class="px-4 py-2 justify-center" :disabled="form.processing">
+                        <span class="text-sm font-semibold">Confirm</span>
+                    </Button>
+                </div>
+            </form>
+            <div>
+                <h3 class="font-semibold dark:text-white text-base pb-3 border-b dark:border-gray-700">Preview</h3>
+                <div
+                    v-if="previewTitle === '' && previewContents === ''"
+                    class="flex flex-col items-center justify-center mt-12"
+                >
+                    <img src="/assets/no_data.png" class="w-80" alt="no preview">
+                    <div class="dark:text-gray-400 mt-4">No preview</div>
+                </div>
+                <div v-else class="pt-8">
+                    <h3 class="font-semibold text-sm dark:text-white">{{ previewTitle }}</h3>
+                    <div class="mt-5 dark:text-gray-400 prose max-w-none leading-3 text-xs" v-html="previewContents"></div>
+                </div>
+            </div>
+        </div>
     </Modal>
 </template>

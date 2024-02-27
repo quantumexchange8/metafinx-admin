@@ -144,7 +144,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         //T&C Setting
         Route::get('/getTnCSetting', [ConfigurationController::class, 'getTnCSetting'])->name('configuration.getTnCSetting');
         Route::post('/addTnCSetting', [ConfigurationController::class, 'addTnCSetting'])->name('configuration.addTnCSetting');
-        Route::put('/editTncSetting/{id}', [ConfigurationController::class, 'editTncSetting'])->name('configuration.editTncSetting');
+        Route::put('/editTnCSetting/{id}', [ConfigurationController::class, 'editTnCSetting'])->name('configuration.editTnCSetting');
         //Dividend Bonus
         Route::post('/addDividendBonus', [ConfigurationController::class, 'addDividendBonus'])->name('configuration.addDividendBonus');
         Route::put('/editDividendBonus/{id}', [ConfigurationController::class, 'editDividendBonus'])->name('configuration.editDividendBonus');

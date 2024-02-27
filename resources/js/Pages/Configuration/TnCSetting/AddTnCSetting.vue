@@ -35,7 +35,6 @@ const FilePond = vueFilePond(
 )
 
 const addTnCSettingModal = ref(false);
-const user = usePage().props.auth.user.id;
 
 const openAddTnCSettingModal = () => {
     addTnCSettingModal.value = true
@@ -52,7 +51,6 @@ const form = useForm({
     type: '',
     title: '',
     contents: '',
-    user_id: user,
 })
 
 watch(form, (watchFormSubject) => {
@@ -80,7 +78,6 @@ const tncSetting = [
   { value: 'swap', label: "Swap Coin" },
   { value: 'withdrawal', label: "Withdrawal" },
   { value: 'sign_up', label: "Sign Up" },
-
 ];
 
 </script>

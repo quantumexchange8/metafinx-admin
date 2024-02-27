@@ -12,7 +12,6 @@ class TermsRequest extends FormRequest
             'type' => ['required'],
             'title' => ['required'],
             'contents' => ['required'],
-            'user_id' => ['required'],
         ];
     }
 
@@ -27,7 +26,6 @@ class TermsRequest extends FormRequest
             'type' => 'Type',
             'title' => 'Title',
             'contents' => 'Contents',
-            'user_id' => 'ID',
         ];
     }
 }
