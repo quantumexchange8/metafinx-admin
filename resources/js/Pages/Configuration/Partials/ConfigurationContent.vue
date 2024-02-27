@@ -34,6 +34,20 @@ const updateContent = (newContent) => {
             </template>
         </ConfigurationLink>
 
+        <ConfigurationLink
+            class="flex-col md:flex-row"
+            title="T&C Setting"
+            @click="updateContent('TnCSetting')"
+            :active="props.content==='TnCSetting'"
+        >
+            <template #icon>
+                <AnnouncementIcon
+                    class="flex-shrink-0 w-6 h-6"
+                    aria-hidden="true"
+                />
+            </template>
+        </ConfigurationLink>
+
          <ConfigurationLink
             class="flex-col md:flex-row"
             title="Dividend Bonus"

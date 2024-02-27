@@ -3,6 +3,7 @@ import AuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import ConfigurationContent from "@/Pages/Configuration/Partials/ConfigurationContent.vue";
 import {ref} from "vue";
 import Announcement from "@/Pages/Configuration/Announcement/Announcement.vue";
+import TnCSetting from "@/Pages/Configuration/TnCSetting/TnCSetting.vue";
 import DividendBonus from "@/Pages/Configuration/DividendBonus/DividendBonus.vue";
 import WithdrawalFee from "@/Pages/Configuration/WithdrawalFee/WithdrawalFee.vue";
 import AffiliateForm from "@/Pages/Configuration/AffiliateSetting/AffliateForm.vue";
@@ -80,6 +81,9 @@ const updateContent = (newContent) => {
             </section>
             <Announcement
                 v-if="content==='Announcement'"
+            />
+            <TnCSetting
+                v-if="content==='TnCSetting'"
             />
             <DividendBonus
                 v-if="content==='DividendBonus'"

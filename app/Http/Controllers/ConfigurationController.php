@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Coin;
+use App\Models\Term;
 use App\Models\User;
 use Inertia\Inertia;
 use App\Models\Setting;
@@ -17,6 +18,7 @@ use App\Models\ConversionRate;
 use App\Models\SettingEarning;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\TermsRequest;
 use App\Models\SettingWithdrawalFee;
 use App\Models\InvestmentSubscription;
 use App\Http\Requests\CoinPriceRequest;
@@ -125,6 +127,40 @@ class ConfigurationController extends Controller
         }
 
         return redirect()->back()->with('title', 'Announcement uploaded')->with('success', 'This announcement has been uploaded successfully.');
+    }
+
+    public function getTnCSetting(Request $request)
+    {
+        $terms = Term::query()
+        ->when($request->filled('search'), function ($query) use ($request) {
+            $search = $request->input('search');
+            $query->where(function ($innerQuery) use ($search) {
+                $innerQuery->where('title', 'like', '%' . $search . '%');
+            });
+        })
+        ->when($request->filled('date'), function ($query) use ($request) {
+            $date = $request->input('date');
+            $dateRange = explode(' - ', $date);
+            $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+            $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+            $query->whereBetween('created_at', [$start_date, $end_date]);
+        })
+        ->latest()
+        ->paginate(10);
+
+        return response()->json($terms);
+    }
+
+    public function addTnCSetting(TermsRequest $request)
+    {
+        $term = Term::create([
+            'type' => $request->type,
+            'title' => $request->title,
+            'contents' => $request->contents,
+            'user_id' => \Auth::id(),
+        ]);
+
+        return redirect()->back()->with('title', 'Terms and Conditions updated')->with('success', 'The Terms and Conditions has been updated successfully.');
     }
 
     public function upload(Request $request)
