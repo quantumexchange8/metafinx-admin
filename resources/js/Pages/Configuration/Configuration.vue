@@ -9,6 +9,7 @@ import WithdrawalFee from "@/Pages/Configuration/WithdrawalFee/WithdrawalFee.vue
 import AffiliateForm from "@/Pages/Configuration/AffiliateSetting/AffliateForm.vue";
 import CoinSetting from "@/Pages/Configuration/CoinSetting/CoinSetting.vue";
 import MasterSetting from "@/Pages/Configuration/MasterSetting/MasterSetting.vue";
+import StakingReward from "@/Pages/Configuration/StakingReward/StakingReward.vue";
 
 const props = defineProps({
     users: Array,
@@ -18,6 +19,7 @@ const props = defineProps({
     conversionRate: Object,
     coinMarketTime: Object,
     masterSetting: Object,
+    stakingReward: Object,
 })
 
 const content = ref('Announcement');
@@ -102,6 +104,10 @@ const updateContent = (newContent) => {
                 :totalCoinSupply="totalCoinSupply"
                 :conversionRate="conversionRate"
                 :coinMarketTime="coinMarketTime"
+            />
+            <StakingReward
+                v-if="content==='StakingReward'"
+                :stakingReward="stakingReward"
             />
         </div>
 

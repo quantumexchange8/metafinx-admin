@@ -19,6 +19,7 @@ use App\Models\SettingEarning;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\TermsRequest;
+use App\Models\SettingStakingReward;
 use App\Models\SettingWithdrawalFee;
 use App\Models\InvestmentSubscription;
 use App\Http\Requests\CoinPriceRequest;
@@ -27,6 +28,7 @@ use App\Http\Requests\MarketTimeRequest;
 use App\Http\Requests\TicketBonusRequest;
 use App\Http\Requests\AnnouncementRequest;
 use App\Http\Requests\DividendBonusRequest;
+use App\Http\Requests\StakingRewardRequest;
 use Illuminate\Validation\ValidationException;
 use App\Notifications\AnnouncementNotification;
 
@@ -42,6 +44,7 @@ class ConfigurationController extends Controller
                 ->groupBy('name', 'slug');
         })
         ->get();
+        $stakingReward = SettingStakingReward::latest()->first();
 
         // Check if $coin_market_time is not null to avoid errors
         if ($coin_market_time) {
@@ -66,6 +69,7 @@ class ConfigurationController extends Controller
             'conversionRate' => ConversionRate::latest()->first(),
             'coinMarketTime' => $coin_market_time,
             'masterSetting' => $masterSettings,
+            'stakingReward' => $stakingReward,
         ]);
     }
 
@@ -543,4 +547,60 @@ class ConfigurationController extends Controller
 
         return redirect()->back()->with('title', 'Market Time Updated')->with('success', 'The MXT Coin market time has been updated successfully.');
     }
+
+    public function getStakingReward(Request $request)
+    {
+        $stakingReward = SettingStakingReward::query()
+            ->with('user:id,name')
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->input('search');
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->whereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%');
+                    });
+                });
+            })
+            ->when($request->filled('month'), function ($query) use ($request) {
+                $month = $request->input('month');
+                $query->where('month', $month);
+            })        
+            // ->when($request->filled('date'), function ($query) use ($request) {
+            //     $date = $request->input('date');
+            //     $dateRange = explode(' - ', $date);
+            //     $start_date = Carbon::createFromFormat('Y-m-d', $dateRange[0])->startOfDay();
+            //     $end_date = Carbon::createFromFormat('Y-m-d', $dateRange[1])->endOfDay();
+            //     $query->whereBetween('release_date', [$start_date, $end_date]);
+            // })
+            ->latest()
+            ->paginate(10);
+
+        return response()->json($stakingReward);
+    }
+
+    public function addStakingReward(StakingRewardRequest $request)
+    {
+        $settingStakingReward = SettingStakingReward::create([
+            'month' => $request->month,
+            'release_date' => null,
+            'percent' => $request->percent,
+            'updated_by' => \Auth::id(),
+        ]);
+
+        return redirect()->back()->with('title', 'Staking Reward')->with('success', 'A staking reward of ' . $request->percent . '% will be released on ' . $request->month . '.');
+    }
+
+
+    public function editStakingReward(StakingRewardRequest $request, $id)
+    {
+        $existingStakingReward = SettingStakingReward::find($id);
+        
+        $existingStakingReward->update([
+            'percent' => $request->percent,
+            'month' => $request->month,
+            'updated_by' => \Auth::id(),
+        ]);
+    
+        return redirect()->back()->with('title', 'Staking Reward Updated')->with('success', 'The staking reward has been updated successfully.');
+    }
+    
 }

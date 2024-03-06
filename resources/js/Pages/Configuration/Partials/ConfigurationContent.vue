@@ -104,5 +104,20 @@ const updateContent = (newContent) => {
             </template>
         </ConfigurationLink>
 
+        <ConfigurationLink
+            class="flex-col md:flex-row"
+            title="Staking Reward"
+            @click="updateContent('StakingReward')"
+            :active="props.content==='StakingReward'"
+        >
+            <template #icon>
+                <CoinSettingIcon
+                    class="flex-shrink-0 w-6 h-6"
+                    aria-hidden="true"
+                />
+            </template>
+        </ConfigurationLink>
+
+
     </PerfectScrollbar>
 </template>

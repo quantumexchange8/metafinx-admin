@@ -161,6 +161,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/updateCoinPrice', [ConfigurationController::class, 'updateCoinPrice'])->name('configuration.updateCoinPrice');
         Route::post('/updateCoinMarketTime', [ConfigurationController::class, 'updateCoinMarketTime'])->name('configuration.updateCoinMarketTime');
         Route::put('/editCoinPrice/{id}', [ConfigurationController::class, 'editCoinPrice'])->name('configuration.editCoinPrice');
+        //Staking Reward
+        Route::get('/getStakingReward', [ConfigurationController::class, 'getStakingReward'])->name('configuration.getStakingReward');
+        Route::post('/addStakingReward', [ConfigurationController::class, 'addStakingReward'])->name('configuration.addStakingReward');
+        Route::put('/editStakingReward/{id}', [ConfigurationController::class, 'editStakingReward'])->name('configuration.editStakingReward');
     });
 
     /**
