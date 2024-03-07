@@ -39,7 +39,12 @@ const closeModal = () => {
 
 <template>
     <form>
-        <div class="flex justify-between items-center px-5 mb-8 shadow-md bg-gradient-to-bl from-pink-400 to-pink-600 rounded-[20px]">
+        <div class="flex justify-between items-center px-5 mb-8 shadow-md rounded-[20px]"
+            :class="{
+                        'bg-gradient-to-bl from-pink-400 to-pink-600': wallet.type === 'internal_wallet',
+                        'bg-gradient-to-bl from-warning-300 to-warning-500': wallet.type === 'musd_wallet',
+                    }"
+        >
             <div class="space-y-2">
                 <div class="text-base font-semibold dark:text-white">
                     {{ wallet.name }}
@@ -48,7 +53,8 @@ const closeModal = () => {
                     $ {{ formatAmount(wallet.balance) }}
                 </div>
             </div>
-                <Wallet class="w-24 h-24"/>
+                <Wallet v-if="wallet.type === 'internal_wallet'" class="w-24 h-24"/>
+                <img v-else-if="wallet.type === 'musd_wallet'" class="w-24 h-24" src="/assets/icon-no-color.png" alt="" >
         </div>
         <div class="flex flex-col gap-4 md:gap-8 mt-3 mb-8">
             <div class="flex flex-col gap-1 md:grid md:grid-cols-3">
