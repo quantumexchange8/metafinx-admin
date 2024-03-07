@@ -47,7 +47,7 @@ const form = useForm({
     setting_coin_id: props.settingCoin.id,
     price: '',
     date: '',
-    conversion_rate: '',
+    // conversion_rate: '',
 })
 
 // const marketTimeForm = useForm({
@@ -92,7 +92,7 @@ watch([price, date], () => {
 const submit = () => {
     form.price = price.value;
     form.date = date.value;
-    form.conversion_rate = conversion_rate.value;
+    // form.conversion_rate = conversion_rate.value;
 
     form.post(route('configuration.updateCoinPrice'), {
         onSuccess: () => {

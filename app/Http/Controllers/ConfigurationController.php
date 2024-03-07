@@ -476,7 +476,7 @@ class ConfigurationController extends Controller
     public function updateCoinPrice(CoinPriceRequest $request)
     {
         $price_date = CoinPrice::orderByDesc('price_date')->first();
-        $current_conversion_rate = ConversionRate::latest()->first();
+        // $current_conversion_rate = ConversionRate::latest()->first();
 
         $date = now()->parse($price_date->price_date)->addDays(2);
         $expectedNextDate = date_format($date, 'Y-m-d');
@@ -499,12 +499,12 @@ class ConfigurationController extends Controller
             'price_date' => $request->date,
         ]);
 
-        if ($request->conversion_rate != $current_conversion_rate->price) {
-            ConversionRate::create([
-                'currency' => 'MYR',
-                'price' => $request->conversion_rate
-            ]);
-        }
+        // if ($request->conversion_rate != $current_conversion_rate->price) {
+        //     ConversionRate::create([
+        //         'currency' => 'MYR',
+        //         'price' => $request->conversion_rate
+        //     ]);
+        // }
 
         return redirect()->back()->with('title', 'Setting Updated')->with('success', 'The MXT Coin price and date has been updated successfully.');
     }
