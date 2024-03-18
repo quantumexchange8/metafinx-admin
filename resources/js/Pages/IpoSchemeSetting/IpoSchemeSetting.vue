@@ -154,7 +154,7 @@ const updateStatus = async (planId, newStatus) => {
                     <div class="flex justify-between">
                         <div class="inline-flex items-center justify-center gap-3">
                             <!-- {{ investmentPlansUrl }} -->
-                            <img class="w-12 h-12 rounded-lg bg-white" :src="investmentPlan.plan_logo ? investmentPlan.plan_logo : '/assets/icon.png'" alt="Medium avatar">
+                            <img class="w-12 h-12 rounded-lg" :src="investmentPlan.plan_logo ? investmentPlan.plan_logo : '/assets/icon.png'" alt="Medium avatar">
                             <div class="grid">
                                 <div class="font-semibold">
                                     {{ investmentPlan.name['en'] }}
