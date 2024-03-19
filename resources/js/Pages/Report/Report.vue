@@ -14,20 +14,21 @@ import PayoutAffiliateDividendEarningChart from "@/Pages/Report/Charts/TotalAffi
 import PayoutStakingRewardChart from "@/Pages/Report/Charts/TotalStakingReward/PayoutStakingRewardChart.vue";
 import PayoutReferralEarningStakingChart from "@/Pages/Report/Charts/TotalReferralEarningStaking/PayoutReferralEarningStakingChart.vue";
 import PayoutPairingEarningChart from "@/Pages/Report/Charts/TotalPairingEarning/PayoutPairingEarningChart.vue";
-
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     report: Object,
-    totatMonthlyReturn: String,
-    totalReferralEarning: String,
-    totatAffiliateEarning: String,
-    totatDividendEarning: String,
-    totatAffiliateDividendEarning: String,
-    totatStakingReward: String,
-    totatReferralStaking: String,
-    totatPairingEarning: String,
+    totatMonthlyReturn: [String, Number],
+    totalReferralEarning: [String, Number],
+    totatAffiliateEarning: [String, Number],
+    totatDividendEarning: [String, Number],
+    totatAffiliateDividendEarning: [String, Number],
+    totatStakingReward: [String, Number],
+    totatReferralStaking: [String, Number],
+    totatPairingEarning: [String, Number],
 })
 
+const { hasRole, hasPermission } = usePermission();
 const { formatAmount, formatDateTime } = transactionFormat();
 
 const isLoading = ref(false);
@@ -168,7 +169,7 @@ const activePayoutLabel = computed(() => {
 
 <template>
     <AuthenticatedLayout title="Report">
-        <template #header>
+        <template #header v-if="hasRole('admin') || hasPermission('ViewReport')">
             <div class="md:flex md:flex-row md:justify-between">
                 <div class="flex flex-col gap-1 md:w-1/2">
                     <div class="md:flex-row md:items-center md:justify-between">
@@ -186,6 +187,7 @@ const activePayoutLabel = computed(() => {
                         class="justify-center w-full gap-2 border border-gray-600 text-white text-sm dark:hover:bg-gray-600"
                         variant="transparent"
                         @click="exportReport"
+                        v-if="hasRole('admin') || hasPermission('ExportReport')"
                     >
                         <CloudDownloadIcon aria-hidden="true" class="w-5 h-5" />
                         <span>Export as Excel</span>
@@ -194,7 +196,7 @@ const activePayoutLabel = computed(() => {
             </div>
         </template>
 
-        <div class="grid grid-cols-1 md:grid-cols-1 md:gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-1 md:gap-5" v-if="hasRole('admin') || hasPermission('ViewReport')">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5 col-span-4">
                 <div
                     v-for="payoutStat in payoutStats"
@@ -281,7 +283,7 @@ const activePayoutLabel = computed(() => {
             </div>
         </div>
 
-        <div class="p-5 my-5 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700">
+        <div class="p-5 my-5 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700" v-if="hasRole('admin') || hasPermission('ViewReport')">
        
             <ReportTable 
                 :activePayout="activePayout"

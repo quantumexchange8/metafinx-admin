@@ -8,11 +8,12 @@ import {useForm, usePage} from "@inertiajs/vue3";
 import {DeleteIcon} from "@/Components/Icons/outline.jsx";
 import Tooltip from "@/Components/Tooltip.vue";
 import {PlusIcon} from "@heroicons/vue/outline";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     settingRanks: Object
 })
-
+const { hasRole, hasPermission } = usePermission();
 const activeComponent = ref('Member');
 const rankDetail = ref('');
 const referralEarning = ref('');
@@ -125,6 +126,7 @@ watchEffect(() => {
                                 v-model="rankDetail.self_deposit"
                                 autofocus
                                 :class="form.errors.self_deposit ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                                :disabled="!(hasRole('admin') || hasPermission('EditRequirement'))"
                             />
                             <InputError :message="form.errors.self_deposit" class="mt-1 col-span-4" />
                         </div>
@@ -139,6 +141,7 @@ watchEffect(() => {
                                 class="flex flex-row items-center gap-3 w-full rounded-lg text-base text-black dark:text-white dark:bg-gray-600 px-3 py-0"
                                 v-model="rankDetail.valid_direct_referral"
                                 :class="form.errors.valid_direct_referral ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                                :disabled="!(hasRole('admin') || hasPermission('EditRequirement'))"
                             />
                             <InputError :message="form.errors.valid_direct_referral" class="mt-1 col-span-4" />
                         </div>
@@ -155,6 +158,7 @@ watchEffect(() => {
                                 placeholder="$ 0.00"
                                 v-model="rankDetail.valid_affiliate_deposit"
                                 :class="form.errors.valid_affiliate_deposit ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                                :disabled="!(hasRole('admin') || hasPermission('EditRequirement'))"
                             />
                             <InputError :message="form.errors.valid_affiliate_deposit" class="mt-1 col-span-4" />
                         </div>
@@ -171,6 +175,7 @@ watchEffect(() => {
                                 placeholder="$ 0.00"
                                 v-model="rankDetail.capping_per_line"
                                 :class="form.errors.capping_per_line ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                                :disabled="!(hasRole('admin') || hasPermission('EditRequirement'))"
                             />
                             <InputError :message="form.errors.capping_per_line" class="mt-1 col-span-4" />
                         </div>
@@ -194,6 +199,7 @@ watchEffect(() => {
                                 placeholder="0%"
                                 v-model="referralEarning.value"
                                 :class="form.errors.referral_earnings ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                                :disabled="!(hasRole('admin') || hasPermission('EditReferralEarning'))"
                             />
                             <InputError :message="form.errors.referral_earnings" class="mt-1 col-span-4" />
                         </div>
@@ -214,9 +220,10 @@ watchEffect(() => {
                                     :class="form.errors[`dividend_earnings.${index}`] ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
                                     :aria-label="`Dividend Level ${index+1}`"
                                     v-model="form.dividend_earnings[index]"
+                                    :disabled="!(hasRole('admin') || hasPermission('EditDividendEarning'))"
                                 />
                                 <InputError :message="form.errors[`dividend_earnings.${index}`]" class="mt-2" />
-                                <Tooltip content="Remove" placement="bottom">
+                                <Tooltip content="Remove" placement="bottom" v-if="hasRole('admin') || hasPermission('EditDividendEarning')">
                                     <Button
                                         type="button"
                                         pill
@@ -234,6 +241,7 @@ watchEffect(() => {
                                 variant="transparent"
                                 class="pl-0 pt-0 inline-flex items-center max-w-xs"
                                 @click="addDividend"
+                                v-if="hasRole('admin') || hasPermission('AddNewDividendEarning')"
                             >
                                 <PlusIcon
                                     class="w-5 h-5 mr-2"
@@ -256,9 +264,10 @@ watchEffect(() => {
                                     :class="form.errors[`affiliate_settings.${index}`] ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
                                     :aria-label="`Affiliate Level ${index+1}`"
                                     v-model="form.affiliate_settings[index]"
+                                    :disabled="!(hasRole('admin') || hasPermission('EditAffiliateEarning'))"
                                 />
                                 <InputError :message="form.errors[`affiliate_settings.${index}`]" class="mt-2" />
-                                <Tooltip content="Remove" placement="bottom">
+                                <Tooltip content="Remove" placement="bottom" v-if="hasRole('admin') || hasPermission('EditAffiliateEarning')">
                                     <Button
                                         type="button"
                                         pill
@@ -276,6 +285,7 @@ watchEffect(() => {
                                 variant="transparent"
                                 class="pl-0 pt-0 inline-flex items-center max-w-xs"
                                 @click="addAffiliateSetting"
+                                v-if="hasRole('admin') || hasPermission('AddNewAffiliateEarning')"
                             >
                                 <PlusIcon
                                     class="w-5 h-5 mr-2"
@@ -286,7 +296,7 @@ watchEffect(() => {
                     </div>
                 </div>
             </div>
-            <div class="flex pt-8 gap-3 w-full md:w-4/5 justify-end border-t dark:border-gray-700">
+            <div class="flex pt-8 gap-3 w-full md:w-4/5 justify-end border-t dark:border-gray-700" v-if="hasRole('admin') || hasPermission('EditRequirement') || hasPermission('AddNewDividendEarning') || hasPermission('AddNewAffiliateEarning') || hasPermission('EditDividendEarning') || hasPermission('EditAffiliateEarning') || hasPermission('EditReferralEarning')">
                 <Button
                     variant="primary"
                     class="px-4 py-2 justify-center w-1/4 md:w-1/6"

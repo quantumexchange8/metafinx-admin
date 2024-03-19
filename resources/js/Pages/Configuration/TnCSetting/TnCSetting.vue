@@ -18,12 +18,14 @@ import Modal from "@/Components/Modal.vue";
 import Tooltip from "@/Components/Tooltip.vue";
 import TipTapEditor from "@/Components/TipTapEditor.vue";
 import BaseListbox from "@/Components/BaseListbox.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
 });
 
+const { hasRole, hasPermission } = usePermission();
 const editTnCSettingModal = ref(false);
 const editTnCSettingData = ref({});
 const tncsettings = ref({data: []});
@@ -147,7 +149,7 @@ const tncSetting = [
 
 <template>
     <div class="md:py-6 md:pl-5 w-full">
-        <div class="flex justify-end">
+        <div class="flex justify-end" v-if="hasRole('admin') || hasPermission('AddNewTerms')">
             <AddTnCSetting />
         </div>
         <div class="py-4">
@@ -216,7 +218,7 @@ const tncSetting = [
                                     {{ tncsetting.user.name }}
                                 </td>
                                 <td class="px-3 py-4">
-                                    <Tooltip content="View Details" placement="bottom" class="relative">
+                                    <Tooltip content="View&nbsp;Details" placement="bottom" class="relative" v-if="hasRole('admin') || hasPermission('ViewTermsDetail')">
                                         <Button
                                             type="button"
                                             class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
@@ -228,7 +230,7 @@ const tncSetting = [
                                             <span class="sr-only">View Details</span>
                                         </Button>
                                     </Tooltip>
-                                    <Tooltip content="Edit T&C Setting" placement="bottom" class="relative">
+                                    <Tooltip content="Edit&nbsp;T&C&nbsp;Setting" placement="bottom" class="relative" v-if="hasRole('admin') || hasPermission('EditTerms')">
                                         <Button
                                             type="button"
                                             class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"

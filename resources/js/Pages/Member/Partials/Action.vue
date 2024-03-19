@@ -6,7 +6,7 @@ import Modal from "@/Components/Modal.vue";
 import DeleteMember from "@/Pages/Member/Partials/DeleteMember.vue";
 import AddMember from "@/Pages/Member/Partials/AddMember.vue";
 import Tooltip from "@/Components/Tooltip.vue";
-
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     members: Object,
@@ -15,6 +15,7 @@ const props = defineProps({
     countries: Array,
 })
 
+const { hasRole, hasPermission } = usePermission();
 const memberDetailModal = ref(false);
 // const getMemberId = ref(null);
 const modalComponent = ref(null);
@@ -45,6 +46,7 @@ const closeModal = () => {
                 variant="action"
                 :href="'/member/member_details/' + members.id"
                 pill
+                v-if="(hasRole('admin') || hasPermission('ViewMemberDetail'))"
             >
                 <MemberDetailIcon aria-hidden="true" class="w-5 h-5 absolute" />
                 <span class="sr-only">View Details</span>
@@ -57,6 +59,7 @@ const closeModal = () => {
                 variant="action"
                 :href="'/member/member_affiliates/' + members.id"
                 pill
+                v-if="(hasRole('admin') || hasPermission('ViewMemberAffiliateTree'))"
             >
                 <AffiliateTreeIcon aria-hidden="true" class="w-5 h-5 absolute" />
                 <span class="sr-only">Affiliate Tree</span>
@@ -69,6 +72,7 @@ const closeModal = () => {
                 variant="danger"
                 @click="openMemberModal(members.id, 'deleteMember')"
                 pill
+                v-if="hasRole('admin') || hasPermission('DeleteMember')"
             >
                 <DeleteIcon aria-hidden="true" class="w-5 h-5 absolute" />
                 <span class="sr-only">Delete</span>
@@ -79,7 +83,7 @@ const closeModal = () => {
             class="justify-center px-3 py-2 gap-2 grow focus:outline-none"
             variant="primary"
             @click="openMemberModal('','add_member')"
-            v-if="type === 'add_member'"
+            v-if="(type === 'add_member') && (hasRole('admin') || hasPermission('AddNewMember'))"
         >
             <AddIcon aria-hidden="true" class="w-5 h-5" />
             <span class="text-sm">Add Member</span>

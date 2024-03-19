@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CoinMultiLevel extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'user_id',
@@ -96,4 +98,20 @@ class CoinMultiLevel extends Model
     {
         return $this->hasOne(CoinMultiLevel::class, 'upline_id', 'id')->where('position', $position);
     }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        $coinMultiLevel = $this->fresh();
+
+        return LogOptions::defaults()
+            ->useLogName('coin_multi_level')
+            ->logOnly(['id', 'user_id', 'sponsor_id', 'upline_id', 'hierarchy_list', 'position', 'coin_stacking_id', 'coin_stacking_amount'])
+            ->setDescriptionForEvent(function (string $eventName) use ($coinMultiLevel) {
+                $actorName = Auth::user() ? Auth::user()->name : 'System ';
+                return "{$actorName} has {$eventName} coin multi level with ID: {$coinMultiLevel->id}";
+            })
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
 }

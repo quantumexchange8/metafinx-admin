@@ -9,6 +9,7 @@ import {ref, watch} from "vue";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
 import BaseListbox from "@/Components/BaseListbox.vue";
 import StakingRewardTable from "@/Pages/Configuration/StakingReward/StakingRewardTable.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     stakingReward: Object,
@@ -19,7 +20,7 @@ const formatter = ref({
     month: 'MM'
 });
 
-
+const { hasRole, hasPermission } = usePermission();
 const { formatAmount } = transactionFormat();
 const month = ref('');
 const percent = ref('');
@@ -71,10 +72,10 @@ const submit = () => {
         </div>
 
         <!-- Staking Reward -->
-        <h3 class="text-base font-semibold dark:text-white border-b dark:border-gray-700 w-full md:w-4/5 pb-3">
+        <h3 class="text-base font-semibold dark:text-white border-b dark:border-gray-700 w-full md:w-4/5 pb-3" v-if="hasRole('admin') || hasPermission('AddNewStakingReward')">
             Staking Reward
         </h3>
-        <form class="flex flex-col gap-8 w-full md:w-4/5">
+        <form class="flex flex-col gap-8 w-full md:w-4/5" v-if="hasRole('admin') || hasPermission('AddNewStakingReward')">
             <div class="flex flex-col gap-5">
                 <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
                     <Label class="text-sm dark:text-white" for="percent" value="Percent(%)" />

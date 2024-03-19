@@ -10,12 +10,14 @@ import InputIconWrapper from "@/Components/InputIconWrapper.vue";
 import Button from "@/Components/Button.vue";
 import {ref} from "vue";
 import BaseListbox from "@/Components/BaseListbox.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
 });
 
+const { hasRole, hasPermission } = usePermission();
 const search = ref('');
 const date = ref('');
 const status = ref('');
@@ -79,7 +81,7 @@ const exportTransaction = () => {
                 placeholder="Filter status"
             />
         </div>
-        <div class="flex justify-end">
+        <div class="flex justify-end" v-if="hasRole('admin') || hasPermission('ExportCoinHistory')">
             <Button
                 type="button"
                 class="justify-center w-full md:px-3.5 md:w-40 gap-2 border border-gray-600 text-white text-sm dark:hover:bg-gray-600"
@@ -99,6 +101,7 @@ const exportTransaction = () => {
             <Tab 
                 as="template"
                 v-slot="{ selected }"
+                v-if="hasRole('admin') || hasPermission('ViewTransactionHistory')"
             >
                 <button
                     :class="[
@@ -115,6 +118,7 @@ const exportTransaction = () => {
             <Tab
                 as="template"
                 v-slot="{ selected }"
+                v-if="hasRole('admin') || hasPermission('ViewStakingHistory')"
             >
                 <button
                     :class="[
@@ -130,7 +134,7 @@ const exportTransaction = () => {
             </Tab>
         </TabList>
         <TabPanels>
-            <TabPanel>
+            <TabPanel v-if="hasRole('admin') || hasPermission('ViewTransactionHistory')">
                 <CoinTransactionHistory
                     :refresh="refresh"
                     :isLoading="isLoading"
@@ -143,7 +147,7 @@ const exportTransaction = () => {
                     @update:export="exportStatus = $event"
                 />
             </TabPanel>
-            <TabPanel>
+            <TabPanel v-if="hasRole('admin') || hasPermission('ViewStakingHistory')">
                 <StackingHistory
                     :refresh="refresh"
                     :isLoading="isLoading"

@@ -16,12 +16,14 @@ import {TailwindPagination} from "laravel-vue-pagination";
 import Loading from "@/Components/Loading.vue";
 import Modal from "@/Components/Modal.vue";
 import Tooltip from "@/Components/Tooltip.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
 });
 
+const { hasRole, hasPermission } = usePermission();
 const announcements = ref({data: []});
 const search = ref('');
 const date = ref('');
@@ -95,8 +97,8 @@ const closeModal = () => {
 </script>
 
 <template>
-    <div class="md:py-6 md:pl-5 w-full">
-        <div class="flex justify-end">
+    <div class="md:py-6 md:pl-5 w-full" v-if="hasRole('admin') || hasPermission('ViewAnnouncement')">
+        <div class="flex justify-end" v-if="hasRole('admin') || hasPermission('AddNewAnnouncement')">
             <AddAnnouncement />
         </div>
         <div class="py-4">
@@ -159,7 +161,7 @@ const closeModal = () => {
                                     {{ announcement.subject }}
                                 </td>
                                 <td class="px-3 py-4">
-                                    <Tooltip content="View Details" placement="bottom" class="relative">
+                                    <Tooltip content="View Details" placement="bottom" class="relative" v-if="hasRole('admin') || hasPermission('ViewAnnouncementDetail')">
                                         <Button
                                             type="button"
                                             class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"

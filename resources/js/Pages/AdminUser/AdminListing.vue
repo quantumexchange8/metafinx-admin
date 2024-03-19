@@ -7,11 +7,13 @@ import {ref} from "vue";
 import Modal from "@/Components/Modal.vue";
 import DeleteMember from "@/Pages/Member/Partials/DeleteMember.vue";
 import {useForm} from "@inertiajs/vue3";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     admins: Object,
 })
 
+const { hasRole, hasPermission } = usePermission();
 const deleteAdminModal = ref(false);
 const subAdmin = ref({});
 
@@ -42,7 +44,7 @@ const deleteAdmin = () => {
 
 <template>
     <AuthenticatedLayout title="Admin User">
-        <template #header>
+        <template #header v-if="hasRole('admin') || hasPermission('ViewAdminUser')">
             <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                 <div>
                     <h2 class="text-2xl font-semibold leading-tight">
@@ -58,6 +60,7 @@ const deleteAdmin = () => {
                         class="justify-center px-3 py-2 gap-2 grow focus:outline-none"
                         variant="primary"
                         :href="route('admin_user.add_sub_admin')"
+                        v-if="hasRole('admin') || hasPermission('AddSubAdmin')"
                     >
                         <AddIcon aria-hidden="true" class="w-5 h-5" />
                         <span class="text-sm">Add Sub Admin</span>
@@ -66,7 +69,7 @@ const deleteAdmin = () => {
             </div>
         </template>
 
-        <div class="my-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="my-8 grid grid-cols-1 md:grid-cols-2 gap-5" v-if="hasRole('admin') || hasPermission('ViewAdminUser')">
             <div
                 v-for="admin in props.admins"
                 class="p-5 dark:bg-gray-700 rounded-xl"
@@ -98,6 +101,7 @@ const deleteAdmin = () => {
                                 variant="gray"
                                 class="justify-center px-3 py-2 gap-2 grow focus:outline-none"
                                 @click="openDeleteAdminModal(admin)"
+                                v-if="hasRole('admin') || hasPermission('DeleteSubAdmin')"
                             >
                                 <TrashIcon aria-hidden="true" class="w-5 h-5" />
                                 <span class="text-sm font-semibold">Delete</span>
@@ -107,6 +111,7 @@ const deleteAdmin = () => {
                                 class="justify-center px-3 py-2 gap-2 grow focus:outline-none"
                                 variant="primary"
                                 :href="`/admin_user/edit_sub_admin/${admin.id}`"
+                                v-if="hasRole('admin') || hasPermission('EditSubAdmin')"
                             >
                                 <CogIcon aria-hidden="true" class="w-5 h-5" />
                                 <span class="text-sm">Edit</span>

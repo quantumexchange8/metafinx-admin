@@ -10,11 +10,13 @@ import {useForm} from "@inertiajs/vue3";
 import Label from "@/Components/Label.vue";
 import Input from "@/Components/Input.vue";
 import InputError from "@/Components/InputError.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     transaction: Object
 })
 
+const { hasRole, hasPermission } = usePermission();
 const transactionModal = ref(false);
 const modalComponent = ref(null);
 const { formatDateTime, formatAmount, formatType } = transactionFormat();
@@ -66,7 +68,7 @@ const submitForm = () => {
 
 <template>
     <div class="inline-flex justify-center items-center gap-2">
-        <Tooltip content="Approve" placement="bottom" class="relative">
+        <Tooltip content="Approve" placement="bottom" class="relative" v-if="hasRole('admin')">
             <Button
                 type="button"
                 pill
@@ -78,7 +80,7 @@ const submitForm = () => {
                 <span class="sr-only">View</span>
             </Button>
         </Tooltip>
-        <Tooltip content="Reject" placement="bottom" class="relative">
+        <Tooltip content="Reject" placement="bottom" class="relative" v-if="hasRole('admin')">
             <Button
                 type="button"
                 pill
@@ -90,7 +92,7 @@ const submitForm = () => {
                 <span class="sr-only">Transfer Upline</span>
             </Button>
         </Tooltip>
-        <Tooltip content="View" placement="bottom" class="relative">
+        <Tooltip content="View" placement="bottom" class="relative" v-if="hasRole('admin') || hasPermission('ViewPendingWithdrawal')">
             <Button
                 type="button"
                 pill
@@ -193,14 +195,18 @@ const submitForm = () => {
             </div>
             <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">Amount</span>
-                <span class="col-span-2 text-black dark:text-white py-2">$ {{ transaction.amount }}</span>
+                <span class="col-span-2 text-black dark:text-white py-2">$ {{ transaction.transaction_amount }}</span>
+            </div>
+            <div class="grid grid-cols-3 items-center gap-2">
+                <span class="text-sm font-semibold dark:text-gray-400">Withdrawal Fee</span>
+                <span class="col-span-2 text-black dark:text-white py-2">$ {{ transaction.transaction_charges }}</span>
             </div>
             <div class="grid grid-cols-3 items-center gap-2">
                 <span class="text-sm font-semibold dark:text-gray-400">Transaction Status</span>
                 <span class="col-span-2 text-black dark:text-white py-2">{{ formatType(transaction.status) }}</span>
             </div>
 
-            <!-- KYC Details -->
+            <!-- KYC Details
             <div v-if="transaction.transaction_type === 'Withdrawal'">
                 <h2 class="py-3 text-xl font-semibold dark:text-white border-b dark:border-gray-700">KYC Details</h2>
                 <div class="p-5 mt-3 bg-white overflow-hidden md:overflow-visible rounded-xl dark:bg-gray-700">
@@ -234,7 +240,7 @@ const submitForm = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
             
         </div>
 

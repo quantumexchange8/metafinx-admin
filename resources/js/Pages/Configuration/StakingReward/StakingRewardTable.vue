@@ -17,11 +17,13 @@ import { useForm } from '@inertiajs/vue3'
 import Label from "@/Components/Label.vue";
 import InputError from "@/Components/InputError.vue";
 import BaseListbox from "@/Components/BaseListbox.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
 });
+const { hasRole, hasPermission } = usePermission();
 const stakingRewards = ref({data: []});
 const search = ref('');
 const month = ref('');
@@ -247,7 +249,7 @@ const months = [
                             {{ stakingReward.user.name }}
                         </td>
                         <td class="px-3 py-4 text-center">
-                            <Tooltip content="Edit&nbsp;Staking&nbsp;Reward" placement="bottom" class="relative">
+                            <Tooltip content="Edit&nbsp;Staking&nbsp;Reward" placement="bottom" class="relative" v-if="hasRole('admin') || hasPermission('EditStakingReward')">
                                 <Button
                                     type="button"
                                     class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"

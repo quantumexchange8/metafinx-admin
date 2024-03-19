@@ -9,7 +9,7 @@ import WalletAdjustment from "@/Pages/Member/MemberDetails/Partials/WalletAdjust
 import InternalTransfer from "@/Pages/Member/MemberDetails/Partials/InternalTransfer.vue";
 import CoinAdjustment from "@/Pages/Member/MemberDetails/Partials/CoinAdjustment.vue";
 import Tooltip from "@/Components/Tooltip.vue";
-
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     member_details: Object,
@@ -22,6 +22,7 @@ const props = defineProps({
     setting_coin: Object,
 })
 
+const { hasRole, hasPermission } = usePermission();
 const memberDetailModal = ref(false);
 // const getMemberId = ref(null);
 const modalComponent = ref(null);
@@ -58,7 +59,7 @@ const openInNewTab = (url) => {
 
 <template>
     <div class>
-        <Tooltip content="Unsubscribe" placement="bottom" v-if="type === 'investment'">
+        <Tooltip content="Unsubscribe" placement="bottom" v-if="type === 'investment' && (hasRole('admin') || hasPermission('UnsubscribeMemberInvestmentPlan'))">
             <Button
                 type="button"
                 class="justify-center px-4 pt-2 w-8 h-8 relative focus:outline-none"
@@ -76,7 +77,7 @@ const openInNewTab = (url) => {
                 class="justify-center px-3 py-2 gap-2 grow focus:outline-none"
                 variant="gray"
                 @click="openMemberModal('edit_member')"
-                v-if="type === 'member'"
+                v-if="(type === 'member') && (hasRole('admin') || hasPermission('EditMember'))"
             >
                 <EditIcon aria-hidden="true" class="w-5 h-5" />
                 <span class="text-sm">Edit</span>
@@ -86,13 +87,13 @@ const openInNewTab = (url) => {
                 class="justify-center px-3 py-2 gap-2 grow focus:outline-none"
                 variant="success"
                 @click="openInNewTab(route('member.impersonate', props.member_details.id))"
-                v-if="type === 'member'"
+                v-if="type === 'member' && (hasRole('admin') || hasPermission('AllowImpersonate'))"
             >
                 <AccessIcon aria-hidden="true" class="w-5 h-5" />
                 <span class="text-sm">Access</span>
             </Button>
         </div>
-        <Tooltip content="Wallet Adjustment" placement="bottom" v-if="type === 'wallet'">
+        <Tooltip content="Wallet Adjustment" placement="bottom" v-if="type === 'wallet' && (hasRole('admin') || hasPermission('AllowWalletAdjustment'))">
             <Button
                 type="button"
                 class="justify-center p-1 w-8 h-8 relative focus:outline-none dark:bg-[#ffffff32]"
@@ -116,7 +117,7 @@ const openInNewTab = (url) => {
                 <span class="sr-only">Internal Transfer</span>
             </Button>
         </Tooltip> -->
-        <Tooltip content="Coin Adjustment" placement="bottom" v-if="type === 'coin'">
+        <Tooltip content="Coin Adjustment" placement="bottom" v-if="type === 'coin' && (hasRole('admin') || hasPermission('AllowCoinAdjustment'))">
             <Button
                 type="button"
                 class="justify-center p-1 w-8 h-8 relative focus:outline-none dark:bg-[#ffffff32]"

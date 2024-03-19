@@ -428,8 +428,23 @@ const removeDescription = (index) => {
                         />
                         <InputError :message="form.errors.commision_multiplier" class="mt-2" />
                 </div>
-                <div class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                <div v-if="investmentPlan.type == 'standard'" class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
                     <Label class="text-sm dark:text-white md:w-1/4" for="investment_period" value="Investment period (months)" />
+                    <div class="flex flex-col w-full">
+                        <Input
+                            id="investment_period"
+                            min="0"
+                            type="number"
+                            placeholder="0"
+                            class="block w-full"
+                            :class="form.errors.investment_period ? 'border border-error-500 dark:border-error-500' : 'border border-gray-400 dark:border-gray-600'"
+                            v-model="form.investment_period"
+                        />
+                        <InputError :message="form.errors.investment_period" class="mt-2" />
+                    </div>
+                </div>
+                <div v-else class="flex gap-1 md:gap-4 mt-8 flex-col md:flex-row">
+                    <Label class="text-sm dark:text-white md:w-1/4" for="investment_period" value="Investment period (days)" />
                     <div class="flex flex-col w-full">
                         <Input
                             id="investment_period"

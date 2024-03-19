@@ -8,6 +8,7 @@ import AddInvestmentPlan from "@/Pages/IpoSchemeSetting/Partials/AddInvestmentPl
 import Button from "@/Components/Button.vue";
 import EditInvestmentPlan from "@/Pages/IpoSchemeSetting/Partials/EditInvestmentPlan.vue";
 import {transactionFormat} from "@/Composables/index.js";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     investmentPlans: Object,
@@ -17,10 +18,11 @@ const props = defineProps({
     coinTransactions: Object,
     currentCoinPrice: Object,
     totalSupply: Object,
-    totalStaking: String,
+    totalStaking: [String, Number],
     currentInvestor: Number,
 })
 
+const { hasRole, hasPermission } = usePermission();
 const { formatAmount } = transactionFormat();
 
 const currentYear = new Date().getFullYear();
@@ -48,7 +50,7 @@ const updateStatus = async (planId, newStatus) => {
 
 <template>
     <AuthenticatedLayout title="MXT Setting">
-        <template #header>
+        <template #header v-if="hasRole('admin') || hasPermission('ViewSettingMXT')">
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <h2 class="text-2xl font-semibold leading-tight">
                     MXT Setting
@@ -59,7 +61,7 @@ const updateStatus = async (planId, newStatus) => {
             </p>
         </template>
 
-        <div class="grid grid-cols-1 md:grid-cols-5 md:gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-5 md:gap-5" v-if="hasRole('admin') || hasPermission('ViewSettingMXT')">
             <div class="grid grid-cols-2 md:grid-cols-1 gap-5 col-span-2">
                 <div class="px-5 py-2.5 flex items-center rounded-[10px] dark:bg-gray-700">
                     <div class="grid gap-2">
@@ -110,12 +112,12 @@ const updateStatus = async (planId, newStatus) => {
         </div>
 
         
-        <div class="p-5 my-5 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700">
+        <div class="p-5 my-5 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700" v-if="hasRole('admin') || hasPermission('ViewSettingMXT')">
             <CoinTransactionHistoryTable />
         </div>
 
-        <template #asideRight>
-            <div class="inset-y-0 p-6 flex flex-col space-y-6 bg-white shadow-lg dark:bg-gray-800 border-l dark:border-gray-700 lg:w-96 fixed right-0">
+        <template #asideRight v-if="hasRole('admin') || hasPermission('ViewSettingMXT')">
+            <div class="inset-y-0 p-6 flex flex-col space-y-6 bg-white shadow-lg dark:bg-gray-800 border-l dark:border-gray-700 lg:w-96 fixed right-0" v-if="hasRole('admin') || hasPermission('AddNewStakingPlan') || hasPermission('EditStakingPlan') || hasPermission('Enable/DisableStakingPlan')">
                 <h3 class="text-xl font-semibold leading-tight">
                     Ongoing Staking Plan
                 </h3>
@@ -135,6 +137,7 @@ const updateStatus = async (planId, newStatus) => {
                             </div>
                         </div>
                         <Switch
+                            v-if="hasRole('admin') || hasPermission('Enable/DisableStakingPlan')"
                             :modelValue="enabled.value && investmentPlan.status === 'active'"
                             :class="investmentPlan.status === 'active' ? 'bg-success-500' : 'bg-gray-500'"
                             class="relative inline-flex h-[24px] w-[48px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
@@ -148,7 +151,7 @@ const updateStatus = async (planId, newStatus) => {
                             />
                         </Switch>
                     </div>
-                    <div class="pt-5">
+                    <div class="pt-5" v-if="hasRole('admin') || hasPermission('EditStakingPlan')">
                         <EditInvestmentPlan
                             :investmentPlan="investmentPlan"
                         />

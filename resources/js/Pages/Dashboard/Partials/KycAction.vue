@@ -10,11 +10,13 @@ import InputError from "@/Components/InputError.vue";
 import {useForm} from "@inertiajs/vue3";
 import Input from "@/Components/Input.vue";
 import Label from "@/Components/Label.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     member: Object
 })
 
+const { hasRole, hasPermission } = usePermission();
 const kycApprovalModal = ref(false);
 const modalComponent = ref(null);
 const approvalType = ref('');
@@ -74,6 +76,7 @@ const handleButton = (type) => {
                 class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
                 variant="success"
                 @click="openKycApprovalModal(member.id, 'approve')"
+                v-if="hasRole('admin') || hasPermission('ApproveKYC')"
             >
                 <CheckIcon aria-hidden="true" class="w-6 h-6 absolute" />
                 <span class="sr-only">View</span>
@@ -86,6 +89,7 @@ const handleButton = (type) => {
                 class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"
                 variant="danger"
                 @click="openKycApprovalModal(member.id, 'reject')"
+                v-if="hasRole('admin')"
             >
                 <XIcon aria-hidden="true" class="w-6 h-6 absolute" />
                 <span class="sr-only">Transfer Upline</span>
@@ -190,6 +194,7 @@ const handleButton = (type) => {
                         variant="danger"
                         class="flex justify-center px-6"
                         @click="handleButton('reject')"
+                        v-if="hasRole('admin')"
                     >
                         Reject
                     </Button>
@@ -198,6 +203,7 @@ const handleButton = (type) => {
                         variant="success"
                         class="flex justify-center px-6"
                         @click="handleButton('approve')"
+                        v-if="hasRole('admin') || hasPermission('VerifyMember')"
                     >
                         Approve KYC
                     </Button>

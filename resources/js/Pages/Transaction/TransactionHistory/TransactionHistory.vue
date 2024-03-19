@@ -7,6 +7,7 @@ import InternalTransferHistory from "@/Pages/Transaction/TransactionHistory/Inte
 import PendingWithdrawal from "@/Pages/Transaction/PendingTransaction/PendingWithdrawal.vue";
 import PendingDeposit from "@/Pages/Transaction/PendingTransaction/PendingDeposit.vue";
 import WalletAdjustmentHistory from "./WalletAdjustmentHistory.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     refresh: Boolean,
@@ -17,6 +18,7 @@ const props = defineProps({
     exportStatus: Boolean,
 })
 
+const { hasRole, hasPermission } = usePermission();
 const type = ref('Deposit');
 
 const emit = defineEmits(['update:loading', 'update:refresh', 'update:export']);
@@ -36,6 +38,7 @@ const updateTransactionType = (transaction_type) => {
             <Tab
                 as="template"
                 v-slot="{ selected }"
+                v-if="hasRole('admin') || hasPermission('ViewDepositHistory')"
             >
                 <button
                     @click="updateTransactionType('Deposit')"
@@ -53,6 +56,7 @@ const updateTransactionType = (transaction_type) => {
             <Tab
                 as="template"
                 v-slot="{ selected }"
+                v-if="hasRole('admin') || hasPermission('ViewWithdrawalHistory')"
             >
                 <button
                     @click="updateTransactionType('Withdrawal')"
@@ -70,6 +74,7 @@ const updateTransactionType = (transaction_type) => {
             <Tab
                 as="template"
                 v-slot="{ selected }"
+                v-if="hasRole('admin') || hasPermission('ViewAdjustmentHistory')"
             >
                 <button
                     @click="updateTransactionType('WalletAdjustment')"
@@ -87,6 +92,7 @@ const updateTransactionType = (transaction_type) => {
             <Tab
                 as="template"
                 v-slot="{ selected }"
+                v-if="hasRole('admin') || hasPermission('ViewInternalTransferHistory')"
             >
                 <button
                     @click="updateTransactionType('InternalTransfer')"
@@ -103,7 +109,7 @@ const updateTransactionType = (transaction_type) => {
             </Tab>
         </TabList>
         <TabPanels>
-            <TabPanel>
+            <TabPanel v-if="hasRole('admin') || hasPermission('ViewDepositHistory')">
                 <DepositHistoryTable
                     :refresh="refresh"
                     :isLoading="isLoading"
@@ -116,7 +122,7 @@ const updateTransactionType = (transaction_type) => {
                     @update:export="$emit('update:export', $event)"
                 />
             </TabPanel>
-            <TabPanel>
+            <TabPanel v-if="hasRole('admin') || hasPermission('ViewWithdrawalHistory')">
                 <WithdrawalHistoryTable
                     :refresh="refresh"
                     :isLoading="isLoading"
@@ -129,7 +135,7 @@ const updateTransactionType = (transaction_type) => {
                     @update:export="$emit('update:export', $event)"
                 />
             </TabPanel>
-            <TabPanel>
+            <TabPanel v-if="hasRole('admin') || hasPermission('ViewAdjustmentHistory')">
                 <WalletAdjustmentHistory
                     :refresh="refresh"
                     :isLoading="isLoading"
@@ -141,7 +147,7 @@ const updateTransactionType = (transaction_type) => {
                     @update:export="$emit('update:export', $event)"
                 />
             </TabPanel>
-            <TabPanel>
+            <TabPanel v-if="hasRole('admin') || hasPermission('ViewInternalTransferHistory')">
                 <InternalTransferHistory
                     :refresh="refresh"
                     :isLoading="isLoading"

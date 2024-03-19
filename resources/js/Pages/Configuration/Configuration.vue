@@ -10,6 +10,7 @@ import AffiliateForm from "@/Pages/Configuration/AffiliateSetting/AffliateForm.v
 import CoinSetting from "@/Pages/Configuration/CoinSetting/CoinSetting.vue";
 import MasterSetting from "@/Pages/Configuration/MasterSetting/MasterSetting.vue";
 import StakingReward from "@/Pages/Configuration/StakingReward/StakingReward.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     users: Array,
@@ -22,7 +23,17 @@ const props = defineProps({
     stakingReward: Object,
 })
 
-const content = ref('Announcement');
+const { hasRole, hasPermission } = usePermission();
+const content = ref(
+    hasRole('admin') || hasPermission('ViewAnnouncement') ? 'Announcement' :
+    hasRole('admin') || hasPermission('ViewTermsSetting') ? 'TnCSetting' :
+    hasRole('admin') || hasPermission('ViewDividendBonus') ? 'DividendBonus' :
+    hasRole('admin') || hasPermission('ViewAffiliateSetting') ? 'AffiliateSetting' :
+    hasRole('admin') || hasPermission('ViewMasterSetting') ? 'MasterSetting' :
+    hasRole('admin') || hasPermission('ViewCoinPrice') ? 'CoinSetting' :
+    hasRole('admin') || hasPermission('ViewStakingReward') ? 'StakingReward' :
+    'Announcement' // Default value if none of the conditions are met
+);
 
 const updateContent = (newContent) => {
     content.value = newContent;
@@ -31,7 +42,7 @@ const updateContent = (newContent) => {
 
 <template>
     <AuthenticatedLayout title="Configuration">
-        <div class="flex flex-col md:flex-row">
+        <div class="flex flex-col md:flex-row" v-if="hasRole('admin') || hasPermission('ViewConfiguration')">
             <!-- section originally has fixed and lg:static -->
             <section
                 tabindex="-1"

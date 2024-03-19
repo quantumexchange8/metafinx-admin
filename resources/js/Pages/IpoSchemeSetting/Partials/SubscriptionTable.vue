@@ -12,12 +12,14 @@ import {ref} from "vue";
 import SubscriptionPending from "@/Pages/IpoSchemeSetting/Partials/SubscriptionPending.vue";
 import PendingTransaction from "@/Pages/Transaction/PendingTransaction/PendingTransaction.vue";
 import BaseListbox from "@/Components/BaseListbox.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
 });
 
+const { hasRole, hasPermission } = usePermission();
 const search = ref('');
 const date = ref('');
 const status = ref('');
@@ -103,6 +105,7 @@ const clearFilters = () => {
                     class="w-full md:w-auto flex items-center justify-center px-3 py-2 border border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
                     variant="transparent"
                     @click="exportSubscription"
+                    v-if="hasRole('admin') || hasPermission('ExportInvestmentHistory')"
                 >
                     <CloudDownloadIcon aria-hidden="true" class="w-5 h-5" />
                     <span>Export</span>
@@ -117,6 +120,7 @@ const clearFilters = () => {
             <Tab
                 as="template"
                 v-slot="{ selected }"
+                v-if="hasRole('admin') || hasPermission('ViewSubscriptionHistory')"
             >
                 <button
                     :class="[
@@ -133,6 +137,7 @@ const clearFilters = () => {
             <Tab
                 as="template"
                 v-slot="{ selected }"
+                v-if="hasRole('admin') || hasPermission('ViewPendingEBMI')"
             >
                 <button
                     :class="[
@@ -148,7 +153,7 @@ const clearFilters = () => {
             </Tab>
         </TabList>
         <TabPanels>
-            <TabPanel>
+            <TabPanel v-if="hasRole('admin') || hasPermission('ViewSubscriptionHistory')">
                 <SubscriptionHistory
                     :refresh="refresh"
                     :isLoading="isLoading"
@@ -161,7 +166,7 @@ const clearFilters = () => {
                     @update:export="exportStatus = $event"
                 />
             </TabPanel>
-            <TabPanel>
+            <TabPanel v-if="hasRole('admin') || hasPermission('ViewPendingEBMI')">
                 <SubscriptionPending
                     :refresh="refresh"
                     :isLoading="isLoading"

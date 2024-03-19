@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
             'success' => session('success'),
             'warning' => session('warning'),
             'toast' => session('toast'),
+            'permissions' => $request->user() ? $request->user()->getAllPermissions()->pluck('name')->toArray() : 'no permission',
         ];
     }
 }

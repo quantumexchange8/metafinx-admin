@@ -4,6 +4,9 @@ import SidebarLink from '@/Components/Sidebar/SidebarLink.vue'
 import {DashboardIcon, UserIcon, IPOIcon, XLCIcon, TransactionIcon, ConfigurationIcon, ReportIcon, AdminUserIcon, LogoutIcon} from '@/Components/Icons/outline'
 import SidebarCollapsible from '@/Components/Sidebar/SidebarCollapsible.vue'
 import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.vue'
+import { usePermission } from "@/Composables/permissions";
+
+const { hasRole, hasPermission } = usePermission();
 </script>
 
 <template>
@@ -16,6 +19,7 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
             title="Dashboard"
             :href="route('dashboard')"
             :active="route().current('dashboard')"
+            v-if="hasRole('admin') || hasPermission('ViewDashboard')"
         >
             <template #icon>
                 <DashboardIcon
@@ -29,6 +33,7 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
             title="Member Listing"
             :href="route('member.member_listing')"
             :active="route().current('member.*')"
+            v-if="hasRole('admin') || hasPermission('ViewMemberListing')"
         >
             <template #icon>
                 <UserIcon
@@ -42,6 +47,7 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
             title="IPO Scheme Setting"
             :href="route('ipo_scheme.setting')"
             :active="route().current('ipo_scheme.*')"
+            v-if="hasRole('admin') || hasPermission('ViewSchemeSettingIPO')"
         >
             <template #icon>
                 <IPOIcon
@@ -55,6 +61,7 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
             title="MXT Setting"
             :href="route('mxt.setting')"
             :active="route().current('mxt_setting.*')"
+            v-if="hasRole('admin') || hasPermission('ViewSettingMXT')"
         >
             <template #icon>
                 <XLCIcon
@@ -68,6 +75,7 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
             title="Transaction"
             :href="route('transaction.listing')"
             :active="route().current('transaction.*')"
+            v-if="hasRole('admin') || hasPermission('ViewTransaction')"
         >
             <template #icon>
                 <TransactionIcon
@@ -81,6 +89,7 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
             title="Report"
             :href="route('report.view')"
             :active="route().current('report.*')"
+            v-if="hasRole('admin') || hasPermission('ViewReport')"
         >
             <template #icon>
                 <ReportIcon
@@ -94,6 +103,7 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
             title="Configuration"
             :href="route('configuration.index')"
             :active="route().current('configuration.*')"
+            v-if="hasRole('admin') || hasPermission('ViewConfiguration')"
         >
             <template #icon>
                 <ConfigurationIcon
@@ -103,18 +113,19 @@ import SidebarCollapsibleItem from '@/Components/Sidebar/SidebarCollapsibleItem.
             </template>
         </SidebarLink>
 
-<!--        <SidebarLink-->
-<!--            title="Admin User"-->
-<!--            :href="route('admin_user.admin_listing')"-->
-<!--            :active="route().current('admin_user.*')"-->
-<!--        >-->
-<!--            <template #icon>-->
-<!--                <AdminUserIcon-->
-<!--                    class="flex-shrink-0 w-6 h-6"-->
-<!--                    aria-hidden="true"-->
-<!--                />-->
-<!--            </template>-->
-<!--        </SidebarLink>-->
+       <SidebarLink
+           title="Admin User"
+           :href="route('admin_user.admin_listing')"
+           :active="route().current('admin_user.*')"
+           v-if="hasRole('admin') || hasPermission('ViewAdminUser')"
+       >
+           <template #icon>
+               <AdminUserIcon
+                   class="flex-shrink-0 w-6 h-6"
+                   aria-hidden="true"
+               />
+           </template>
+       </SidebarLink>
 
         <SidebarLink
             title="Log Out"

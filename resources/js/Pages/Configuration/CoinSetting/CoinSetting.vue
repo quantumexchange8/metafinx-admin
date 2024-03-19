@@ -11,6 +11,7 @@ import WithdrawalFeeTable from "@/Pages/Configuration/WithdrawalFee/WithdrawalFe
 import BaseListbox from "@/Components/BaseListbox.vue";
 import Combobox from "@/Components/Combobox.vue";
 import CoinSettingTable from "@/Pages/Configuration/CoinSetting/CoinSettingTable.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     settingCoin: Object,
@@ -29,6 +30,7 @@ const meridiem = [
     { label: 'PM', value: 'PM' },
 ]
 
+const { hasRole, hasPermission } = usePermission();
 const { formatAmount } = transactionFormat();
 // const frequency = ref(props.coinMarketTime.frequency);
 const isFormDirty = ref(false);
@@ -129,10 +131,10 @@ const submitMarketTime = () => {
         </div>
 
         <!-- Coin Details -->
-        <h3 class="text-base font-semibold dark:text-white border-b dark:border-gray-700 w-full md:w-4/5 pb-3">
+        <h3 class="text-base font-semibold dark:text-white border-b dark:border-gray-700 w-full md:w-4/5 pb-3" v-if="hasRole('admin') || hasPermission('AddNewCoinPrice')">
             Coin Details
         </h3>
-        <form class="flex flex-col gap-8 w-full md:w-4/5">
+        <form class="flex flex-col gap-8 w-full md:w-4/5" v-if="hasRole('admin') || hasPermission('AddNewCoinPrice')">
             <div class="flex flex-col gap-5">
                 <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
                     <Label class="text-sm dark:text-white" for="price" value="MXT Coin Price" />

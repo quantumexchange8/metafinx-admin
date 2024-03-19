@@ -34,11 +34,11 @@ class ReportController extends Controller
             'totatMonthlyReturn' => $totatMonthlyReturn,
             'totalReferralEarning' => $totalReferralEarning,
             'totatAffiliateEarning' => $totatAffiliateEarning ,
-            'totatDividendEarning' => $totatDividendEarning ? 0 : "0.00",
-            'totatAffiliateDividendEarning' => $totatAffiliateDividendEarning ? 0 : "0.00",
-            'totatStakingReward' => $totatStakingReward ? 0 : "0.00",
+            'totatDividendEarning' => $totatDividendEarning ? $totatDividendEarning : "0.00",
+            'totatAffiliateDividendEarning' => $totatAffiliateDividendEarning ? $totatAffiliateDividendEarning : "0.00",
+            'totatStakingReward' => $totatStakingReward ? $totatStakingReward : "0.00",
             'totatReferralStaking' => $totatReferralStaking,
-            'totatPairingEarning' => number_format($totatPairingEarning, 2),
+            'totatPairingEarning' => $totatPairingEarning,
         ]);
     }
 

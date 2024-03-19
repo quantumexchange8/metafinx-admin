@@ -15,6 +15,7 @@ import {useForm, usePage} from "@inertiajs/vue3";
 import toast from "@/Composables/toast.js";
 import Alert from "@/Components/Alert.vue";
 import {Inertia} from "@inertiajs/inertia";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     search: String,
@@ -27,10 +28,11 @@ const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
 });
+const { hasRole, hasPermission } = usePermission();
 const withdrawals = ref({data: []});
 const currentPage = ref(1);
-const refreshDeposit = ref(props.refresh);
-const depositLoading = ref(props.isLoading);
+const refreshWithdrawal = ref(props.refresh);
+const withdrawalLoading = ref(props.isLoading);
 const emit = defineEmits(['update:loading', 'update:refresh', 'update:export']);
 const { formatDateTime, formatAmount } = transactionFormat();
 const totalAmount = ref(0);
@@ -68,7 +70,7 @@ watch(
 const updateChecked = (id, amount) => {
     if (isNaN(amount)) {
         console.error(`Invalid amount: ${amount}`);
-        return;  // Skip further processing for this deposit
+        return;  // Skip further processing for this withdrawal
     }
 
     const index = isChecked.value.indexOf(id);
@@ -84,15 +86,15 @@ const updateChecked = (id, amount) => {
 const handleSelectAll = () => {
     isAllSelected.value = !isAllSelected.value;
     if (isAllSelected.value) {
-        const depositData = withdrawals.value.data;
+        const withdrawalData = withdrawals.value.data;
 
-        for (const deposit of depositData) {
-            const id = deposit.id;
+        for (const withdrawal of withdrawalData) {
+            const id = withdrawal.id;
             // Check if the ID is already in isChecked
             if (!isChecked.value.includes(id)) {
                 // If not, add it to isChecked
                 isChecked.value.push(id);
-                totalAmount.value += parseFloat(deposit.amount);
+                totalAmount.value += parseFloat(withdrawal.amount);
             }
         }
     } else {
@@ -103,7 +105,7 @@ const handleSelectAll = () => {
 };
 
 const getResults = async (page = 1, search = '', date = '') => {
-    depositLoading.value = true
+    withdrawalLoading.value = true
     try {
         let url = `/transaction/getPendingTransaction/Withdrawal?page=${page}`;
 
@@ -120,7 +122,7 @@ const getResults = async (page = 1, search = '', date = '') => {
     } catch (error) {
         console.error(error);
     } finally {
-        depositLoading.value = false
+        withdrawalLoading.value = false
         emit('update:loading', false);
     }
 }
@@ -142,7 +144,7 @@ const handlePageChange = (newPage) => {
 };
 
 watch(() => props.refresh, (newVal) => {
-    refreshDeposit.value = newVal;
+    refreshWithdrawal.value = newVal;
     if (newVal) {
         // Call the getResults function when refresh is true
         getResults();
@@ -151,7 +153,7 @@ watch(() => props.refresh, (newVal) => {
 });
 
 watch(() => props.exportStatus, (newVal) => {
-    refreshDeposit.value = newVal;
+    refreshWithdrawal.value = newVal;
     if (newVal) {
         let url = `/transaction/getPendingTransaction/Withdrawal?exportStatus=yes`;
 
@@ -177,9 +179,9 @@ const paginationActiveClass = [
 ];
 
 function isItemSelected(id, amount) {
-    return isChecked.value.some(deposit =>
-        deposit.id === id &&
-        deposit.amount === amount
+    return isChecked.value.some(withdrawal =>
+        withdrawal.id === id &&
+        withdrawal.amount === amount
     );
 }
 
@@ -234,7 +236,7 @@ const rejectTransaction = async () => {
         {{ alertMessage }}
     </Alert>
     <div class="relative overflow-x-auto sm:rounded-lg">
-        <div v-if="depositLoading" class="w-full flex justify-center my-8">
+        <div v-if="withdrawalLoading" class="w-full flex justify-center my-8">
             <Loading />
         </div>
         <div v-else class="overflow-x-auto">
@@ -274,59 +276,59 @@ const rejectTransaction = async () => {
                     </th>
                 </tr>
                 <tr
-                    v-for="deposit in withdrawals.data"
+                    v-for="withdrawal in withdrawals.data"
                     class="bg-white dark:bg-transparent text-xs text-gray-900 dark:text-white border-b dark:border-gray-600"
                 >
                     <td class="py-3 mx-1 text-center">
                         <Checkbox
-                            :checked="isAllSelected || isItemSelected(deposit.id, deposit.amount)"
-                            :model-value="isChecked.includes(deposit.id)"
-                            @update:model-value="updateChecked(deposit.id, deposit.amount)"
+                            :checked="isAllSelected || isItemSelected(withdrawal.id, withdrawal.amount)"
+                            :model-value="isChecked.includes(withdrawal.id)"
+                            @update:model-value="updateChecked(withdrawal.id, withdrawal.amount)"
                         />
                     </td>
                     <td class="py-3">
                         <div class="inline-flex items-center gap-2">
-                            <img :src="deposit.user.profile_photo_url ? deposit.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
+                            <img :src="withdrawal.user.profile_photo_url ? withdrawal.user.profile_photo_url : 'https://img.freepik.com/free-icon/user_318-159711.jpg'" class="w-8 h-8 rounded-full" alt="">
                             <div class="flex flex-col">
                                 <div>
-                                    {{ deposit.user.name }}
+                                    {{ withdrawal.user.name }}
                                 </div>
                                 <div class="dark:text-gray-400">
-                                    {{ deposit.user.email }}
+                                    {{ withdrawal.user.email }}
                                 </div>
                             </div>
                         </div>
                     </td>
                     <td class="py-3">
                         <div class="inline-flex items-center gap-2">
-                            <div v-if="deposit.from_wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                            <div v-if="withdrawal.from_wallet.type === 'internal_wallet'" class="bg-gradient-to-t from-pink-300 to-pink-600 dark:shadow-pink-500 rounded-full w-4 h-4 shrink-0 grow-0">
                                 <InternalWalletIcon class="mt-0.5 ml-0.5"/>
                             </div>
-                            <div v-else-if="deposit.from_wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
+                            <div v-else-if="withdrawal.from_wallet.type === 'musd_wallet'" class="bg-gradient-to-t from-warning-300 to-warning-600 dark:shadow-warning-500 rounded-full w-4 h-4 shrink-0 grow-0">
                                 <InternalMUSDWalletIcon class="mt-0.5 ml-0.5"/>
                             </div>
-                            {{ deposit.from_wallet.name }}
+                            {{ withdrawal.from_wallet.name }}
                         </div>
                     </td>
                     <td class="py-3">
-                        {{ formatDateTime(deposit.created_at) }}
+                        {{ formatDateTime(withdrawal.created_at) }}
                     </td>
                     <td class="py-3">
-                        {{ deposit.transaction_number }}
+                        {{ withdrawal.transaction_number }}
                     </td>
                     <td class="py-3">
-                        ${{ deposit.transaction_amount }}
+                        ${{ withdrawal.amount }}
                     </td>
                     <td class="py-3 text-center">
                         <Action
-                            :transaction="deposit"
+                            :transaction="withdrawal"
                         />
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
-        <div class="flex justify-center mt-4" v-if="!depositLoading">
+        <div class="flex justify-center mt-4" v-if="!withdrawalLoading">
             <TailwindPagination
                 :item-classes=paginationClass
                 :active-classes=paginationActiveClass
@@ -346,7 +348,7 @@ const rejectTransaction = async () => {
             <div class="text-xl font-semibold">
                 Total Amount: ${{ formatAmount(totalAmount) }}
             </div>
-            <div class="pt-3 px-2 grid grid-cols-2 gap-4">
+            <div class="pt-3 px-2 grid grid-cols-2 gap-4" v-if="hasRole('admin')">
                 <Button
                     type="button"
                     variant="success"

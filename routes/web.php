@@ -1,17 +1,18 @@
 <?php
 
-use App\Http\Controllers\AdminUserController;
-use App\Http\Controllers\ConfigurationController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\IpoSchemeController;
-use App\Http\Controllers\MemberController;
-use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\MXTController;
+use App\Models\Role;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\MXTController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\IpoSchemeController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ConfigurationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +29,10 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+$roles = Role::allUniqueNames();
+$rolesString = implode('|', $roles);
+
+Route::middleware(['auth', 'role:'.$rolesString])->group(function () {
     // Route::get('/xlc_setting', function () {
     //     return Inertia::render('XLCSetting/XLCSetting');
     // });

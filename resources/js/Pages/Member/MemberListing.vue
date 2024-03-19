@@ -11,6 +11,7 @@ import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
 import MemberTable from "@/Pages/Member/Partials/MemberTable.vue";
 import Action from "@/Pages/Member/Partials/Action.vue";
 import BaseListbox from "@/Components/BaseListbox.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     settingRanks: Array,
@@ -20,6 +21,7 @@ const props = defineProps({
 
 })
 
+const { hasRole, hasPermission } = usePermission();
 const search = ref('');
 const date = ref('');
 const type = ref('');
@@ -84,7 +86,7 @@ const exportMember = () => {
 
 <template>
     <AuthenticatedLayout title="Member Listing">
-        <template #header>
+        <template #header v-if="hasRole('admin') || hasPermission('ViewMemberListing')">
             <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                 <div>
                     <h2 class="text-2xl font-semibold leading-tight">
@@ -109,6 +111,7 @@ const exportMember = () => {
                             variant="transparent"
                             v-slot="{ iconSizeClasses }"
                             @click="exportMember"
+                            v-if="hasRole('admin') || hasPermission('ExportMember')"
                         >
                         <!-- @click="exportTransaction" -->
                             <div class="inline-flex items-center">
@@ -125,7 +128,7 @@ const exportMember = () => {
             </div>
         </template>
 
-        <div class="p-5 my-5 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700">
+        <div class="p-5 my-5 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700" v-if="hasRole('admin') || hasPermission('ViewMemberListing')">
             <div class="flex justify-between">
                 <h4 class="font-semibold dark:text-white">All Members</h4>
                 <RefreshIcon

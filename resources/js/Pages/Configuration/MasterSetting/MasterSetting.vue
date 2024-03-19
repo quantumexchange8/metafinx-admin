@@ -7,11 +7,13 @@ import { useForm } from "@inertiajs/vue3";
 import { transactionFormat } from "@/Composables/index.js";
 import { ref } from "vue";
 import MasterSettingTable from "@/Pages/Configuration/MasterSetting/MasterSettingTable.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     masterSetting: Object
 });
 
+const { hasRole, hasPermission } = usePermission();
 const forms = ref({});
 
 function clearField(setting) {
@@ -61,7 +63,7 @@ const getPlaceholder = (slug) => {
                 </h2>
             </div>
 
-            <form @submit.prevent="() => submit(setting)" class="flex flex-col gap-8 w-full mt-5 md:w-4/5">
+            <form @submit.prevent="() => submit(setting)" class="flex flex-col gap-8 w-full mt-5 md:w-4/5" v-if="hasRole('admin') || hasPermission('EditMasterSetting')">
                 <div class="flex flex-col gap-5">
                     <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
                         <Label class="text-sm dark:text-white self-center" for="value" :value="setting.name" />

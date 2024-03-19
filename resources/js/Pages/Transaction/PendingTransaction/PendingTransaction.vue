@@ -3,6 +3,7 @@ import {Tab, TabGroup, TabList, TabPanel, TabPanels} from "@headlessui/vue";
 import {ref} from "vue";
 import PendingDeposit from "@/Pages/Transaction/PendingTransaction/PendingDeposit.vue";
 import PendingWithdrawal from "@/Pages/Transaction/PendingTransaction/PendingWithdrawal.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const props = defineProps({
     refresh: Boolean,
@@ -12,6 +13,7 @@ const props = defineProps({
     exportStatus: Boolean,
 })
 
+const { hasRole, hasPermission } = usePermission();
 const emit = defineEmits(['update:loading', 'update:refresh', 'update:export']);
 const type = ref('Deposit');
 const updateTransactionType = (transaction_type) => {
@@ -25,6 +27,7 @@ const updateTransactionType = (transaction_type) => {
             <Tab
                 as="template"
                 v-slot="{ selected }"
+                v-if="hasRole('admin') || hasPermission('ViewPendingDeposit')"
             >
                 <button
                     @click="updateTransactionType('Deposit')"
@@ -42,6 +45,8 @@ const updateTransactionType = (transaction_type) => {
             <Tab
                 as="template"
                 v-slot="{ selected }"
+                v-if="hasRole('admin') || hasPermission('ViewPendingWithdrawal')"
+                
             >
                 <button
                     @click="updateTransactionType('Withdrawal')"
@@ -58,7 +63,7 @@ const updateTransactionType = (transaction_type) => {
             </Tab>
         </TabList>
         <TabPanels>
-            <TabPanel>
+            <TabPanel v-if="hasRole('admin') || hasPermission('ViewPendingDeposit')">
                 <PendingDeposit
                     :refresh="refresh"
                     :isLoading="isLoading"
@@ -70,7 +75,7 @@ const updateTransactionType = (transaction_type) => {
                     @update:export="$emit('update:export', $event)"
                 />
             </TabPanel>
-            <TabPanel>
+            <TabPanel v-if="hasRole('admin') || hasPermission('ViewPendingWithdrawal')">
                 <PendingWithdrawal
                     :refresh="refresh"
                     :isLoading="isLoading"

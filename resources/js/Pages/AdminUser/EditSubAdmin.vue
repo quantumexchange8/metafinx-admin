@@ -12,7 +12,7 @@ import {transactionFormat} from "@/Composables/index.js";
 import Button from "@/Components/Button.vue";
 
 const props = defineProps({
-    permissions: Object,
+    permissionsList: Object,
     admin_permissions: Object,
     admin: Object,
 })
@@ -26,7 +26,7 @@ const form = useForm({
     position: props.admin.role,
     email: props.admin.email,
     password: "",
-    permissions: props.admin_permissions,
+    permissionsList: props.admin_permissions,
 })
 
 const submit = () => {
@@ -43,7 +43,7 @@ const togglePasswordVisibility = () => {
 </script>
 
 <template>
-    <AuthenticatedLayout title="Add Sub Admin">
+    <AuthenticatedLayout title="Edit Sub Admin">
         <template #header>
             <div class="flex flex-row gap-2 items-center">
                 <h2 class="text-sm font-semibold dark:text-gray-400">
@@ -150,13 +150,13 @@ const togglePasswordVisibility = () => {
                 <h3 class="text-base font-semibold dark:text-white border-b dark:border-gray-700 w-full pb-3">
                     Sub-Admin Permissions
                 </h3>
-                <div class="flex items-start gap-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div
-                        v-for="(permission_group, name) in props.permissions"
+                        v-for="(permission_group, name) in props.permissionsList"
                         class="my-5 p-5 rounded-xl dark:bg-gray-700 space-y-3 w-full"
                     >
                         <h4 class="text-sm font-semibold dark:text-white pb-3 border-b dark:border-gray-600">
-                            {{ name }}
+                            Allow {{ formatType(name) }} Access
                         </h4>
                         <div
                             v-for="permission in permission_group"
@@ -164,7 +164,7 @@ const togglePasswordVisibility = () => {
                         >
                             <div>
                                 <label class="relative inline-flex items-center gap-8 mb-5 cursor-pointer">
-                                    <input type="checkbox" v-model="form.permissions" :value="permission.name" class="sr-only peer">
+                                    <input type="checkbox" v-model="form.permissionsList" :value="permission.name" class="sr-only peer">
                                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-500 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-success-500"></div>
                                     <span class="text-sm font-medium text-gray-800 dark:text-white"> {{ formatType(permission.name) }}</span>
                                 </label>

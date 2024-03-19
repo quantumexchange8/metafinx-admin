@@ -16,11 +16,13 @@ import Modal from "@/Components/Modal.vue";
 import { useForm } from '@inertiajs/vue3'
 import Label from "@/Components/Label.vue";
 import InputError from "@/Components/InputError.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const formatter = ref({
     date: 'YYYY-MM-DD',
     month: 'MM'
 });
+const { hasRole, hasPermission } = usePermission();
 const fees = ref({data: []});
 const search = ref('');
 const date = ref('');
@@ -219,7 +221,7 @@ const isCoinPriceReleased = (fee) => {
                             {{ fee.user.name }}
                         </td>
                         <td class="px-3 py-4 text-center">
-                            <Tooltip content="Edit Coin Price" placement="bottom" class="relative">
+                            <Tooltip content="Edit Coin Price" placement="bottom" class="relative" v-if="hasRole('admin') || hasPermission('EditCoinPrice')">
                                 <Button
                                     type="button"
                                     class="justify-center px-4 pt-2 mx-1 w-8 h-8 focus:outline-none"

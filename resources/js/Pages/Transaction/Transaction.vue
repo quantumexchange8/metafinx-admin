@@ -10,8 +10,12 @@ import VueTailwindDatepicker from "vue-tailwind-datepicker";
 import Input from "@/Components/Input.vue";
 import Button from "@/Components/Button.vue";
 import BaseListbox from "@/Components/BaseListbox.vue";
+import { usePermission } from "@/Composables/permissions";
 
-const activeComponent = ref("pending"); // 'pending' is initially active
+const { hasRole, hasPermission } = usePermission();
+const activeComponent = ref( 
+    hasRole('admin') || hasPermission('ViewPendingWithdrawal') || hasPermission('ViewPendingDeposit') ? 'pending' : 'history'
+); // 'pending' is initially active
 const refresh = ref(false);
 const isLoading = ref(false);
 const search = ref('');
@@ -47,7 +51,7 @@ const exportTransaction = () => {
 
 <template>
     <AuthenticatedLayout title="Transaction">
-        <template #header>
+        <template #header v-if="hasRole('admin') || hasPermission('ViewTransaction')">
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                     <h2 class="text-2xl font-semibold leading-tight">
@@ -65,6 +69,7 @@ const exportTransaction = () => {
                         variant="transparent"
                         v-slot="{ iconSizeClasses }"
                         @click="exportTransaction"
+                        v-if="hasRole('admin') || hasPermission('ExportTransaction')"
                     >
                         <div class="inline-flex items-center">
                             <CloudDownloadIcon
@@ -79,21 +84,37 @@ const exportTransaction = () => {
             </div>
         </template>
 
-        <div class="pt-3 md:flex md:justify-between items-center">
+        <div class="pt-3 md:flex md:justify-between items-center" v-if="hasRole('admin') || hasPermission('ViewTransaction')">
             <div class="inline-flex items-center justify-center rounded-md shadow-sm" role="group">
                 <button
                     type="button"
-                    class="px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-200 rounded-l-xl hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
-                    :class="{ 'bg-transparent': activeComponent !== 'pending', 'dark:bg-[#38425080] dark:text-white': activeComponent === 'pending' }"
+                    :class="[
+                                {
+                                    'rounded-l-xl': hasRole('admin') || (hasPermission('ViewDepositHistory') || hasPermission('ViewWithdrawalHistory') || hasPermission('ViewAdjustmentHistory') || hasPermission('ViewInternalTransferHistory')),
+                                    'rounded-xl': (!hasRole('admin') && !(hasPermission('ViewDepositHistory') || hasPermission('ViewWithdrawalHistory') || hasPermission('ViewAdjustmentHistory') || hasPermission('ViewInternalTransferHistory'))),
+                                    'bg-transparent': activeComponent !== 'pending',
+                                    'dark:bg-[#38425080] dark:text-white': activeComponent === 'pending'
+                                }, 
+                                'px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-200 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600'
+                            ]"
                     @click="setActiveComponent('pending')"
+                    v-if="hasRole('admin') || hasPermission('ViewPendingWithdrawal') || hasPermission('ViewPendingDeposit')"
                 >
                     Pending Transaction
                 </button>
                 <button
                     type="button"
-                    class="px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-200 rounded-r-xl hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
-                    :class="{ 'bg-transparent': activeComponent !== 'history', 'dark:bg-[#38425080] dark:text-white': activeComponent === 'history' }"
+                    :class="[
+                                {
+                                    'rounded-r-xl': hasRole('admin') || (hasPermission('ViewPendingWithdrawal') || hasPermission('ViewPendingDeposit')),
+                                    'rounded-xl': (!hasRole('admin')) && !(hasPermission('ViewPendingWithdrawal') || hasPermission('ViewPendingDeposit')),
+                                    'bg-transparent': activeComponent !== 'history',
+                                    'dark:bg-[#38425080] dark:text-white': activeComponent === 'history'
+                                }, 
+                                'px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-200 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600'
+                            ]"
                     @click="setActiveComponent('history')"
+                    v-if="hasRole('admin') || hasPermission('ViewDepositHistory') || hasPermission('ViewWithdrawalHistory') || hasPermission('ViewAdjustmentHistory') || hasPermission('ViewInternalTransferHistory')"
                 >
                     Transaction History
                 </button>
@@ -146,7 +167,7 @@ const exportTransaction = () => {
             </div>
         </div>
 
-        <div class="p-5 my-8 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700">
+        <div class="p-5 my-8 bg-white overflow-hidden md:overflow-visible rounded-xl shadow-md dark:bg-gray-700" v-if="hasRole('admin') || hasPermission('ViewTransaction')">
             <PendingTransaction
                 v-if="activeComponent === 'pending'"
                 :refresh="refresh"
@@ -159,7 +180,7 @@ const exportTransaction = () => {
                 @update:export="exportStatus = $event"
             />
             <TransactionHistory
-                v-if="activeComponent === 'history'"
+                v-if="activeComponent === 'history' "
                 :refresh="refresh"
                 :isLoading="isLoading"
                 :search="search"

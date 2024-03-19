@@ -9,6 +9,7 @@ import {transactionFormat} from "@/Composables/index.js";
 import {ref} from "vue";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
 import DividendTable from "@/Pages/Configuration/DividendBonus/DividendTable.vue";
+import { usePermission } from "@/Composables/permissions";
 
 const formatter = ref({
     date: 'YYYY-MM-DD',
@@ -34,11 +35,12 @@ const submit = () => {
     })
 }
 
+const { hasRole, hasPermission } = usePermission();
 </script>
 
 <template>
     <div class="flex flex-col gap-8 py-8 px-5 w-full">
-        <form @submit.prevent="submit" class="flex flex-col gap-8 w-full md:w-4/5">
+        <form @submit.prevent="submit" class="flex flex-col gap-8 w-full md:w-4/5" v-if="hasRole('admin') || hasPermission('AddNewDividendBonus')">
             <div class="flex flex-col gap-5">
                 <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
                     <Label class="text-sm dark:text-white" for="dividend_bonus_amount" value="Dividend Bonus Amount" />
