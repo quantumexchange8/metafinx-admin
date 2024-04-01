@@ -579,11 +579,21 @@ class ConfigurationController extends Controller
 
     public function addStakingReward(StakingRewardRequest $request)
     {
+        $existingRecord = SettingStakingReward::where('start_of_month', date('Y-m-01', strtotime($request->month)))
+            ->where('end_of_month', date('Y-m-t', strtotime($request->month)))
+            ->first();
+
+        if ($existingRecord) {
+            throw ValidationException::withMessages(['month' => ['A staking reward for the month of ' . $request->month . ' of current year already exists.']]);
+        }
+        
         $settingStakingReward = SettingStakingReward::create([
             'month' => $request->month,
             'release_date' => $request->date,
             'percent' => $request->percent,
             'updated_by' => \Auth::id(),
+            'start_of_month' => date('Y-m-01', strtotime($request->month)),
+            'end_of_month' => date('Y-m-t', strtotime($request->month)),
         ]);
 
         return redirect()->back()->with('title', 'Staking Reward')->with('success', 'A staking reward of ' . $request->percent . '% will be released on ' . $request->month . '.');
@@ -592,6 +602,15 @@ class ConfigurationController extends Controller
 
     public function editStakingReward(StakingRewardRequest $request, $id)
     {
+        $existingRecord = SettingStakingReward::where('start_of_month', date('Y-m-01', strtotime($request->month)))
+            ->where('end_of_month', date('Y-m-t', strtotime($request->month)))
+            ->where('id', '!=', $id)
+            ->first();
+
+        if ($existingRecord) {
+            throw ValidationException::withMessages(['month' => ['A staking reward for the month of ' . $request->month . ' of current year already exists.']]);
+        }
+
         $existingStakingReward = SettingStakingReward::find($id);
         
         $existingStakingReward->update([
@@ -599,6 +618,8 @@ class ConfigurationController extends Controller
             'month' => $request->month,
             'release_date' => $request->date,
             'updated_by' => \Auth::id(),
+            'start_of_month' => date('Y-m-01', strtotime($request->month)),
+            'end_of_month' => date('Y-m-t', strtotime($request->month)),
         ]);
     
         return redirect()->back()->with('title', 'Staking Reward Updated')->with('success', 'The staking reward has been updated successfully.');

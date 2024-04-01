@@ -342,6 +342,7 @@ const months = [
                                 :options="months"
                                 placeholder="Select Month"
                             />
+                            <InputError :message="form.errors.month" class="mt-2" />
                         </div>
                     </div>
                     <div class="flex flex-col gap-1 md:grid md:grid-cols-4">

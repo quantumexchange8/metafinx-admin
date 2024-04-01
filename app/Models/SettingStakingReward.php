@@ -18,6 +18,8 @@ class SettingStakingReward extends Model
         'percent',
         'is_done',
         'updated_by',
+        'start_of_month',
+        'end_of_month',
     ];
 
     protected $casts = [
