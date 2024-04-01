@@ -10,6 +10,7 @@ class StakingRewardRequest extends FormRequest
     {
         return [
             'month' => ['required'],
+            'date' => ['required'],
             'percent' => ['required'],
         ];
     }
@@ -23,6 +24,7 @@ class StakingRewardRequest extends FormRequest
     {
         return [
             'month' => 'Month',
+            'date' => 'Date',
             'percent' => 'Percent',
         ];
     }

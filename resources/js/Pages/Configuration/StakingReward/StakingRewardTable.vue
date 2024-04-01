@@ -1,7 +1,7 @@
 <script setup>
 import { RefreshIcon, SearchIcon, ArrowLeftIcon, ArrowRightIcon } from "@heroicons/vue/outline";
 import {usePage} from "@inertiajs/vue3";
-import {ref, watch, watchEffect} from "vue";
+import {ref, watch, watchEffect, onMounted } from "vue";
 import InputIconWrapper from "@/Components/InputIconWrapper.vue";
 import Input from "@/Components/Input.vue";
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
@@ -27,6 +27,7 @@ const { hasRole, hasPermission } = usePermission();
 const stakingRewards = ref({data: []});
 const search = ref('');
 const month = ref('');
+const date = ref('');
 const currentPage = ref(1);
 const isLoading = ref(false);
 const refresh = ref(false);
@@ -103,7 +104,12 @@ watch(() => refresh.value, (newVal) => {
 
 const openModal = (stakingRewards) => {
     form.percent = stakingRewards.percent;
-    form.month = stakingRewards.month;
+    form.month = stakingRewards.month
+    const releaseDate = new Date(stakingRewards.release_date);
+    const year = releaseDate.getFullYear();
+    const month = String(releaseDate.getMonth() + 1).padStart(2, '0');
+    const day = String(releaseDate.getDate()).padStart(2, '0');
+    form.date = `${year}-${month}-${day}`;
     stakingReward.value = stakingRewards;
     editModal.value = true;
     // console.log(form.date);
@@ -116,11 +122,13 @@ const closeModal = () => {
 const form = useForm({
     percent: '',
     month: '',
+    date: '',
 });
 
 function clearField() {
     form.percent = '';
     form.month = '';
+    form.date = '';
 }
 
 const submit = () => {
@@ -154,6 +162,19 @@ const months = [
     {value: 'November', label: 'November'},
     {value: 'December', label: 'December'},
 ];
+
+// function generateDates(month) {
+//     const index = months.findIndex(item => item.value === month);
+//     if (index !== -1) {
+//         const numDays = new Date(new Date().getFullYear(), index + 1, 0).getDate();
+//         return Array.from({ length: numDays }, (_, i) => ({ value: `${i + 1}`, label: `${i + 1}` }));
+//     }
+// }
+
+// watch(()=> form.month, (newValue) => {
+//     form.date = '';
+//     dates.value = generateDates(newValue);
+// });
 
 </script>
 
@@ -213,6 +234,9 @@ const months = [
                             Date
                         </th>
                         <th scope="col" class="px-3 py-4 text-center">
+                            Release Date
+                        </th>
+                        <th scope="col" class="px-3 py-4 text-center">
                             Percent (%)
                         </th>
                         <th scope="col" class="px-3 py-4 text-center">
@@ -238,6 +262,9 @@ const months = [
                     >
                         <td class="px-3 py-4">
                             {{ formatDateTime(stakingReward.created_at) }}
+                        </td>
+                        <td class="px-3 py-4 text-center">
+                            {{ formatDateTime(stakingReward.release_date) }}
                         </td>
                         <td class="px-3 py-4 text-center">
                             {{ stakingReward.percent }}
@@ -308,7 +335,7 @@ const months = [
                         </div>
                     </div>
                     <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
-                        <Label class="text-sm dark:text-white" for="month" value="month" />
+                        <Label class="text-sm dark:text-white" for="month" value="Month" />
                         <div class="md:col-span-3">
                             <BaseListbox
                                 v-model="form.month"
@@ -317,6 +344,21 @@ const months = [
                             />
                         </div>
                     </div>
+                    <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
+                        <Label class="text-sm dark:text-white" for="date" value="Release Date" />
+                        <div class="md:col-span-3">
+                            <vue-tailwind-datepicker
+                                id="date"
+                                placeholder="Select dates"
+                                :formatter="formatter"
+                                separator=" - "
+                                v-model="form.date"
+                                as-single
+                            />
+                            <InputError :message="form.errors.date" class="mt-2" />
+                        </div>
+                    </div>
+
                 </div>
                 <div class="flex pt-8 gap-3 justify-end border-t dark:border-gray-700">
                     <Button

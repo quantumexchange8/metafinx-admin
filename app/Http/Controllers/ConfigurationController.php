@@ -581,7 +581,7 @@ class ConfigurationController extends Controller
     {
         $settingStakingReward = SettingStakingReward::create([
             'month' => $request->month,
-            'release_date' => null,
+            'release_date' => $request->date,
             'percent' => $request->percent,
             'updated_by' => \Auth::id(),
         ]);
@@ -597,6 +597,7 @@ class ConfigurationController extends Controller
         $existingStakingReward->update([
             'percent' => $request->percent,
             'month' => $request->month,
+            'release_date' => $request->date,
             'updated_by' => \Auth::id(),
         ]);
     

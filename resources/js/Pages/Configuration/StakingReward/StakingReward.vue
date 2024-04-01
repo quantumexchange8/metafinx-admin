@@ -24,15 +24,19 @@ const { hasRole, hasPermission } = usePermission();
 const { formatAmount } = transactionFormat();
 const month = ref('');
 const percent = ref('');
+const date = ref('');
+const dates = ref([]);
 
 const form = useForm({
     month: '',
     percent: '',
+    date: '',
 })
 
 function clearField() {
     form.month = '';
     form.percent = '';
+    form.date = '';
 }
 
 const months = [
@@ -50,8 +54,22 @@ const months = [
     {value: 'December', label: 'December'},
 ];
 
+function generateDates(month) {
+    const index = months.findIndex(item => item.value === month);
+    if (index !== -1) {
+        const numDays = new Date(new Date().getFullYear(), index + 1, 0).getDate();
+        return Array.from({ length: numDays }, (_, i) => ({ value: `${i + 1}`, label: `${i + 1}` }));
+    }
+}
+
+watch(month, (newValue) => {
+    form.date = '';
+    dates.value = generateDates(newValue);
+});
+
 const submit = () => {
     form.month = month.value;
+    form.date = date.value;
     form.percent = percent.value;
 
     form.post(route('configuration.addStakingReward'), {
@@ -102,6 +120,22 @@ const submit = () => {
                             :options="months"
                             placeholder="Select Month"
                         />
+                        <InputError :message="form.errors.month" class="mt-2" />
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1 md:grid md:grid-cols-4">
+                    <Label class="text-sm dark:text-white" for="date" value="Release Date" />
+                    <div class="md:col-span-3">
+                        <vue-tailwind-datepicker
+                            id="date"
+                            placeholder="Select dates"
+                            :formatter="formatter"
+                            separator=" - "
+                            v-model="date"
+                            as-single
+                        />
+                        <InputError :message="form.errors.date" class="mt-2" />
                     </div>
                 </div>
 
