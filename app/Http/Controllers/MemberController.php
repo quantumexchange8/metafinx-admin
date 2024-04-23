@@ -3,41 +3,43 @@
 namespace App\Http\Controllers;
 
 use App\Models\Coin;
-use App\Models\CoinPrice;
 use App\Models\User;
 use Inertia\Inertia;
 use App\Models\Wallet;
 use App\Models\Earning;
+use App\Models\CoinPrice;
 use App\Models\SettingCoin;
 use App\Models\SettingRank;
+use App\Models\Transaction;
+use App\Models\CoinStacking;
 use Illuminate\Http\Request;
 use App\Models\CoinAdjustment;
+use App\Models\CoinMultiLevel;
+use App\Models\PaymentAccount;
 use App\Models\SettingCountry;
 use Illuminate\Support\Carbon;
+use App\Models\AssetAdjustment;
 use App\Models\BalanceAdjustment;
+use App\Exports\MemberListingExport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\InvestmentSubscription;
+use App\Services\RunningNumberService;
 use App\Http\Requests\AddMemberRequest;
 use Spatie\Activitylog\Models\Activity;
+use App\Exports\MemberListingTypeExport;
 use App\Http\Requests\EditMemberRequest;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\KycApprovalRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use App\Http\Requests\CoinAdjustmentRequest;
+use App\Http\Requests\PaymentAccountRequest;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Requests\WalletAdjustmentRequest;
-use App\Models\AssetAdjustment;
-use App\Models\Transaction;
 use App\Notifications\KycApprovalNotification;
 use Illuminate\Validation\ValidationException;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\MemberListingExport;
-use App\Exports\MemberListingTypeExport;
-use App\Services\RunningNumberService;
-use App\Models\CoinMultiLevel;
-use App\Models\CoinStacking;
 
 class MemberController extends Controller
 {
@@ -286,6 +288,7 @@ class MemberController extends Controller
         $walletSum = Wallet::where('user_id', $user->id)->sum('balance');
         $referralCount = User::where('upline_id', $user->id)->count();
         $coins = Coin::with('setting_coin')->where('user_id', $user->id)->get();
+        $paymentAccounts = PaymentAccount::where('user_id', $user->id)->get();
 
         return Inertia::render('Member/MemberDetails/MemberDetail', [
             'member_details' => $user,
@@ -300,6 +303,7 @@ class MemberController extends Controller
             // 'total_affiliate' => count($user->getChildrenIds()),
             'self_deposit' => floatval($this->getSelfDeposit($user)),
             'valid_affiliate_deposit' => floatval($this->getValidAffiliateDeposit($user)),
+            'paymentAccounts' => $paymentAccounts,
         ]);
     }
 
@@ -1050,5 +1054,23 @@ class MemberController extends Controller
 
         return response()->json($detail);
     }
+
+    public function updatePaymentAccount(PaymentAccountRequest $request)
+    {
+        $paymentAccount = PaymentAccount::find($request->id);
+    
+        if ($paymentAccount) {
+            $paymentAccount->update([
+                'payment_account_name' => $request->payment_account_name,
+                'payment_platform_name' => $request->payment_platform_name,
+                'account_no' => $request->account_no,
+                'status' => $request->status,
+            ]);
+    
+            return back()->with('title', 'Success! Payment Account Updated')->with('success', 'The payment account has been successfully updated.');
+        }
+    
+        return back()->withErrors(['message' => 'Payment account not found']);
+    }    
 
 }

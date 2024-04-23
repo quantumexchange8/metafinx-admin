@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import {ref} from "vue";
+import {ref, onMounted} from "vue";
 import Button from "@/Components/Button.vue";
 import {
     ChevronRight,
@@ -28,7 +28,10 @@ import Action from "@/Pages/Member/MemberDetails/Partials/Action.vue";
 import AccountInformation from "@/Pages/Member/MemberDetails/Partials/AccountInformation.vue";
 import EarningInformation from "@/Pages/Member/MemberDetails/Partials/EarningInformation.vue";
 import {transactionFormat} from "@/Composables/index.js";
+import toast from "@/Composables/toast.js";
 import Tooltip from "@/Components/Tooltip.vue";
+import { CreditEditIcon } from "@/Components/Icons/outline.jsx";
+import PaymentAccountDetail from "@/Pages/Member/MemberDetails/Partials/PaymentAccountDetail.vue"
 
 const props = defineProps({
     wallets: Object,
@@ -41,7 +44,8 @@ const props = defineProps({
     walletSum: Number,
     referralCount: Number,
     self_deposit: Number,
-    valid_affiliate_deposit: Number
+    valid_affiliate_deposit: Number,
+    paymentAccounts: Object,
 })
 
 const isLoading = ref(false);
@@ -50,6 +54,8 @@ const frontIdentityModal = ref(false);
 const backIdentityModal = ref(false);
 const { formatAmount } = transactionFormat();
 const tooltipContent = ref('Copy');
+const paymentModal = ref(false);
+const paymentDetails = ref(null);
 
 function refreshTable() {
     isLoading.value = !isLoading.value;
@@ -109,6 +115,56 @@ function copyTestingCode () {
     walletAddressCopy.setAttribute('type', 'hidden')
     window.getSelection().removeAllRanges()
 }
+
+const openModal = (paymentAccount) => {
+    paymentModal.value = true;
+    paymentDetails.value = paymentAccount;
+}
+
+const closeModal = () => {
+    paymentModal.value = false
+}
+
+const handleCloseModal = () => {
+    closeModal(); 
+}
+
+const copyAccountNumber = (accountNumber) => {
+    const tempInput = document.createElement('input');
+    tempInput.value = accountNumber;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+
+    toast.add({
+        message: 'Copy Successful!',
+    });
+}
+
+const screenWidth = ref(window.innerWidth);
+
+onMounted(() => {
+    window.addEventListener('resize', () => {
+        screenWidth.value = window.innerWidth;
+    });
+});
+
+const truncatedAccountNumber = (accountNumber) => {
+    let maxLength = 20; // Default max length for mobile screens
+
+    // Adjust maxLength based on screen width
+    if (screenWidth.value > 768) {
+        maxLength = 35; // Adjust max length for wider screens
+    }
+
+    if (accountNumber.length > maxLength) {
+        return accountNumber.slice(0, maxLength) + "...";
+    } else {
+        return accountNumber;
+    }
+}
+
 </script>
 
 <template>
@@ -306,6 +362,56 @@ function copyTestingCode () {
             </div>
         </div>
 
+        <div class="flex flex-col gap-5 mb-8">
+            <h3 class="text-base font-semibold border-b border-gray-700 pb-5">
+                Payment Account
+            </h3>
+            <div class="space-y-5">
+                <div v-if="paymentAccounts.length === 0" class="flex justify-center">
+                    No Payment Accounts
+                </div>
+
+                <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <div v-for="paymentAccount in paymentAccounts" class="flex flex-col overflow-hidden rounded-[20px] w-full border border-gray-00 dark:border-gray-800">
+                        <div
+                            class="flex justify-between h-32 bg-gradient-to-bl from-gray-300 to-gray-500"
+                        >
+                            <div class="py-5 px-4 flex flex-col gap-2">
+                                <div class="flex flex-col">
+                                    <div class="text-base font-semibold text-gray-100 dark:text-white">
+                                        {{ paymentAccount.payment_account_name }}
+                                    </div>
+                                    <div class="text-xl font-semibold text-gray-100 dark:text-white flex items-center">
+                                        <span>{{ truncatedAccountNumber(paymentAccount.account_no) }}</span>
+                                        <div @click.prevent="copyAccountNumber(paymentAccount.account_no)" class="ml-2">
+                                            <DuplicateIcon class="w-5 hover:cursor-pointer" />
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <Tooltip content="Payment Account Detail" placement="right">
+                                            <Button
+                                                type="button"
+                                                class="justify-center p-1 w-8 h-8 relative focus:outline-none dark:bg-[#ffffff32]"
+                                                variant="transparent"
+                                                @click="openModal(paymentAccount)"
+                                                pill
+                                            >
+                                                <CreditEditIcon aria-hidden="true" class="w-5 h-5 absolute" />
+                                                <span class="sr-only">Payment Account Detail</span>
+                                            </Button>
+                                        </Tooltip>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <Modal :show="paymentModal" title="Payment Account Detail" @close="closeModal" max-width="lg">
+            <PaymentAccountDetail :paymentDetails="paymentDetails" @closeModal="handleCloseModal"/>
+        </Modal>
 
         <div class="flex flex-col md:flex-row items-start gap-8 text-base text-gray-800 dark:text-white">
             <AccountInformation
