@@ -153,11 +153,6 @@ onMounted(() => {
 const truncatedAccountNumber = (accountNumber) => {
     let maxLength = 20; // Default max length for mobile screens
 
-    // Adjust maxLength based on screen width
-    if (screenWidth.value > 768) {
-        maxLength = 35; // Adjust max length for wider screens
-    }
-
     if (accountNumber.length > maxLength) {
         return accountNumber.slice(0, maxLength) + "...";
     } else {
